@@ -4,17 +4,35 @@ import '../css/app.css';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { ConfigProvider } from 'antd';
+import viVN from 'antd/locale/vi_VN';
+import { Provider } from "react-redux";
+import { store, persistor } from "@/redux/store.js";
+import 'antd/dist/reset.css'
+import { PersistGate } from 'redux-persist/integration/react'
+import Toast from "@/Components/Toast.jsx";
+import Loading from "@/Components/Loading.jsx";
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: (title) => `${title}`,
     resolve: (name) => resolvePageComponent(`./Pages/${name}.jsx`, import.meta.glob('./Pages/**/*.jsx')),
-    setup({ el, App, props }) {
+    setup({el, App, props}) {
         const root = createRoot(el);
-        root.render(<App {...props} />);
+        root.render(
+            <Provider store={store}>
+                <PersistGate loading={null} persistor={persistor}>
+                    <React.StrictMode>
+                        <Loading />
+                        <Toast />
+                        <App {...props}/>
+                    </React.StrictMode>
+                </PersistGate>
+            </Provider>
+        );
     },
     progress: {
         color: '#4B5563',
     },
-});
+}).then(r => console.log('----- App made by Bui Huy Anh -------'));
