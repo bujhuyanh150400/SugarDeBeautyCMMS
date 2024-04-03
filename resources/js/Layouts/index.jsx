@@ -1,9 +1,9 @@
 import {Layout as LayoutAntd } from 'antd';
-import LeftMenu from "@/layouts/LeftMenu.jsx";
-import Header from "@/layouts/Header.jsx";
+import LeftMenu from "@/Layouts/LeftMenu.jsx";
+import Header from "@/Layouts/Header.jsx";
 const {Content} = LayoutAntd;
 
-const Layout = ({children}) => {
+const LayoutCMMS = ({children}) => {
     return (
         <LayoutAntd hasSider>
             <LeftMenu/>
@@ -18,4 +18,4 @@ const Layout = ({children}) => {
         </LayoutAntd>
     );
 }
-export default Layout;
+export default LayoutCMMS;

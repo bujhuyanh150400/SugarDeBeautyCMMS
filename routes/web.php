@@ -1,9 +1,8 @@
 <?php
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,10 +14,13 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Login', [
-    ]);
+
+Route::middleware('guest')->group(function (){
+    Route::get('/',[DashboardController::class,'index'])->name('dashboard');
+    Route::get('/view_login',[AuthController::class,'view_login'])->name('view_login');
+    Route::post('/login',[AuthController::class,'login'])->name('login');
 });
+
 
 
 

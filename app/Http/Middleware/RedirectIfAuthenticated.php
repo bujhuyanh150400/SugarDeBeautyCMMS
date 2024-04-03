@@ -10,21 +10,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle(Request $request, Closure $next, string ...$guards): Response
+    public function handle(Request $request, Closure $next): Response
     {
-        $guards = empty($guards) ? [null] : $guards;
-
-        foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+        if (Auth::check()) {
+            if ($request->route()->getName() === 'view_login') {
+                return redirect()->route('dashboard');
+            }
+        } else {
+            if ($request->route()->getName() !== 'view_login' && $request->method() !== 'POST') {
+                return redirect()->route('view_login');
             }
         }
-
         return $next($request);
     }
 }

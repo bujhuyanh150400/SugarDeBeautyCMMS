@@ -2,13 +2,11 @@ import {Button, Layout, Flex, Image, Dropdown, Badge, Modal} from 'antd';
 import {BellOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined} from "@ant-design/icons";
 import {setCollapsedMenu, setLoading} from "@/redux/reducers/AppSlice.js";
 import {useDispatch, useSelector} from "react-redux";
-import logo from "~/assets/logo.png";
-import {Link} from "react-router-dom";
+import logo from "@/assets/logo.png";
 import {v4 as uuid} from 'uuid';
 import {createSelector} from "@reduxjs/toolkit";
 import {useState} from "react";
 const {HeaderAntd} = Layout;
-import apiRequest from "~/service/apiRequest.js";
 import {handleErrorApi} from "@/utils/function.js"
 import {openToast} from "@/redux/reducers/ToastSlice.js";
 import Constant from "@/utils/constant.js";
