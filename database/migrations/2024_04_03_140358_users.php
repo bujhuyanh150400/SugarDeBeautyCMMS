@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('description')->nullable()->comment('Mô tả về nhân viên');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
+            $table->smallInteger('is_deleted')->default(0)->comment('0 - chưa xóa | 1 - đã xóa');
             $table->unsignedBigInteger('facility_id')->nullable()->comment('Cơ sở làm việc');
             $table->unsignedBigInteger('specialties_id')->nullable()->comment('Chuyên ngành làm việc');
             $table->foreign('facility_id')->references('id')->on('facilities')->onDelete('cascade');

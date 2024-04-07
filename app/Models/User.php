@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -24,7 +25,7 @@ class User extends Authenticatable
         'created_by',
         'updated_by',
         'avatar',
-        'specialty_id',
+        'facility_id',
         'description',
         'specialties_id',
     ];
@@ -35,4 +36,35 @@ class User extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
+
+    public function facility(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Facilities::class);
+    }
+    public function specialties(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Specialties::class);
+    }
+    public function scopeKeywordFilter(Builder $query, $keyword = null): void
+    {
+        if (!empty($keyword)) {
+            $keyword = strtolower($keyword);
+            $query->whereRaw('LOWER(email) LIKE ?', '%' . $keyword . '%')
+                ->orWhereRaw('LOWER(name) LIKE ?', '%' . $keyword . '%')
+                ->orWhere('id', '=', intval($keyword));
+        }
+    }
+    public function scopePermissionFilter(Builder $query, $permission = null): void
+    {
+        if (!empty($permission)) {
+            $query->where('permission', $permission);
+        }
+    }
+    public function scopeFacilityFilter(Builder $query, $facility_id = null): void
+    {
+        if (!empty($facility_id)) {
+            $query->where('facility_id', $facility_id);
+        }
+    }
+
 }

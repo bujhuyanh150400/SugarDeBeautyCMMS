@@ -4,9 +4,8 @@ import {
 import {Layout, Menu} from 'antd';
 import {useSelector} from "react-redux";
 import {v4 as uuid} from 'uuid';
-import {Link, router} from '@inertiajs/react';
+import {Link, usePage} from '@inertiajs/react';
 
-const {Sider} = Layout;
 
 const setMenu = {
     /**
@@ -19,7 +18,7 @@ const setMenu = {
      */
     itemMenu: (label, link, icon = '', disabled = false) => {
         return {
-            label: <Link to={`${link}`}>{label}</Link>,
+            label: <Link replace href={`/${link}`}>{label}</Link>,
             key: uuid(),
             icon,
             disabled,
@@ -45,15 +44,16 @@ const setMenu = {
 };
 
 const itemMenu = [
-    setMenu.itemMenu('Dashboard', '/', <DashboardOutlined/>),
+    setMenu.itemMenu('Dashboard', '', <DashboardOutlined/>),
     setMenu.subMenu('Nhân sự', <UserOutlined/>, [
-        setMenu.itemMenu('Quản lý nhân sự', '/ManagerUsers'),
+        setMenu.itemMenu('Quản lý nhân sự', 'user/list'),
     ])
 ];
 
 
 const LeftMenu = () => {
-    const location = router().current();
+    const page = usePage();
+    const parentPath = page.url.split('/').splice(1,2).shift();
     /**
      * Hàm đệ quy để tìm kiếm MenuItem tương ứng với đường dẫn hiện tại
      * @param {array} itemMenu
@@ -63,33 +63,42 @@ const LeftMenu = () => {
         let selectedKey = null;
         let openKeys = [];
         for (const menuItem of itemMenu) {
-            if (menuItem.link === location.pathname) {
+            let urlPathParent = menuItem.link ?  menuItem.link.split('/').shift() : ''
+            if (urlPathParent === parentPath) {
                 selectedKey = menuItem.key;
                 openKeys.push(menuItem.key);
-                return { selectedKey, openKeys };
+                return {selectedKey, openKeys};
             } else if (menuItem.children && menuItem.children.length > 0) {
-                const { selectedKey: childSelectedKey, openKeys: childOpenKeys } = findLocation(menuItem.children);
+                const {selectedKey: childSelectedKey, openKeys: childOpenKeys} = findLocation(menuItem.children);
                 if (childSelectedKey) {
                     selectedKey = childSelectedKey;
                     openKeys = openKeys.concat(menuItem.key, childOpenKeys);
-                    return { selectedKey, openKeys };
+                    return {selectedKey, openKeys};
                 }
             }
         }
-        return { selectedKey, openKeys };
+        return {selectedKey, openKeys};
     };
-    const { selectedKey, openKeys } = findLocation(itemMenu);
+    const {selectedKey, openKeys} = findLocation(itemMenu);
     const statusMenu = useSelector(state => state.app.collapsedMenu);
     return (
-        <Sider trigger={null} collapsible collapsed={statusMenu}>
-            <Menu className="sticky top-0 left-0 bottom-0  h-screen"
-                  theme="light"
-                  mode="inline"
-                  selectedKeys={[selectedKey]}
-                  defaultOpenKeys={openKeys}
-                  items={itemMenu}
+        <Layout.Sider trigger={null} collapsible collapsed={statusMenu}>
+            <Menu
+                style={{
+                    position: "sticky",
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    height: "100vh",
+                    zIndex: '999',
+                }}
+                theme="light"
+                mode="inline"
+                selectedKeys={[selectedKey]}
+                defaultOpenKeys={openKeys}
+                items={itemMenu}
             />
-        </Sider>
+        </Layout.Sider>
 
     );
 }

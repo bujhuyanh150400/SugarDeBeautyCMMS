@@ -1,13 +1,11 @@
 import LayoutCMMS from "@/Layouts/index.jsx";
 
 
-const Dashboard = () => {
+const Dashboard = ({title}) => {
     return (
-        <>
-            <LayoutCMMS>
-                test 1234
-            </LayoutCMMS>
-        </>
+        <LayoutCMMS title={title}>
+            test 1234
+        </LayoutCMMS>
     )
 }
 export default Dashboard;

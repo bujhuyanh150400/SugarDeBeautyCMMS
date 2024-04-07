@@ -11,7 +11,11 @@ class DashboardController extends Controller
     {
         parent::__construct();
     }
-    public function index() {
-        return Inertia::render('Dashboard',[]);
+
+    public function index()
+    {
+        return Inertia::render('Dashboard', [
+            'title' => 'Trang chủ'
+        ]);
     }
 }

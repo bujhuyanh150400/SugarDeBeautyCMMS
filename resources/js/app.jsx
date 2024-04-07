@@ -1,17 +1,15 @@
+import {createRoot} from 'react-dom/client';
+import {createInertiaApp} from '@inertiajs/react';
+import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
+import React from 'react'
+import {ConfigProvider} from 'antd';
 import './bootstrap';
 import '../css/app.css';
-
-import { createRoot } from 'react-dom/client';
-import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { ConfigProvider } from 'antd';
 import viVN from 'antd/locale/vi_VN';
-import { Provider } from "react-redux";
-import { store, persistor } from "@/redux/store.js";
+import {Provider} from "react-redux";
+import {store, persistor} from "@/redux/store.js";
 import 'antd/dist/reset.css'
-import { PersistGate } from 'redux-persist/integration/react'
+import {PersistGate} from 'redux-persist/integration/react'
 import Toast from "@/Components/Toast.jsx";
 import Loading from "@/Components/Loading.jsx";
 
@@ -23,11 +21,13 @@ createInertiaApp({
         root.render(
             <Provider store={store}>
                 <PersistGate loading={null} persistor={persistor}>
-                    <React.StrictMode>
-                        <Loading />
-                        <Toast />
-                        <App {...props}/>
-                    </React.StrictMode>
+                    <ConfigProvider autoInsertSpaceInButton={false} locale={viVN}>
+                        <React.StrictMode>
+                            <Loading/>
+                            <Toast/>
+                            <App {...props}/>
+                        </React.StrictMode>
+                    </ConfigProvider>
                 </PersistGate>
             </Provider>
         );

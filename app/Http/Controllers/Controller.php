@@ -10,6 +10,13 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
+    const PER_PAGE = 2;
+    const FILE_PATH_ADMIN = 'file_storage/admin/';
+    protected function getIdAsTimestamp(): int
+    {
+        return intval(date('ymdHis') . rand(10, 9999));
+    }
+
     public function __construct()
     {
     }

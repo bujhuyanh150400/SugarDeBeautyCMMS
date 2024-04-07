@@ -1,55 +1,68 @@
 import {Button, Layout, Flex, Image, Dropdown, Badge, Modal} from 'antd';
-import {BellOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined} from "@ant-design/icons";
+import {
+    BellOutlined,
+    ExclamationCircleFilled,
+    LogoutOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    UserOutlined
+} from "@ant-design/icons";
 import {setCollapsedMenu, setLoading} from "@/redux/reducers/AppSlice.js";
 import {useDispatch, useSelector} from "react-redux";
-import logo from "@/assets/logo.png";
-import {v4 as uuid} from 'uuid';
-import {createSelector} from "@reduxjs/toolkit";
-import {useState} from "react";
-const {HeaderAntd} = Layout;
-import {handleErrorApi} from "@/utils/function.js"
+import {v4 as uuidv4, v4 as uuid} from 'uuid';
+import {useEffect, useState} from "react";
+import {router, usePage} from "@inertiajs/react";
 import {openToast} from "@/redux/reducers/ToastSlice.js";
 import Constant from "@/utils/constant.js";
-
-const selectStatusMenu = state => state.app.collapsedMenu;
-const selectLogin = state => state.login.currentUser;
-
-
-const selectMenuAndLogin = createSelector(
-    selectStatusMenu,
-    selectLogin,
-    (statusMenu, login) => ({ statusMenu, login }));
 
 
 const HeaderAdmin = () => {
     const dispatch = useDispatch();
-    const statusMenu = useSelector(selectMenuAndLogin);
+    const page = usePage();
+    const currentUser = page.props.auth.user;
+    const statusMenu = useSelector(state => state.app.collapsedMenu);
     const [openAccountModal, setOpenAccountModal] = useState(false);
-    /**
-     * Function xử lý  logout
-     * @return {Promise<void>}
-     */
     const handleLogout = async () => {
-        console.log('test');
+        Modal.confirm({
+            title: 'Bạn có muốn đăng xuất không ?',
+            icon: <ExclamationCircleFilled/>,
+            okText: 'Tôi muốn đăng xuất',
+            cancelText: 'Không',
+            onOk() {
+                router.post('/logout')
+            },
+            onCancel() {
+                return false
+            }
+        });
     }
-
     const items = [
         {
             key: uuid(),
             label: "Thông tin tài khoản",
-            onClick: ()=>setOpenAccountModal(true)
+            onClick: () => setOpenAccountModal(true)
         },
         {
             key: uuid(),
-            icon: <LogoutOutlined />,
-            danger:true,
+            icon: <LogoutOutlined/>,
+            danger: true,
             label: "Đăng xuất",
-            onClick : handleLogout,
+            onClick: handleLogout,
         },
     ];
     return (
         <>
-            <HeaderAntd className="sticky top-0 w-full p-0 bg-white pe-10">
+            <Layout.Header
+                style={{
+                    position: 'sticky',
+                    top: 0,
+                    width: '100%',
+                    padding: '0 2.5rem 0 0',
+                    background: '#fff',
+                    zIndex: '999',
+                    borderBottom:'1px solid #ccc'
+                }}
+            >
                 <Flex align="center" justify="space-between">
                     {/*Logo and btn menu*/}
                     <Flex align="center" gap="small">
@@ -63,15 +76,6 @@ const HeaderAdmin = () => {
                                 height: 64,
                             }}
                         />
-                        <Link to="/" className="w-[200px] flex items-center justify-center">
-                            <Image
-                                preview={false}
-                                width="fit-content"
-                                height="fit-content"
-                                src={logo}
-                                alt="Logo HVBASE"
-                            />
-                        </Link>
                     </Flex>
                     {/* Account and notification */}
                     <Flex align="center" gap="small">
@@ -82,34 +86,33 @@ const HeaderAdmin = () => {
                             arrow
                         >
                             <Button
-                                icon={<UserOutlined />}
+                                icon={<UserOutlined/>}
                                 size="large">
-                                test124
+                                {currentUser.name}
                             </Button>
                         </Dropdown>
                         <Badge count={21} overflowCount={20}>
                             <Button
-                                icon={<BellOutlined />}
+                                icon={<BellOutlined/>}
                                 size="large">
                             </Button>
                         </Badge>
                     </Flex>
                 </Flex>
-            </HeaderAntd>
+            </Layout.Header>
             <Modal
                 open={openAccountModal}
                 title={`Thông tin tài khoản `}
-                onCancel={()=>setOpenAccountModal(false)}
+                onCancel={() => setOpenAccountModal(false)}
                 footer={[
-                    <Button danger="true" key="back" onClick={()=>setOpenAccountModal(false)}>
-                        Thoát
+                    <Button onClick={() => {
+                        router.get('/');
+                        setOpenAccountModal(false);
+                    }}>
+                        hehe
                     </Button>,
                 ]}
             >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
                 <p>Some contents...</p>
             </Modal>
         </>

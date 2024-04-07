@@ -10,12 +10,12 @@ use Inertia\Inertia;
 class AuthController extends Controller
 {
 
-    public function view_login()
+    public function view_login(): \Inertia\Response
     {
         return Inertia::render('Login');
     }
 
-    public function login(Request $request)
+    public function login(Request $request): \Illuminate\Http\RedirectResponse
     {
         $validator = Validator::make($request->all(), [
             'email' => ['required', 'email'],
@@ -42,7 +42,9 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-
+        Auth::logout();
+        // Xóa session hoặc thực hiện bất kỳ xử lý đăng xuất nào khác nếu cần thiết
+        $request->session()->invalidate();
+        return redirect()->route('view_login');
     }
-
 }
