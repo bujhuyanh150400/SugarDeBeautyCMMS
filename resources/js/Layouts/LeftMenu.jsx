@@ -47,6 +47,8 @@ const itemMenu = [
     setMenu.itemMenu('Dashboard', '', <DashboardOutlined/>),
     setMenu.subMenu('Nhân sự', <UserOutlined/>, [
         setMenu.itemMenu('Quản lý nhân sự', 'user/list'),
+        setMenu.itemMenu('Quản lý cơ sở', 'facilities/list'),
+        setMenu.itemMenu('Quản lý chuyên môn', 'specialties/list'),
     ])
 ];
 

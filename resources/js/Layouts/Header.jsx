@@ -7,13 +7,11 @@ import {
     MenuUnfoldOutlined,
     UserOutlined
 } from "@ant-design/icons";
-import {setCollapsedMenu, setLoading} from "@/redux/reducers/AppSlice.js";
+import {setCollapsedMenu} from "@/redux/reducers/AppSlice.js";
 import {useDispatch, useSelector} from "react-redux";
-import {v4 as uuidv4, v4 as uuid} from 'uuid';
-import {useEffect, useState} from "react";
+import {v4 as uuid} from 'uuid';
+import {useState} from "react";
 import {router, usePage} from "@inertiajs/react";
-import {openToast} from "@/redux/reducers/ToastSlice.js";
-import Constant from "@/utils/constant.js";
 
 
 const HeaderAdmin = () => {
@@ -60,7 +58,7 @@ const HeaderAdmin = () => {
                     padding: '0 2.5rem 0 0',
                     background: '#fff',
                     zIndex: '999',
-                    borderBottom:'1px solid #ccc'
+                    borderBottom: '1px solid #ccc'
                 }}
             >
                 <Flex align="center" justify="space-between">

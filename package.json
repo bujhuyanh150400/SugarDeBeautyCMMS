@@ -26,6 +26,7 @@
         "@reduxjs/toolkit": "^2.2.3",
         "antd": "^5.16.1",
         "dayjs": "^1.11.10",
+        "lodash": "^4.17.21",
         "react-redux": "^9.1.0",
         "redux-persist": "^6.0.0",
         "redux-thunk": "^3.1.0",

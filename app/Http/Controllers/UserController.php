@@ -98,7 +98,6 @@ class UserController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-
         $data = [
             'id' => $this->getIdAsTimestamp(),
             'email' => $request->input('email'),

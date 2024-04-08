@@ -40,7 +40,7 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): \Illuminate\Http\RedirectResponse
     {
         Auth::logout();
         // Xóa session hoặc thực hiện bất kỳ xử lý đăng xuất nào khác nếu cần thiết

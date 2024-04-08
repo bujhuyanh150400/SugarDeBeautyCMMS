@@ -10,37 +10,41 @@ import {
     UserOutlined
 } from "@ant-design/icons";
 import {v4 as uuid} from 'uuid';
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 
 const List = (props) => {
     const {facilities,filter, users} = props;
     const permissions = Object.values(props.auth.permission);
-    const {data, setData, submit, processing, errors} = useForm({
-        keyword: '',
-        facility: '',
-        permission: ''
+    const [dataFilter,setDataFilters] = useState({
+        keyword:'',
+        facility:'',
+        permission: '',
     });
-    useEffect(()=>{
-        if(filter.keyword){
-            data.keyword = filter.keyword;
+    useEffect(() => {
+        let updatedFilters = {};
+        if (filter.keyword) {
+            updatedFilters = { ...updatedFilters, keyword: filter.keyword };
         }
-        if (filter.facility){
-            setData('facility',filter.facility);
+        if (filter.facility) {
+            updatedFilters = { ...updatedFilters, facility: filter.facility };
         }
-        if (filter.permission){
-            setData('facility',filter.permission);
+        if (filter.permission) {
+            updatedFilters = { ...updatedFilters, permission: filter.permission };
         }
-    },[filter])
+        setDataFilters(prevState => ({
+            ...prevState,
+            ...updatedFilters
+        }));
+    }, []);
     const handlePagination = async (pagination) => {
         await router.get('/user/list', {
             page: pagination.current,
-            filter: data
+            filter: dataFilter
         });
     }
     const filterForm = async () => {
-        console.log(data)
         await router.get('/user/list', {
-            filter: data
+            filter: dataFilter
         });
     }
     return (
@@ -69,8 +73,11 @@ const List = (props) => {
                                             name="keyword"
                                         >
                                             <Input
-                                                value={data.keyword}
-                                                onChange={(e) => setData('keyword', e.target.value)}
+                                                value={dataFilter.keyword}
+                                                onChange={(e) => setDataFilters(prevState => ({
+                                                    ...prevState,
+                                                    keyword: e.target.value
+                                                }))}
                                                 placeholder="Tìm theo ID, tên nhân viên, email nhân viên"/>
                                         </Form.Item>
                                     </Col>
@@ -82,8 +89,11 @@ const List = (props) => {
                                             <Select
                                                 showSearch
                                                 placeholder="Chọn cơ sở"
-                                                value={data.facility}
-                                                onChange={(value) => setData('facility', value)}
+                                                value={dataFilter.facility}
+                                                onChange={(value) => setDataFilters(prevState => ({
+                                                    ...prevState,
+                                                    facility: value
+                                                }))}
                                                 filterOption={(input, option) => {
                                                     return (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
                                                 }}
@@ -110,8 +120,11 @@ const List = (props) => {
                                             <Select
                                                 showSearch
                                                 placeholder="Chọn cơ sở"
-                                                value={data.permission}
-                                                onChange={(value) => setData('permission', value)}
+                                                value={dataFilter.permission}
+                                                onChange={(value) => setDataFilters(prevState => ({
+                                                    ...prevState,
+                                                    permission: value
+                                                }))}
                                                 filterOption={(input, option) => {
                                                     return (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
                                                 }}
@@ -137,7 +150,6 @@ const List = (props) => {
                                         Tìm kiếm
                                     </Button>
                                     <Button
-                                        htmlType="submit"
                                         style={{
                                             backgroundColor: '#52c41a',
                                             borderColor: '#52c41a',

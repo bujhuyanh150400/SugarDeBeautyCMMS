@@ -7,7 +7,7 @@ import {openToast} from "@/redux/reducers/ToastSlice.js";
 import {v4 as uuidv4} from "uuid";
 import Constant from "@/utils/constant.js";
 
-const Login = () => {
+const Login = (props) => {
     const dispatch = useDispatch()
     const { data, setData, post, processing, errors } = useForm({
         email: '',
@@ -15,7 +15,7 @@ const Login = () => {
     })
     const handleSubmit = async () => {
         await post('/login',data);
-        if (errors?.login){
+        if (props.errors?.login){
             dispatch(openToast({
                 id: uuidv4(),
                 type: Constant.ToastType.ERROR,

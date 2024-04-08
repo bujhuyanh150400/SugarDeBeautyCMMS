@@ -7,7 +7,9 @@ import {useEffect} from "react";
 import Constant from "@/utils/constant.js";
 import {openToast} from "@/redux/reducers/ToastSlice.js";
 import {v4 as uuidv4} from "uuid";
+import {useDispatch} from "react-redux";
 const LayoutCMMS = ({children,title,back_to}) => {
+    const dispatch = useDispatch();
     const flashMessage = usePage().props.flash
     useEffect(() => {
         if (flashMessage.success || flashMessage.error || flashMessage.warning || flashMessage.info) {
