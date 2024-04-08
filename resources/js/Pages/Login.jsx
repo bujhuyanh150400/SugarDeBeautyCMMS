@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Button, Flex, Card, Form, Input, Typography , Space } from 'antd';
 import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { useForm } from '@inertiajs/react'
@@ -13,8 +13,8 @@ const Login = (props) => {
         email: '',
         password: '',
     })
-    const handleSubmit = async () => {
-        await post('/login',data);
+
+    useEffect(()=>{
         if (props.errors?.login){
             dispatch(openToast({
                 id: uuidv4(),
@@ -23,6 +23,10 @@ const Login = (props) => {
                 description: errors?.login,
             }));
         }
+    },[props.errors])
+
+    const handleSubmit = async () => {
+        await post('/login',data);
     };
     return (
         <Flex style={{
