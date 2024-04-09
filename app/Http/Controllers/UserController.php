@@ -33,7 +33,7 @@ class UserController extends Controller
             ->paginate($limit);
         return Inertia::render('User/List', [
             'title' => $title,
-            'users' => $users,
+            'users' => fn () => $users,
             'query' => $request->query() ?: null,
             'facilities' => $facilities
         ]);
@@ -55,7 +55,9 @@ class UserController extends Controller
     {
         $facilityIds = Facilities::pluck('id')->toArray();
         $specialtyIds = Specialties::pluck('id')->toArray();
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make(
+            $request->all(),
+            [
             'email' => ['required', 'email', Rule::unique('users')],
             'name' => 'required',
             'password' => 'required|min:8|max:36',
@@ -68,7 +70,8 @@ class UserController extends Controller
             'facility_id' => ['required', Rule::in($facilityIds)],
             'specialties_id' => ['required', Rule::in($specialtyIds)],
             'description' => 'nullable|string',
-        ], [
+        ],
+            [
             'email.required' => 'Vui lòng nhập địa chỉ email.',
             'email.email' => 'Địa chỉ email không hợp lệ.',
             'email.unique' => 'Địa chỉ email đã tồn tại trong hệ thống.',

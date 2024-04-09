@@ -30,12 +30,18 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        if (Auth::attempt(['email' => $request->input('email'), 'password' => $request->input('password')])) {
-            $request->session()->regenerate();
-            return redirect()->route('dashboard');
-        } else {
+        try{
+            if (Auth::attempt(['email' => $request->input('email'), 'password' => $request->input('password')])) {
+                $request->session()->regenerate();
+                return redirect()->route('dashboard');
+            } else {
+                return redirect()->back()->withErrors([
+                    'login' => 'Email hoặc password của bạn không đúng hoặc không tồn tại',
+                ])->withInput();
+            }
+        }catch (\Exception $exception){
             return redirect()->back()->withErrors([
-                'login' => 'Email hoặc password của bạn không đúng hoặc không tồn tại',
+                'login' => 'Có lỗi về sự cố kĩ thuật, vui lòng liên hệ với quản trị viên',
             ])->withInput();
         }
     }

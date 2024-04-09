@@ -1,6 +1,6 @@
 import LayoutCMMS from "@/Layouts/index.jsx";
 import {Button, Form, Input, Col, Row, Select, Collapse, Flex, Typography, Table, Avatar} from "antd";
-import {router, useForm} from "@inertiajs/react";
+import {router, useForm, usePage} from "@inertiajs/react";
 import {
     DeleteOutlined,
     EditOutlined,
@@ -28,12 +28,22 @@ const List = (props) => {
         await router.get('/user/list', {
             page: pagination.current,
             ...query
-        },{ preserveState: true });
+        }, {
+            replace: true,
+            preserveState: true,
+            preserveScroll: true,
+            only: ['users']
+        });
     }
     const filterForm = async () => {
         await router.get('/user/list', {
             ...query
-        },{ preserveState: true });
+        }, {
+            replace: true,
+            preserveState: true,
+            preserveScroll: true,
+            only: ['users'],
+        });
     }
     return (
         <LayoutCMMS title={props.title}>

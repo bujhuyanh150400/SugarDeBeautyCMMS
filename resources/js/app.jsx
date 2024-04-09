@@ -33,6 +33,6 @@ createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#0284c7',
     },
 }).then(r => console.log('----- App made by Bui Huy Anh -------'));

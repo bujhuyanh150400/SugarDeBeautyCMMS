@@ -1,12 +1,7 @@
-import {
-    DashboardOutlined, UserOutlined,
-} from '@ant-design/icons';
 import {Layout, Menu} from 'antd';
 import {useSelector} from "react-redux";
-import {v4 as uuid} from 'uuid';
 import {Link, usePage} from '@inertiajs/react';
 import DynamicIcon from "@/Components/DynamicIcon.jsx";
-
 const LeftMenu = () => {
     const page = usePage();
     const parentPath = page.url.split('/').splice(1, 2).shift();
