@@ -183,6 +183,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         'PermissionAdmin' => \App\Helpers\PermissionAdmin::class,
+        'Menu' => \App\Helpers\Menu::class,
     ])->toArray(),
 
 ];

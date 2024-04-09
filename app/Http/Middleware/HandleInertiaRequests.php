@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use App\Helpers\PermissionAdmin;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-
+use App\Helpers\Menu;
 class HandleInertiaRequests extends Middleware
 {
     protected $rootView = 'app';
@@ -15,11 +15,13 @@ class HandleInertiaRequests extends Middleware
     }
     public function share(Request $request): array
     {
+        $menu = new Menu();
         return [
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
-                'permission' => PermissionAdmin::getList()
+                'permission' => PermissionAdmin::getList(),
+                'menu' => $menu->getListByPermission(),
             ],
             'flash' => [
                 'success' => $request->session()->get('success'),

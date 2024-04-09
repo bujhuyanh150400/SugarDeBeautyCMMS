@@ -5,67 +5,34 @@ import {Layout, Menu} from 'antd';
 import {useSelector} from "react-redux";
 import {v4 as uuid} from 'uuid';
 import {Link, usePage} from '@inertiajs/react';
-
-
-const setMenu = {
-    /**
-     * @description Item Menu: Dùng để set item menu ( ko có sub menu)
-     * @param {string} label
-     * @param {string} link
-     * @param {JSX.Element} icon
-     * @param {boolean} disabled
-     * @return {{icon: string, disabled: boolean, label: JSX.Element, key}}
-     */
-    itemMenu: (label, link, icon = '', disabled = false) => {
-        return {
-            label: <Link replace href={`/${link}`}>{label}</Link>,
-            key: uuid(),
-            icon,
-            disabled,
-            link
-        }
-    },
-    /**
-     * @description sub Menu: Dùng để set sub menu ( có menu con), còn nếu muốn label ko thì chỉ điền label
-     * @param {string} label
-     * @param {JSX.Element} icon
-     * @param {array}children
-     * @return {{children: *[], icon: string, label: string, type: string, key: string}}
-     */
-    subMenu: (label = '', icon = '', children = []) => {
-        return {
-            type: '',
-            label,
-            key: uuid(),
-            icon,
-            children
-        }
-    },
-};
-
-const itemMenu = [
-    setMenu.itemMenu('Dashboard', '', <DashboardOutlined/>),
-    setMenu.subMenu('Nhân sự', <UserOutlined/>, [
-        setMenu.itemMenu('Quản lý nhân sự', 'user/list'),
-        setMenu.itemMenu('Quản lý cơ sở', 'facilities/list'),
-        setMenu.itemMenu('Quản lý chuyên môn', 'specialties/list'),
-    ])
-];
-
+import DynamicIcon from "@/Components/DynamicIcon.jsx";
 
 const LeftMenu = () => {
     const page = usePage();
-    const parentPath = page.url.split('/').splice(1,2).shift();
-    /**
-     * Hàm đệ quy để tìm kiếm MenuItem tương ứng với đường dẫn hiện tại
-     * @param {array} itemMenu
-     * @return {{selectedKey: null, openKeys: *[]}|{selectedKey: *, openKeys: *[]}}
-     */
-    const findLocation = (itemMenu) => {
+    const parentPath = page.url.split('/').splice(1, 2).shift();
+    const menu = page.props.auth.menu;
+    // Chưa tối ưu lắm ...
+    let arrayMenu = menu.map((item_menu) => {
+        let children = item_menu.is_sub ? item_menu.children.map((children_item)=>{
+            return {
+                key: children_item.key,
+                label : <Link replace href={`/${children_item.href}`}>{children_item.label}</Link>,
+                link_uri: children_item.href
+            }
+        }) : null
+        return {
+            key: item_menu.key,
+            label : item_menu.is_sub ? item_menu.label : <Link replace href={`/${item_menu.href}`}>{item_menu.label}</Link>,
+            icon: (<DynamicIcon icon={item_menu.icon} />),
+            children: children,
+            link_uri: item_menu.href
+        }
+    });
+    const findLocation = (menu) => {
         let selectedKey = null;
         let openKeys = [];
-        for (const menuItem of itemMenu) {
-            let urlPathParent = menuItem.link ?  menuItem.link.split('/').shift() : ''
+        for (const menuItem of menu) {
+            let urlPathParent = menuItem.link_uri ? menuItem.link_uri.split('/').shift() : '';
             if (urlPathParent === parentPath) {
                 selectedKey = menuItem.key;
                 openKeys.push(menuItem.key);
@@ -80,8 +47,8 @@ const LeftMenu = () => {
             }
         }
         return {selectedKey, openKeys};
-    };
-    const {selectedKey, openKeys} = findLocation(itemMenu);
+    }
+    const {selectedKey, openKeys} = findLocation(arrayMenu);
     const statusMenu = useSelector(state => state.app.collapsedMenu);
     return (
         <Layout.Sider trigger={null} collapsible collapsed={statusMenu}>
@@ -98,7 +65,7 @@ const LeftMenu = () => {
                 mode="inline"
                 selectedKeys={[selectedKey]}
                 defaultOpenKeys={openKeys}
-                items={itemMenu}
+                items={arrayMenu}
             />
         </Layout.Sider>
 
