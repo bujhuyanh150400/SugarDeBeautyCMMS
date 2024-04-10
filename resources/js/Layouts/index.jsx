@@ -8,7 +8,8 @@ import Constant from "@/utils/constant.js";
 import {openToast} from "@/redux/reducers/ToastSlice.js";
 import {v4 as uuidv4} from "uuid";
 import {useDispatch} from "react-redux";
-const LayoutCMMS = ({children,title,back_to}) => {
+const LayoutCMMS = ({children,back_to}) => {
+    const {props} = usePage();
     const dispatch = useDispatch();
     const flashMessage = usePage().props.flash
     useEffect(() => {
@@ -38,7 +39,7 @@ const LayoutCMMS = ({children,title,back_to}) => {
     }, [flashMessage]);
     return (
         <LayoutAntd hasSider>
-            <Head title={title ?? "CMMS admin"}/>
+            <Head title={props.title ? props.title : "CMMS admin"}/>
             <LeftMenu />
             <LayoutAntd>
                 <Header/>
@@ -56,7 +57,7 @@ const LayoutCMMS = ({children,title,back_to}) => {
                         <Flex align="center" gap={12} style={{ paddingBottom:"2rem"}}>
                             {back_to ? <Button size="small" danger onClick={()=> router.get(back_to)} icon={<SwapLeftOutlined />}>Quay lại</Button> : ''}
                             <Typography.Title level={5} style={{ margin: 0 }}>
-                                {title}
+                                {props.title ? props.title : "CMMS admin"}
                             </Typography.Title>
                         </Flex>
                         {children}

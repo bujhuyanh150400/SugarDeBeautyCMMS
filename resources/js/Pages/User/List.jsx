@@ -1,5 +1,5 @@
 import LayoutCMMS from "@/Layouts/index.jsx";
-import {Button, Form, Input, Col, Row, Select, Collapse, Flex, Typography, Table, Avatar} from "antd";
+import {Button, Form, Input, Col, Row, Select, Collapse, Flex, Typography, Table, Avatar, Descriptions} from "antd";
 import {router, useForm, usePage} from "@inertiajs/react";
 import {
     DeleteOutlined,
@@ -45,8 +45,12 @@ const List = (props) => {
             only: ['users'],
         });
     }
+
+    const seeDetailUser = async (id) => {
+        router.get(`/user/detail/${id}`);
+    }
     return (
-        <LayoutCMMS title={props.title}>
+        <LayoutCMMS>
             <Form
                 layout="vertical"
                 name="basic"
@@ -138,14 +142,10 @@ const List = (props) => {
             <Table
                 columns={[
                     {
-                        title: 'ID',
-                        dataIndex: 'id',
-                        key: 'id',
-                    },
-                    {
-                        title: 'Avatar',
+                        title: '',
                         dataIndex: 'avatar',
                         key: 'avatar',
+                        align:'center',
                         render: (avatar) => {
                             if (avatar) {
                                 return (
@@ -156,38 +156,38 @@ const List = (props) => {
                         }
                     },
                     {
-                        title: 'Tên nhân viên',
-                        dataIndex: 'name',
-                        key: 'name',
-                    },
-                    {
-                        title: 'Email/SDT nhân viên',
-                        dataIndex: 'emailPhone',
-                        key: 'emailPhone',
+                        title: 'Nhân viên',
+                        dataIndex: 'info',
+                        key: 'info',
+                        render: (_, record) => (
+                            <>
+                                <Typography.Text strong>{record.name}<Typography.Text keyboard>{record.permission}</Typography.Text></Typography.Text>
+                                <Flex justify="space-between" gap={8} align="flex-start">
+                                    <Typography.Text style={{display:'inline'}} type="secondary">Email: <Typography.Paragraph copyable>{record.email}</Typography.Paragraph ></Typography.Text>
+                                    <Typography.Text type="secondary">SĐT: <Typography.Paragraph copyable>{record.phone}</Typography.Paragraph ></Typography.Text>
+                                </Flex>
+                            </>
+                        )
                     },
                     {
                         title: 'Thuộc cơ sở',
                         dataIndex: 'facility',
                         key: 'facility',
-                    },
-                    {
-                        title: 'Chuyên viên',
-                        dataIndex: 'specialty',
-                        key: 'specialty',
-                    },
-                    {
-                        title: 'Chức vụ',
-                        dataIndex: 'permission',
-                        key: 'permission',
+                        align:'center',
+
                     },
                     {
                         title: 'Action',
                         dataIndex: 'action',
                         key: 'action',
+                        align:'center',
                         render: (id) => (
-                            <Flex gap={6} align="center">
-                                <Button icon={<MenuOutlined/>}>Chi tiết</Button>
-                                <Button type="primary" icon={<EditOutlined/>}>Chỉnh sửa</Button>
+                            <Flex gap={6} align="center" justify="center">
+                                <Button onClick={() => router.get(route('user.detail', {user_id:id}))} icon={<MenuOutlined/>}>
+                                    Chi tiết
+                                </Button>
+                                <Button type="primary" onClick={() => router.get(route('user.view_edit', {user_id:id}))}
+                                        icon={<EditOutlined/>}>Chỉnh sửa</Button>
                                 <Button danger type="primary" icon={<DeleteOutlined/>}>Xóa</Button>
                             </Flex>
                         )
@@ -208,10 +208,12 @@ const List = (props) => {
                         id: user.id,
                         avatar: user.avatar ? `/view_file/${user.avatar}` : null,
                         name: user.name,
-                        emailPhone: `${user.email} - ${user.phone}`,
+                        email: user.email,
+                        phone: user.phone,
                         facility: `${user.facility.name} - ${user.facility.address}`,
                         specialty: `${user.specialties.name}`,
-                        permission: props.auth.permission[user.permission].text
+                        permission: props.auth.permission[user.permission].text,
+                        action: user.id,
                     }
                 })}
             />

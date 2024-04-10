@@ -134,4 +134,12 @@ class UserController extends Controller
             return redirect()->back()->withInput();
         }
     }
+
+    public function detail($user_id){
+        $user = User::findOrFail($user_id);
+        return Inertia::render('User/Detail', [
+            'title'=> 'Chi tiết nhân sự: ' . $user->name,
+            'user' => $user,
+        ]);
+    }
 }

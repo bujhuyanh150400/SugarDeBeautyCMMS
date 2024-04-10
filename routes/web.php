@@ -27,6 +27,8 @@ Route::middleware('guest')->group(function (){
         Route::get('/list',[UserController::class,'list'])->name('user.list');
         Route::get('/view_add',[UserController::class,'view_add'])->name('user.view_add');
         Route::post('/add',[UserController::class,'add'])->name('user.add');
+        Route::get('/detail/{user_id}',[UserController::class,'detail'])->name('user.detail')->whereNumber('user_id');
+        Route::get('/view_edit/{user_id}',[UserController::class,'detail'])->name('user.view_edit')->whereNumber('user_id');
     });
 });
 
