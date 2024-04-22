@@ -2,16 +2,16 @@ import {createRoot} from 'react-dom/client';
 import {createInertiaApp} from '@inertiajs/react';
 import {resolvePageComponent} from 'laravel-vite-plugin/inertia-helpers';
 import React from 'react'
-import {ConfigProvider} from 'antd';
+
+import 'semantic-ui-css/semantic.min.css'
+import '@fontsource/roboto';
 import './bootstrap';
 import '../css/app.css';
-import viVN from 'antd/locale/vi_VN';
 import {Provider} from "react-redux";
 import {store, persistor} from "@/redux/store.js";
-import 'antd/dist/reset.css'
 import {PersistGate} from 'redux-persist/integration/react'
-import Toast from "@/Components/Toast.jsx";
-import Loading from "@/Components/Loading.jsx";
+import {Toaster} from "react-hot-toast";
+
 
 createInertiaApp({
     title: (title) => `${title}`,
@@ -21,13 +21,11 @@ createInertiaApp({
         root.render(
             <Provider store={store}>
                 <PersistGate loading={null} persistor={persistor}>
-                    <ConfigProvider autoInsertSpaceInButton={false} locale={viVN}>
-                        <React.StrictMode>
-                            <Loading/>
-                            <Toast/>
-                            <App {...props}/>
-                        </React.StrictMode>
-                    </ConfigProvider>
+                    <Toaster
+                        position="top-right"
+                        reverseOrder={false}
+                    />
+                    <App {...props}/>
                 </PersistGate>
             </Provider>
         );

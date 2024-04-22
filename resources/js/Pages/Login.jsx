@@ -1,90 +1,57 @@
-import {useEffect, useState} from "react";
-import { Button, Flex, Card, Form, Input, Typography , Space } from 'antd';
-import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { useForm } from '@inertiajs/react'
-import {useDispatch} from "react-redux";
-import {openToast} from "@/redux/reducers/ToastSlice.js";
-import {v4 as uuidv4} from "uuid";
-import Constant from "@/utils/constant.js";
+import {useEffect} from "react";
+import {useForm} from '@inertiajs/react'
+import {Button, Checkbox, Form, FormField, Input, Transition, Message, FormInput} from "semantic-ui-react";
+import toast from "react-hot-toast";
 
 const Login = (props) => {
-    const dispatch = useDispatch()
-    const { data, setData, post, processing, errors } = useForm({
+    const {data, setData, post, processing, errors} = useForm({
         email: '',
         password: '',
+        remember: false
     })
-
-    useEffect(()=>{
-        if (props.errors?.login){
-            dispatch(openToast({
-                id: uuidv4(),
-                type: Constant.ToastType.ERROR,
-                message: 'Xác thực tài khoản',
-                description: errors?.login,
-            }));
+    useEffect(() => {
+        if (props.errors?.login) {
+            toast.error(props.errors.login)
         }
-    },[props.errors])
+    }, [props.errors])
 
     const handleSubmit = async () => {
-        await post('/login',data);
+        await post('/login', data);
     };
     return (
-        <Flex style={{
-            width: "100vw",
-            height: "100vh",
-            backgroundImage: "linear-gradient(to right, #a5f3fc, #3182CE)"
-        }} justify="center" align="center">
-            <Card
-                size="default"
-                style={{
-                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                    padding: "1rem"
-                }}>
-                <Form
-                    name="HVLogin"
-                    initialValues={{ remember: true }}
-                    onFinish={handleSubmit}
-                >
-                    <Space direction="vertical" size="small" style={{ display: 'flex' }}>
-                        <Typography.Title level={3} className="flex items-center justify-center">CMMS Login</Typography.Title>
-                        <Form.Item
-                            name="username"
-                            validateStatus={errors.email ? 'error' : ''}
-                            help={errors.email}
-                        >
-                            <Input size="large"
-                                   value={data.email}
-                                   onChange={(e) => setData('email', e.target.value)}
-                                   prefix={<UserOutlined />}
-                                   placeholder="Email đăng nhập" />
-                        </Form.Item>
-                        <Form.Item
-                            name="password"
-                            validateStatus={errors.password ? 'error' : ''}
-                            help={errors.password}
-                        >
-                            <Input.Password
-                                size="large"
+        <>
+            <div className="relative w-screen h-screen bg-gray-100 p-0 md:p-6">
+                <div
+                    className="w-full h-full rounded-lg bg-gradient-to-br from-blue-400 via-teal-200 to-lime-300 shadow-2xl p-2 border-t border-t-white border-l border-l-white  backdrop-blur-2xl flex items-center justify-center">
+                    <div className="rounded-lg p-1 shadow-2xl backdrop-blur-2xl bg-white/60 w-full max-w-xl">
+                        <Form className="p-4 flex flex-col gap-2"  onSubmit={handleSubmit}>
+                            <FormInput
+                                disabled={processing}
+                                error={errors.email ? {content: errors.email, pointing: "below"} : false}
+                                value={data.email}
+                                onChange={(e) => setData('email', e.target.value)}
+                                name="email" label='Email đăng nhập' placeholder='bha@gmail.com'/>
+                            <FormInput
+                                disabled={processing}
+                                error={errors.password ? {content: errors.password, pointing: "below"} : false}
+                                label='Mật khẩu đăng nhập'
+                                type="password"
                                 value={data.password}
-                                autoComplete="true"
                                 onChange={(e) => setData('password', e.target.value)}
-                                prefix={<LockOutlined />}
-                                placeholder="Mật khẩu"
-                                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                                placeholder='********'/>
+                            <Message
+                                header='Lưu ý khi đăng nhập'
+                                list={[
+                                    'Email phải đúng định dạng, là tài khoản được đăng kí hệ thống',
+                                    'Mật khẩu sẽ từ 8 - 16 kí tự'
+                                ]}
                             />
-
-                        </Form.Item>
-                        <Form.Item>
-                            <Flex align="center" justify="center">
-                                <Button type="primary"  loading={processing} block htmlType="submit">
-                                    Đăng nhập
-                                </Button>
-                            </Flex>
-                        </Form.Item>
-                    </Space>
-                </Form>
-            </Card>
-        </Flex>
+                            <Button type="submit" loading={processing} primary>Đăng nhập</Button>
+                        </Form>
+                    </div>
+                </div>
+            </div>
+        </>
     );
 }
 export default Login

@@ -31,7 +31,8 @@ class AuthController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
         try{
-            if (Auth::attempt(['email' => $request->input('email'), 'password' => $request->input('password')])) {
+            $remember = $request->boolean('remember');
+            if (Auth::attempt(['email' => $request->input('email'), 'password' => $request->input('password')],$remember)) {
                 $request->session()->regenerate();
                 return redirect()->route('dashboard');
             } else {
