@@ -7,7 +7,6 @@ class PermissionAdmin
     const ADMIN = 16;
     const MANAGER = 18;
     const EMPLOYEE = 20;
-    const CASHIER = 22;
     static function getList()
     {
         return [
@@ -21,12 +20,8 @@ class PermissionAdmin
             ],
             self::EMPLOYEE => [
                 'value' => self::EMPLOYEE,
-                'text' => 'Kỹ thuật viên'
-            ],
-            self::CASHIER => [
-                'value' => self::CASHIER,
-                'text' => 'Thu ngân'
-            ],
+                'text' => 'Nhân viên'
+            ]
         ];
     }
 }

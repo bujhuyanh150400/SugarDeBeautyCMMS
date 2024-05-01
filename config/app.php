@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Ho_Chi_Minh',
 
     /*
     |--------------------------------------------------------------------------
@@ -184,6 +184,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         'PermissionAdmin' => \App\Helpers\PermissionAdmin::class,
         'Menu' => \App\Helpers\Menu::class,
+        'AppConstant' => \App\Helpers\AppConstant::class,
     ])->toArray(),
 
 ];

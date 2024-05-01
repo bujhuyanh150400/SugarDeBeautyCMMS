@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,13 +15,31 @@ class Facilities extends Model
         'id',
         'name',
         'address',
-        'description',
         'active',
+        'created_at',
         'updated_at',
-        'logo',
     ];
+
+    public function scopeKeywordFilter(Builder $query, $keyword = null): void
+    {
+        if (!empty($keyword)) {
+            $keyword = strtolower($keyword);
+            $query->whereRaw('LOWER(name) LIKE ?', '%' . $keyword . '%')
+                ->orWhereRaw('LOWER(address) LIKE ?', '%' . $keyword . '%')
+                ->orWhere('id', '=', intval($keyword));
+        }
+    }
+    public function scopeActiveFilter(Builder $query, $active = null): void
+    {
+        if (!empty($active)) {
+            $query->where('active', $active);
+        }
+    }
+    /**
+    -------------- Relations -------------
+     */
     public function users(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class,'facility_id');
     }
 }

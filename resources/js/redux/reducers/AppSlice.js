@@ -2,20 +2,20 @@ import { createSlice } from '@reduxjs/toolkit';
 export const AppSlice = createSlice({
     name: 'app',
     initialState: {
-        loading: false,
-        collapsedMenu:false,
+        collapsedMenu:true,
+        darkTheme:false,
     },
     reducers: {
-        setLoading: (state, action) => {
-            state.loading = action.payload
-        },
         setCollapsedMenu : (state, action) => {
             state.collapsedMenu = action.payload
+        },
+        setThemeDark : (state, action) => {
+            state.darkTheme = action.payload
         }
     },
 });
 export const {
-    setLoading,
-    setCollapsedMenu
+    setCollapsedMenu,
+    setThemeDark
 } = AppSlice.actions;
 export default AppSlice.reducer;

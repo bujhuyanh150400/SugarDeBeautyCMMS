@@ -12,7 +12,7 @@ class AuthController extends Controller
 
     public function view_login(): \Inertia\Response
     {
-        return Inertia::render('Login');
+        return Inertia::render('Login',['title'=> 'Đăng nhập Sugar de beaute']);
     }
 
     public function login(Request $request): \Illuminate\Http\RedirectResponse

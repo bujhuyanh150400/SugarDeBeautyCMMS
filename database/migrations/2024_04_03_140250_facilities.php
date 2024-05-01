@@ -16,7 +16,6 @@ return new class extends Migration
             $table->id();
             $table->string('name')->comment('Tên cơ sở');
             $table->string('address')->comment('Địa chỉ cụ thể cơ sở ');
-            $table->string('logo')->nullable()->comment('Ảnh đại diện cơ sở');
             $table->smallInteger('active')->default(1)->comment('Cơ sở có đang hoạt động không: 1 - có| 2 - không');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();

@@ -2,103 +2,108 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppConstant;
 use App\Helpers\PermissionAdmin;
-use App\Http\Requests\Admin\UsersController\AddRequest;
 use App\Models\Facilities;
 use App\Models\Specialties;
 use App\Models\User;
+use App\Models\File as FileModels;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Inertia\Response;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    private array $facilityIds;
+    private array $specialtyIds;
+
     public function __construct()
     {
         parent::__construct();
+        $this->facilityIds = Facilities::pluck('id')->toArray();
+        $this->specialtyIds = Specialties::pluck('id')->toArray();
     }
-
-    public function list(Request $request): \Inertia\Response
+    public function list(Request $request): Response
     {
+
         $title = "Danh sách nhân sự";
-        $limit = $request->input('limit', self::PER_PAGE);
         $facilities = Facilities::all();
         $users = User::KeywordFilter($request->get('keyword') ?? '')
             ->PermissionFilter($request->get('permission') ?? '')
             ->FacilityFilter($request->get('facility') ?? '')
             ->with('facility')
             ->with('specialties')
-            ->paginate($limit);
+            ->with('files')
+            ->where('is_deleted', AppConstant::NOT_DELETED)
+            ->orderBy('created_at', 'desc')
+            ->paginate(self::PER_PAGE);
         return Inertia::render('User/List', [
             'title' => $title,
-            'users' => fn () => $users,
+            'users' => fn() => $users,
             'query' => $request->query() ?: null,
             'facilities' => $facilities
         ]);
     }
-
-    public function view_add(): \Inertia\Response
+    public function view_add(): Response
     {
         $title = "Thêm nhân sự mới";
         $facilities = Facilities::all();
         $specialties = Specialties::all();
-        return Inertia::render('User/AddUser', [
+        return Inertia::render('User/Add', [
             'title' => $title,
             'facilities' => $facilities,
             'specialties' => $specialties
         ]);
     }
-
-    public function add(Request $request)
+    public function add(Request $request): RedirectResponse
     {
-        $facilityIds = Facilities::pluck('id')->toArray();
-        $specialtyIds = Specialties::pluck('id')->toArray();
         $validator = Validator::make(
             $request->all(),
             [
-            'email' => ['required', 'email', Rule::unique('users')],
-            'name' => 'required',
-            'password' => 'required|min:8|max:36',
-            'address' => 'required|max:255',
-            'phone' => 'required|numeric|min:9',
-            'birth' => 'required|date',
-            'gender' => 'required|in:1,2',
-            'permission' => ['required', Rule::in(array_keys(PermissionAdmin::getList()))],
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
-            'facility_id' => ['required', Rule::in($facilityIds)],
-            'specialties_id' => ['required', Rule::in($specialtyIds)],
-            'description' => 'nullable|string',
-        ],
+                'email' => ['required', 'email', Rule::unique('users')],
+                'name' => 'required',
+                'password' => 'required|min:8|max:16',
+                'address' => 'required|max:255',
+                'phone' => ['required', 'regex:/^\+\d{10,15}$/'],
+                'birth' => 'required|date',
+                'gender' => 'required|in:1,2',
+                'permission' => ['required', Rule::in(array_keys(PermissionAdmin::getList()))],
+                'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
+                'facility_id' => ['required', Rule::in($this->facilityIds)],
+                'specialties_id' => ['required', Rule::in($this->specialtyIds)],
+            ],
             [
-            'email.required' => 'Vui lòng nhập địa chỉ email.',
-            'email.email' => 'Địa chỉ email không hợp lệ.',
-            'email.unique' => 'Địa chỉ email đã tồn tại trong hệ thống.',
-            'name.required' => 'Vui lòng nhập tên.',
-            'password.required' => 'Vui lòng nhập mật khẩu.',
-            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
-            'password.max' => 'Mật khẩu không được vượt quá 36 ký tự.',
-            'address.required' => 'Vui lòng nhập địa chỉ.',
-            'address.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
-            'phone.required' => 'Vui lòng nhập số điện thoại.',
-            'phone.numeric' => 'Số điện thoại phải là số.',
-            'phone.min' => 'Số điện thoại phải có ít nhất :min ký tự.',
-            'birth.required' => 'Vui lòng nhập ngày sinh.',
-            'birth.date' => 'Ngày sinh không hợp lệ.',
-            'gender.required' => 'Vui lòng chọn giới tính.',
-            'gender.in' => 'Giới tính không hợp lệ.',
-            'permission.required' => 'Vui lòng chọn vai trò của người dùng.',
-            'permission.in' => 'Bạn đang cố tình chọn sai quyền.',
-            'avatar.image' => 'Tệp phải là hình ảnh.',
-            'avatar.mimes' => 'Tệp phải có định dạng jpeg, png, jpg, gif hoặc svg.',
-            'avatar.max' => 'Tệp không được vượt quá 10240KB.',
-            'facility_id.required' => 'Vui lòng chọn cơ sở.',
-            'facility_id.in' => 'Cơ sở không tồn tại trong hệ thống.',
-            'specialties_id.required' => 'Vui lòng chọn chuyên môn.',
-            'specialties_id.in' => 'Chuyên môn không tồn tại trong hệ thống.',
-            'description.string' => 'Mô tả phải văn bản.',
-        ]);
+                'email.required' => 'Vui lòng nhập địa chỉ email.',
+                'email.email' => 'Địa chỉ email không hợp lệ.',
+                'email.unique' => 'Địa chỉ email đã tồn tại trong hệ thống.',
+                'name.required' => 'Vui lòng nhập tên.',
+                'password.required' => 'Vui lòng nhập mật khẩu.',
+                'password.min' => 'Mật khẩu phải có ít nhất :min ký tự.',
+                'password.max' => 'Mật khẩu không được vượt quá :max ký tự.',
+                'address.required' => 'Vui lòng nhập địa chỉ.',
+                'address.max' => 'Địa chỉ không được vượt quá :max ký tự.',
+                'phone.required' => 'Vui lòng nhập số điện thoại.',
+                'phone.regex' => 'Số điện thoại phải tuân thủ định dạng E.164 và có từ 10 đến 15 chữ số.',
+                'birth.required' => 'Vui lòng nhập ngày sinh.',
+                'birth.date' => 'Ngày sinh không hợp lệ.',
+                'gender.required' => 'Vui lòng chọn giới tính.',
+                'gender.in' => 'Giới tính không hợp lệ.',
+                'permission.required' => 'Vui lòng chọn vai trò của người dùng.',
+                'permission.in' => 'Bạn đang cố tình chọn sai quyền.',
+                'avatar.image' => 'Tệp phải là hình ảnh.',
+                'avatar.mimes' => 'Tệp phải có định dạng jpeg, png, jpg, gif hoặc svg.',
+                'avatar.max' => 'Tệp không được vượt quá 10240KB.',
+                'facility_id.required' => 'Vui lòng chọn cơ sở.',
+                'facility_id.in' => 'Cơ sở không tồn tại trong hệ thống.',
+                'specialties_id.required' => 'Vui lòng chọn chuyên môn.',
+                'specialties_id.in' => 'Chuyên môn không tồn tại trong hệ thống.',
+            ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -110,22 +115,25 @@ class UserController extends Controller
             'address' => $request->input('address'),
             'permission' => $request->input('permission'),
             'phone' => $request->input('phone'),
-            'birth' => date('Y-m-d', strtotime($request->input('birth'))),
+            'birth' => $request->date('birth')->setTimezone(config('app.timezone'))->format('Y-m-d'),
             'gender' => $request->integer('gender'),
-            'description' => $request->input('description'),
             'facility_id' => $request->integer('facility_id'),
             'specialties_id' => $request->integer('specialties_id'),
         ];
-        if ($request->hasFile('avatar')) {
-            $extension = $request->file('avatar')->extension();
-            // Tạo tên tệp ngắn gọn và độc đáo
-            $avatarFileName = 'avatar_' . $data['id'] . '.' . $extension;
-            // Lưu trữ file và lấy đường dẫn lưu trữ
-            $filePath = self::FILE_PATH_ADMIN . $data['id'];
-            $avatarPath = $request->file('avatar')->storeAs($filePath, $avatarFileName);
-            $data['avatar'] = base64_encode($avatarPath);
-        }
         $user = User::create($data);
+        if ($request->hasFile('avatar')) {
+            $avatar = FileController::saveFile($request->file('avatar'), AppConstant::FILE_TYPE_AVATAR);
+            $savedAvatar = FileModels::create($avatar);
+            $user->files()->attach($savedAvatar->id);
+        }
+        if ($request->hasFile('file_upload')) {
+            $files = $request->file('file_upload');
+            foreach ($files as $file) {
+                $file_upload = FileController::saveFile($file);
+                $savedFileUpload = FileModels::create($file_upload);
+                $user->files()->attach($savedFileUpload->id);
+            }
+        }
         if ($user) {
             session()->flash('success', 'Lưu trữ dữ liệu thành công!');
             return redirect()->route('user.list');
@@ -134,12 +142,126 @@ class UserController extends Controller
             return redirect()->back()->withInput();
         }
     }
-
-    public function detail($user_id){
-        $user = User::findOrFail($user_id);
-        return Inertia::render('User/Detail', [
-            'title'=> 'Chi tiết nhân sự: ' . $user->name,
-            'user' => $user,
-        ]);
+    public function view_edit($user_id): Response|RedirectResponse
+    {
+        $user = User::with('facility', 'specialties', 'files')->find($user_id);
+        if ($user) {
+            $facilities = Facilities::all();
+            $specialties = Specialties::all();
+            return Inertia::render('User/Edit', [
+                'title' => 'Chỉnh sửa nhân sự ' . $user->name,
+                'user' => $user,
+                'facilities' => $facilities,
+                'specialties' => $specialties
+            ]);
+        } else {
+            session()->flash('error', 'Không tìm thấy người dùng');
+            return redirect()->back();
+        }
     }
+    public function edit($user_id,Request $request): RedirectResponse
+    {
+        $user = User::find($user_id);
+        if ($user) {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'name' => 'required',
+                    'address' => 'required|max:255',
+                    'phone' => ['required', 'regex:/^\+\d{10,15}$/'],
+                    'birth' => 'required|date',
+                    'gender' => 'required|in:1,2',
+                    'permission' => ['required', Rule::in(array_keys(PermissionAdmin::getList()))],
+                    'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
+                    'facility_id' => ['required', Rule::in($this->facilityIds)],
+                    'specialties_id' => ['required', Rule::in($this->specialtyIds)],
+                ],
+                [
+                    'name.required' => 'Vui lòng nhập tên.',
+                    'address.required' => 'Vui lòng nhập địa chỉ.',
+                    'address.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
+                    'phone.required' => 'Vui lòng nhập số điện thoại.',
+                    'phone.regex' => 'Số điện thoại phải tuân thủ định dạng E.164 và có từ 10 đến 15 chữ số.',
+                    'birth.required' => 'Vui lòng nhập ngày sinh.',
+                    'birth.date' => 'Ngày sinh không hợp lệ.',
+                    'gender.required' => 'Vui lòng chọn giới tính.',
+                    'gender.in' => 'Giới tính không hợp lệ.',
+                    'permission.required' => 'Vui lòng chọn vai trò của người dùng.',
+                    'permission.in' => 'Bạn đang cố tình chọn sai quyền.',
+                    'avatar.image' => 'Tệp phải là hình ảnh.',
+                    'avatar.mimes' => 'Tệp phải có định dạng jpeg, png, jpg, gif hoặc svg.',
+                    'avatar.max' => 'Tệp không được vượt quá 10240KB.',
+                    'facility_id.required' => 'Vui lòng chọn cơ sở.',
+                    'facility_id.in' => 'Cơ sở không tồn tại trong hệ thống.',
+                    'specialties_id.required' => 'Vui lòng chọn chuyên môn.',
+                    'specialties_id.in' => 'Chuyên môn không tồn tại trong hệ thống.',
+                ]);
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+            $user->name = $request->input('name');
+            $user->address = $request->input('address');
+            $user->phone = $request->input('phone');
+            $user->birth = $request->date('birth')->setTimezone(config('app.timezone'))->format('Y-m-d');
+            $user->gender = $request->input('gender');
+            $user->permission = $request->integer('permission');
+            $user->facility_id = $request->integer('facility_id');
+            $user->specialties_id = $request->integer('specialties_id');
+            $user->updated_at = now();
+            $user->save();
+            if ($request->hasFile('avatar')) {
+                $avatar = FileController::saveFile($request->file('avatar'), AppConstant::FILE_TYPE_AVATAR);
+                $savedAvatar = FileModels::create($avatar);
+                $user->files()->attach($savedAvatar->id);
+            }
+            if ($request->hasFile('file_upload')) {
+                $files = $request->file('file_upload');
+                foreach ($files as $file) {
+                    $file_upload = FileController::saveFile($file);
+                    $savedFileUpload = FileModels::create($file_upload);
+                    $user->files()->attach($savedFileUpload->id);
+                }
+            }
+            session()->flash('success', 'Lưu trữ dữ liệu thành công!');
+            return redirect()->route('user.list');
+        } else {
+            session()->flash('error', 'Không tìm thấy người dùng');
+            return redirect()->back();
+        }
+    }
+    public function deleted($user_id): RedirectResponse
+    {
+        $user = User::find($user_id);
+        if ($user) {
+            if (Auth::user()->id === $user->id) {
+                session()->flash('error', 'Bạn không thể xóa tài khoản đang đăng nhập được');
+            } else {
+                $user->is_deleted = AppConstant::DELETED;
+                $user->save();
+                session()->flash('success', 'Xoá người dùng thành công');
+            }
+        } else {
+            session()->flash('error', 'Không tìm thấy người dùng');
+        }
+        return redirect()->back();
+
+    }
+    public function deletedFile(Request $request): RedirectResponse
+    {
+        $user = User::find($request->integer('user_id'));
+        $file = FileModels::find($request->integer('file_id'));
+        if ($user && $file) {
+            $user->files()->detach($file->id);
+            $filepath = base64_decode($file->file_location);
+            if (Storage::exists($filepath)) {
+                Storage::delete($filepath);
+            }
+            $file->delete();
+            session()->flash('success', 'Thành công xoá file');
+        } else {
+            session()->flash('error', 'Không tìm thấy người dùng hoặc file');
+        }
+        return redirect()->back();
+    }
+
 }

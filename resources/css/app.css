@@ -1,6 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body, * {
+
+
+body .roboto {
     font-family: 'Roboto', sans-serif !important;
+}
+body::-webkit-scrollbar-track
+{
+    background-color: #cccc;
+}
+
+body::-webkit-scrollbar
+{
+    width: 5px;
+    background-color: #cccc;
+}
+
+body::-webkit-scrollbar-thumb
+{
+    background: #25B3F5;
+    border-radius: 50px;
 }

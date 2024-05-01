@@ -7,73 +7,54 @@ use Illuminate\Support\Str;
 class Menu
 {
     /**
-     * Function dùng để set menu đơn
-     * @param $label
-     * @param $icon
-     * @param $href
-     * @param $children
-     * @param $disabled
+     * Function dùng để set menu
+     * @param string $label
+     * @param string $icon
+     * @param string $href
+     * @param string $active
+     * @param array $children
      * @return array
      */
-    private function setMenu($label = '', $icon = '', $href = '', $children = [], $disabled = false): array
+    private function setMenu(string $label = '', string $icon = '', string $href = '',string $active = '' , array $children = []): array
     {
         return [
             'key' => Str::uuid(),
-            'is_sub' => false,
             'label' => $label,
             'icon' => $icon,
             'href' => $href,
+            'active' => $active,
             'children' => $children,
-            'disabled' => $disabled,
         ];
     }
-
-    /** Function dùng để set Menu cha
-     * @param $label
-     * @param $icon
-     * @param $children
-     * @param $disabled
-     * @return array
-     */
-    private function setSubMenu($label = '', $icon = '', $children = [], $disabled = false): array
-    {
-        return [
-            'key' => Str::uuid(),
-            'is_sub' => true,
-            'label' => $label,
-            'icon' => $icon,
-            'children' => $children,
-            'disabled' => $disabled,
-        ];
-    }
-
     /** Function dùng để set menu con (trong menu cha)
-     * @param $label
-     * @param $href
+     * @param string $label
+     * @param string $href
+     * @param string $active
      * @return array
      */
-    private function setChildMenu($label = '', $href = ''): array
+    private function setChildMenu(string $label = '', string $href = '', string $active = '',string $icon = ''): array
     {
         return [
             'key' => Str::uuid(),
             'label' => $label,
             'href' => $href,
+            'active' => $active,
+            'icon' => $icon,
         ];
     }
-
     public function getListByPermission(): array
     {
         if (!auth()->check()) {
             return [];
         } else {
             $permission = auth()->user()['permission'];
-            return  match ($permission) {
+            return match ($permission) {
                 PermissionAdmin::ADMIN => [
-                    $this->setMenu('Trang chủ', 'DashboardOutlined', ''),
-                    $this->setSubMenu('Quản lý nhân viên', 'UserOutlined', [
-                        $this->setChildMenu('Quản lý nhân sự', 'user/list'),
-                        $this->setChildMenu('Quản lý cơ sở', 'facilities/list'),
-                        $this->setChildMenu('Quản lý chuyên môn', 'specialties/list'),
+                    $this->setMenu('Trang chủ', 'DashboardIcon', '/dashboard' , 'dashboard'),
+                    $this->setMenu('Quản lý nhân sự', 'PeoplesIcon', '/user/manager/list' , 'user' ,[
+                        $this->setChildMenu('Quản lý nhân sự', '/user/manager/list' , 'manager'),
+                        $this->setChildMenu('Quản lý cơ sở', '/user/facilities/list' , 'facilities'),
+                        $this->setChildMenu('Quản lý chuyên môn', '/user/specialties/list','specialties'),
                     ]),
                 ],
                 default => [],

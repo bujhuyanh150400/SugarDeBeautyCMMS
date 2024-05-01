@@ -15,12 +15,10 @@ return new class extends Migration
             $table->string('email')->unique()->comment('Email nhân sự ( dùng để đăng nhập)');
             $table->string('password')->comment('Password nhân sự');
             $table->timestamp('birth')->comment('Ngày sinh nhân sự');
-            $table->text('avatar')->nullable()->comment('Avatar của nhân sự');
             $table->smallInteger('gender')->default(1)->comment('Giới tính: 1 - Nam | 2 - nữ');
             $table->string('phone')->nullable()->comment('SĐT Nhân viên');
             $table->text('address')->nullable()->comment('Địa chỉ nơi ở nhân viên');
             $table->smallInteger('permission')->nullable()->comment('Phân quyền trong Admin');
-            $table->text('description')->nullable()->comment('Mô tả về nhân viên');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
             $table->smallInteger('is_deleted')->default(0)->comment('0 - chưa xóa | 1 - đã xóa');

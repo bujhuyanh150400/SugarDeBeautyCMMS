@@ -26,7 +26,6 @@ class User extends Authenticatable
         'updated_by',
         'avatar',
         'facility_id',
-        'description',
         'specialties_id',
     ];
     protected $hidden = [
@@ -37,14 +36,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function facility(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Facilities::class);
-    }
-    public function specialties(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Specialties::class);
-    }
+
     public function scopeKeywordFilter(Builder $query, $keyword = null): void
     {
         if (!empty($keyword)) {
@@ -65,6 +57,23 @@ class User extends Authenticatable
         if (!empty($facility_id)) {
             $query->where('facility_id', $facility_id);
         }
+    }
+
+    /**
+        -------------- Relations -------------
+     */
+
+    public function facility(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Facilities::class);
+    }
+    public function specialties(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Specialties::class);
+    }
+    public function files(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(File::class, 'file_user', 'user_id', 'file_id');
     }
 
 }

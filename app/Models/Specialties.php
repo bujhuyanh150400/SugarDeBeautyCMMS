@@ -16,12 +16,13 @@ class Specialties extends Model
         'name',
         'description',
         'active',
-        'logo',
         'updated_at',
-        'created_by',
-        'updated_by',
+        'created_at',
     ];
 
+    /**
+    -------------- Relations -------------
+     */
     public function users(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(User::class);
