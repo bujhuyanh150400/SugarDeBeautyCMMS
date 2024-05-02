@@ -19,7 +19,6 @@ class Facilities extends Model
         'created_at',
         'updated_at',
     ];
-
     public function scopeKeywordFilter(Builder $query, $keyword = null): void
     {
         if (!empty($keyword)) {

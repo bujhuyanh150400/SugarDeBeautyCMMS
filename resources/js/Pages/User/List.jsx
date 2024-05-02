@@ -217,7 +217,7 @@ const List = (props) => {
                 <Modal.Footer>
                     <Button onClick={() => {
                         setAlertDeleted(false)
-                        router.put(route('user.deleted', {user_id: idDeleted}),null,{ preserveScroll: true })
+                        router.patch(route('user.deleted', {user_id: idDeleted}),null,{ preserveScroll: true })
                     }} appearance="primary" color="red">
                         Có
                     </Button>

@@ -51,10 +51,22 @@ class Menu
             return match ($permission) {
                 PermissionAdmin::ADMIN => [
                     $this->setMenu('Trang chủ', 'DashboardIcon', '/dashboard' , 'dashboard'),
+                    $this->setMenu('Lịch làm', 'CalendarIcon', '/time_attendance/manager/list' , 'time_attendance', [
+                        $this->setChildMenu('Quản lý lịch làm', '/time_attendance/schedule/list' , 'schedule'),
+                        $this->setChildMenu('Quản lý chấm công', '/time_attendance/manager/list' , 'manager'),
+                    ]),
                     $this->setMenu('Quản lý nhân sự', 'PeoplesIcon', '/user/manager/list' , 'user' ,[
                         $this->setChildMenu('Quản lý nhân sự', '/user/manager/list' , 'manager'),
                         $this->setChildMenu('Quản lý cơ sở', '/user/facilities/list' , 'facilities'),
                         $this->setChildMenu('Quản lý chuyên môn', '/user/specialties/list','specialties'),
+                    ]),
+                    $this->setMenu('Quản lý lương', 'QrcodeIcon', '/salary/manager' , 'salary'),
+                    $this->setMenu('Quản lý nghỉ phép', 'IdMappingIcon', '/leave' , 'leave'),
+                    $this->setMenu('Quản lý đào tạo', 'PeoplesIcon', '/education/workflow/list' , 'education' ,[
+                        $this->setChildMenu('Workflow', '/education/workflow/list' , 'workflow'),
+                        $this->setChildMenu('Thư viện bài test', '/education/library/list' , 'library'),
+                        $this->setChildMenu('Đào tạo (Lý thuyết)', '/education/test/list','test'),
+                        $this->setChildMenu('Đào tạo (Thực hành)', '/education/practice/list','practice'),
                     ]),
                 ],
                 default => [],

@@ -2,11 +2,10 @@ import Layout from "@/Layouts/index.jsx";
 import {useState} from "react";
 import {Link, router} from "@inertiajs/react";
 import {
-    Avatar,
     Button,
     ButtonGroup,
     Col,
-    Divider,
+    Popover,
     Form,
     Grid, Modal,
     Pagination,
@@ -14,20 +13,17 @@ import {
     Row,
     SelectPicker,
     Table,
-    Text
+    Whisper,
 } from "rsuite";
 import SearchIcon from "@rsuite/icons/Search.js";
 import PlusIcon from "@rsuite/icons/Plus.js";
 import constant from "@/utils/constant.js";
 import EditIcon from "@rsuite/icons/Edit.js";
-import TrashIcon from "@rsuite/icons/Trash.js";
 import OffIcon from '@rsuite/icons/Off';
 import RemindIcon from "@rsuite/icons/legacy/Remind.js";
-import {value} from "lodash/seq.js";
 
 const List = (props) => {
-    const {facilities} = props;
-
+    const {specialties} = props;
     const [filter, setFilter] = useState({
         keyword: '',
         active: '',
@@ -41,16 +37,16 @@ const List = (props) => {
     const optionsRouter = {
         replace: true,
         preserveState: true,
-        only: ['facilities']
+        only: ['specialties']
     }
     const handlePagination = async (page) => {
-        await router.get(route('facilities.list'), {
+        await router.get(route('specialties.list'), {
             page: page,
             ...filter
         }, optionsRouter);
     }
     const filterForm = async () => {
-        await router.get(route('facilities.list'), filter, optionsRouter);
+        await router.get(route('specialties.list'), filter, optionsRouter);
     }
     const [alertActiveStatus, setAlertActiveStatus] = useState({
         id: null,
@@ -71,7 +67,7 @@ const List = (props) => {
                                         onChange={(value) => handleChangeFilter('keyword', value)}
                                         name="keyword"
                                         id="keyword"
-                                        placeholder="ID, Tên, Địa chỉ Cơ sở"/>
+                                        placeholder="ID, Tên chuyên môn"/>
                                 </Form.Group>
                             </Col>
                             <Col xl={6} lg={12} md={24}>
@@ -94,16 +90,16 @@ const List = (props) => {
                                     Tìm kiếm
                                 </Button>
                                 <Button type="button" startIcon={<PlusIcon/>}
-                                        onClick={() => router.get(route('facilities.view_add'))} color="green"
+                                        onClick={() => router.get(route('specialties.view_add'))} color="green"
                                         appearance="primary">
-                                    Thêm cơ sở
+                                    Thêm chuyên ngành
                                 </Button>
                             </Col>
                         </Row>
                     </Grid>
                 </Form>
             </Panel>
-            <Table affixHeader rowHeight={100} autoHeight data={facilities.data}>
+            <Table affixHeader rowHeight={100} autoHeight data={specialties.data}>
                 <Table.Column flexGrow={1} verticalAlign="center" align="center" fullText>
                     <Table.HeaderCell>ID</Table.HeaderCell>
                     <Table.Cell dataKey="id"/>
@@ -112,12 +108,22 @@ const List = (props) => {
                     <Table.HeaderCell>Tên cơ sở</Table.HeaderCell>
                     <Table.Cell dataKey="name"/>
                 </Table.Column>
-                <Table.Column flexGrow={1} verticalAlign="center" align="start" fullText>
-                    <Table.HeaderCell>Địa chỉ</Table.HeaderCell>
-                    <Table.Cell dataKey="address"/>
+                <Table.Column flexGrow={3} verticalAlign="center" align="start" fullText>
+                    <Table.HeaderCell>Mô tả về chuyên ngành</Table.HeaderCell>
+                    <Table.Cell>
+                        {rowData => (
+                            <Whisper
+                                placement="rightStart"
+                                trigger="click"
+                                speaker={<Popover arrow={true}><div dangerouslySetInnerHTML={{ __html: rowData.description }}></div></Popover>}
+                            >
+                                <div className="!w-full" dangerouslySetInnerHTML={{ __html: rowData.description }}></div>
+                            </Whisper>
+                        )}
+                    </Table.Cell>
                 </Table.Column>
-                <Table.Column flexGrow={0.5} verticalAlign="center" align="start" fullText>
-                    <Table.HeaderCell>Số nhân viên hiện có</Table.HeaderCell>
+                <Table.Column flexGrow={1} verticalAlign="center" align="start" fullText>
+                    <Table.HeaderCell>Số nhân viên</Table.HeaderCell>
                     <Table.Cell>
                         {rowData => (
                             <span>{rowData.users.length} nhân sự</span>
@@ -129,7 +135,7 @@ const List = (props) => {
                     <Table.Cell>
                         {rowData => (
                             <ButtonGroup>
-                                <Button as={Link} href={route('facilities.view_edit', {facility_id: rowData.id})}
+                                <Button as={Link} href={route('specialties.view_edit', {specialty_id: rowData.id})}
                                         startIcon={<EditIcon/>} color="green" appearance="primary">Sửa</Button>
                                 {rowData.active === constant.ACTIVE ? (
                                     <Button startIcon={<OffIcon/>} color="blue" appearance="primary"
@@ -157,19 +163,18 @@ const List = (props) => {
                     </Table.Cell>
                 </Table.Column>
             </Table>
-            {facilities.total > 0 && (
+            {specialties.total > 0 && (
                 <div className="my-8 flex w-full justify-center items-center">
-                    <Pagination prev next ellipsis size="lg" limit={facilities.per_page}
-                                activePage={facilities.current_page} total={facilities.total}
+                    <Pagination prev next ellipsis size="lg" limit={specialties.per_page}
+                                activePage={specialties.current_page} total={specialties.total}
                                 onChangePage={handlePagination}/>
                 </div>
             )}
             {/*Modal alert xoá nhân viên*/}
-            <Modal backdrop="static" role="alertdialog" open={alertActiveStatus.openAlert} size="xs">
+            <Modal backdrop="static" role="alertdialog" open={alertActiveStatus.openAlert} size="sm">
                 <Modal.Body>
                     <RemindIcon className="text-amber-500 text-2xl"/>
-                    Bạn có muốn cho cơ sở
-                    này {alertActiveStatus.active === constant.ACTIVE ? 'hoạt động' : 'không hoạt động'}
+                    Bạn có muốn cho chuyên ngành này {alertActiveStatus.active === constant.ACTIVE ? 'hoạt động' : 'không hoạt động'} không
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={() => {
@@ -177,7 +182,7 @@ const List = (props) => {
                             ...value,
                             openAlert: false
                         }));
-                        router.patch(route('facilities.change_active', {facility_id: alertActiveStatus.id}), {active: alertActiveStatus.active}, {preserveScroll: true})
+                        router.patch(route('specialties.change_active', {specialty_id: alertActiveStatus.id}), {active: alertActiveStatus.active}, {preserveScroll: true})
                     }} appearance="primary" color="red">
                         Có
                     </Button>

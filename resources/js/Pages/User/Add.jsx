@@ -253,7 +253,7 @@ const Add = (props) => {
                     </Form.Group>
                 </div>
                 <div className="flex items-center justify-end">
-                    <Button type="submit" size="lg" appearance="primary" color="green" startIcon={<PlusIcon/>}>Tạo nhân
+                    <Button type="submit"  appearance="primary" color="green" startIcon={<PlusIcon/>}>Tạo nhân
                         viên</Button>
                 </div>
             </Form>

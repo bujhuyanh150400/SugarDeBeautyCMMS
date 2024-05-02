@@ -13,6 +13,9 @@ const Gender = [
     {label: 'Nữ', value: 2},
 ];
 
+const ACTIVE = 1;
+const IN_ACTIVE = 2;
+
 const ActiveStatus = [
     {label: 'Lựa chọn', value: null},
     {label: 'Hoạt động', value: 1},
@@ -28,5 +31,7 @@ export default {
     PermissionAdmin,
     Gender,
     FileType,
-    ActiveStatus
+    ActiveStatus,
+    ACTIVE,
+    IN_ACTIVE
 };

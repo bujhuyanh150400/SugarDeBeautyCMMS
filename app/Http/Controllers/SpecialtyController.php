@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AppConstant;
 use App\Models\Facilities;
+use App\Models\Specialties;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -11,51 +12,50 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class FacilityController extends Controller
+class SpecialtyController extends Controller
 {
     public function __construct()
     {
         parent::__construct();
     }
-
-
     public function list(): Response
     {
-        $facilities = Facilities::KeywordFilter(request()->get('keyword') ?? '')
+        $specialties = Specialties::KeywordFilter(request()->get('keyword') ?? '')
             ->ActiveFilter(request()->get('active') ?? '')
             ->with(['users' => function ($query) {
                 $query->where('is_deleted', AppConstant::NOT_DELETED);
             }])
             ->orderBy('created_at', 'desc')
             ->paginate(self::PER_PAGE);
-        return Inertia::render('Facility/List', [
-            'title' => "Danh sách cơ sở",
-            'facilities' => fn() => $facilities,
+        return Inertia::render('Specialty/List', [
+            'title' => "Danh sách chuyên môn",
+            'specialties' => fn() => $specialties,
             'query' => request()->query() ?: null,
         ]);
     }
-
     public function view_add(): Response
     {
-        $title = "Thêm cơ sở mới";
-        return Inertia::render('Facility/Add', [
+        $title = "Thêm chuyên môn mới";
+        return Inertia::render('Specialty/Add', [
             'title' => $title,
         ]);
     }
-
     public function add(Request $request): RedirectResponse
     {
         $validator = Validator::make(
             $request->all(),
             [
                 'name' => 'required',
-                'address' => 'required|max:255',
+                'description' => [function ($attribute, $value, $fail){
+                    $value = trim(strip_tags($value));
+                    if (empty($value)){
+                        $fail('Vui lòng nhập mô tả');
+                    }
+                }],
                 'active' => ['required', Rule::in([AppConstant::ACTIVE, AppConstant::IN_ACTIVE])],
             ],
             [
-                'name.required' => 'Vui lòng nhập tên cơ sở.',
-                'address.required' => 'Vui lòng nhập địa chỉ.',
-                'address.max' => 'Địa chỉ không được vượt quá :max ký tự.',
+                'name.required' => 'Vui lòng nhập tên chuyên môn.',
                 'active.required' => 'Vui lòng chọn trạng thái hoạt động.',
                 'active.in' => 'Bạn đang cố tình chọn sai trạng thái.',
             ]);
@@ -64,72 +64,72 @@ class FacilityController extends Controller
         }
         $data = [
             'name' => $request->input('name'),
-            'address' => $request->input('address'),
+            'description' => $request->input('description'),
             'active' => $request->input('active'),
         ];
-        $facility = Facilities::create($data);
-        if ($facility) {
+        $specialty = Specialties::create($data);
+        if ($specialty) {
             session()->flash('success', 'Lưu trữ dữ liệu thành công!');
-            return redirect()->route('facilities.list');
+            return redirect()->route('specialties.list');
         } else {
             session()->flash('error', 'Có lỗi gì đó khi thao tác, vui lòng liên hệ quản trị viên');
             return redirect()->back()->withInput();
         }
     }
 
-    public function view_edit($facility_id): Response|RedirectResponse
+    public function view_edit($specialty_id): Response|RedirectResponse
     {
-        $facility = Facilities::find($facility_id);
-        if ($facility) {
-            $title = "Sửa cơ sở : " . $facility->name;
-            return Inertia::render('Facility/Edit', [
+        $specialty = Specialties::find($specialty_id);
+        if ($specialty) {
+            $title = "Sửa chuyên môn: " . $specialty->name;
+            return Inertia::render('Specialty/Edit', [
                 'title' => $title,
-                'facility' => $facility
+                'specialty' => $specialty
             ]);
         } else {
-            session()->flash('error', 'Không tìm thấy cơ sở');
+            session()->flash('error', 'Không tìm thấy chuyên môn');
             return redirect()->back();
         }
     }
-
-    public function edit($facility_id, Request $request): RedirectResponse
+    public function edit($specialty_id, Request $request): RedirectResponse
     {
-        $facility = Facilities::find($facility_id);
-        if ($facility) {
+        $specialty = Specialties::find($specialty_id);
+        if ($specialty) {
             $validator = Validator::make(
                 $request->all(),
                 [
                     'name' => 'required',
-                    'address' => 'required|max:255',
+                    'description' => [function ($attribute, $value, $fail){
+                        $value = trim(strip_tags($value));
+                        if (empty($value)){
+                            $fail('Vui lòng nhập mô tả');
+                        }
+                    }],
                     'active' => ['required', Rule::in([AppConstant::ACTIVE, AppConstant::IN_ACTIVE])],
                 ],
                 [
                     'name.required' => 'Vui lòng nhập tên cơ sở.',
-                    'address.required' => 'Vui lòng nhập địa chỉ.',
-                    'address.max' => 'Địa chỉ không được vượt quá :max ký tự.',
-                    'active.required' => 'Vui lòng chọn trạng thái hoạt động.',
                     'active.in' => 'Bạn đang cố tình chọn sai trạng thái.',
                 ]);
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
             }
-
-            $facility->name = $request->input('name');
-            $facility->address = $request->input('address');
-            $facility->active = $request->integer('active');
-            $facility->save();
+            $specialty->name = $request->input('name');
+            $specialty->description = $request->input('description');
+            $specialty->active = $request->integer('active');
+            $specialty->save();
             session()->flash('success', 'Lưu trữ dữ liệu thành công!');
-            return redirect()->route('facilities.list');
+            return redirect()->route('specialties.list');
         } else {
-            session()->flash('error', 'Không tìm thấy cơ sở');
+            session()->flash('error', 'Không tìm thấy chuyên môn');
             return redirect()->back();
         }
     }
 
-    public function change_active($facility_id): RedirectResponse
+    public function change_active($specialty_id): RedirectResponse
     {
-        $facility = Facilities::find($facility_id);
-        if ($facility) {
+        $specialty = Specialties::find($specialty_id);
+        if ($specialty) {
             $validator = Validator::make(
                 ['active' => request()->get('active')],
                 ['active' => ['required', Rule::in([AppConstant::ACTIVE, AppConstant::IN_ACTIVE])]],
@@ -142,14 +142,13 @@ class FacilityController extends Controller
                 $errors_active = reset($errors_active);
                 session()->flash('error', $errors_active);
             }else{
-                $facility->active = request()->get('active');
-                $facility->save();
+                $specialty->active = request()->get('active');
+                $specialty->save();
                 session()->flash('success', 'Thay đổi trạng thái thành công');
             }
         } else {
-            session()->flash('error', 'Không tìm thấy cơ sở');
+            session()->flash('error', 'Không tìm thấy chuyên môn');
         }
         return redirect()->back();
     }
-
 }

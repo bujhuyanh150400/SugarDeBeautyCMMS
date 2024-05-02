@@ -9,7 +9,7 @@ const LeftMenu = () => {
     const childPath = page.url.split('/').splice(2, 3).shift();
     const menus = page.props.auth.menu;
     const collapsedMenu = useSelector(state => state.app.collapsedMenu);
-    const RenderMenu = ({menu}) => {
+    const RenderMenu = ({menu,parent}) => {
         return (
             <>
                 {(menu.children && menu.children.length > 0) ? (
@@ -22,11 +22,14 @@ const LeftMenu = () => {
                         placement="rightStart"
                     >
                         {menu.children.map(menuChild => (
-                            <RenderMenu key={uuid()} menu={menuChild} />
+                            <RenderMenu key={uuid()} parent={menu.active} menu={menuChild} />
                         ))}
                     </Nav.Menu>
                 ): (
-                    <Nav.Item key={menu.key} as={Link} href={menu.href} active={menu.active === childPath || menu.active === parentPath} eventKey={menu.active}  icon={<DynamicIcon icon={menu.icon} />}>
+                    <Nav.Item key={menu.key} as={Link}
+                              href={menu.href}
+                              eventKey={ parent ? `${parent}-${menu.active}` : menu.active }
+                              icon={<DynamicIcon icon={menu.icon} />}>
                         {menu.label}
                     </Nav.Item>
                 )}
@@ -42,7 +45,7 @@ const LeftMenu = () => {
         >
             <Sidenav expanded={collapsedMenu} defaultOpenKeys={[parentPath]} appearance="subtle">
                 <Sidenav.Body>
-                    <Nav>
+                    <Nav activeKey={`${parentPath}-${childPath}`}>
                         {menus.map((menu) => (<RenderMenu key={uuid()} menu={menu} />))}
                     </Nav>
                 </Sidenav.Body>

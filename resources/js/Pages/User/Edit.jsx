@@ -303,7 +303,7 @@ const Edit = (props) => {
                 <Modal.Footer>
                     <Button onClick={() => {
                         setAlertDeleted(false)
-                        router.put(route('user.deleted_file'),{
+                        router.patch(route('user.deleted_file'),{
                             user_id: user.id,
                             file_id: idDeleted
                         },{ preserveScroll: true })
@@ -331,7 +331,7 @@ const Edit = (props) => {
                     <Button onClick={() => {
                         setAlertDeletedAvatar(false)
                         setDemoAvatar(null)
-                        router.put(route('user.deleted_file'),{
+                        router.patch(route('user.deleted_file'),{
                             user_id: user.id,
                             file_id: idDeleted
                         },{ preserveScroll: true })
