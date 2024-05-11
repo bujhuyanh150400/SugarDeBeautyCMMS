@@ -69,7 +69,7 @@ class DatabaseSeeder extends Seeder
             'remember_token' => null,
         ]);
         $randomKey = array_rand(PermissionAdmin::getList());
-        for ($i = 0; $i < 30; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             DB::table('users')->insert([
                 'id' => intval(date('ymdHis') . rand(10, 9999)),
                 'name' => $faker->name,

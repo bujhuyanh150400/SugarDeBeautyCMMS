@@ -7,7 +7,7 @@ class PermissionAdmin
     const ADMIN = 16;
     const MANAGER = 18;
     const EMPLOYEE = 20;
-    static function getList()
+    static function getList(): array
     {
         return [
             self::ADMIN => [

@@ -1,10 +1,10 @@
 import Layout from "@/Layouts/index.jsx";
 
-
+import {QRCodeCanvas} from 'qrcode.react';
 const Dashboard = () => {
     return (
         <Layout>
-            test 1234
+
         </Layout>
     )
 }

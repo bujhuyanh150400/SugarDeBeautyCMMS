@@ -185,6 +185,7 @@ return [
         'PermissionAdmin' => \App\Helpers\PermissionAdmin::class,
         'Menu' => \App\Helpers\Menu::class,
         'AppConstant' => \App\Helpers\AppConstant::class,
+        'ScheduleStatus'=> \App\Helpers\ScheduleStatus::class,
     ])->toArray(),
 
 ];

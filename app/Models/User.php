@@ -75,5 +75,12 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(File::class, 'file_user', 'user_id', 'file_id');
     }
-
+    public function timeAttendance(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->HasOne(TimeAttendance::class);
+    }
+    public function schedules(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Schedule::class);
+    }
 }
