@@ -34,6 +34,7 @@ class AuthController extends Controller
             $remember = $request->boolean('remember');
             if (Auth::attempt(['email' => $request->input('email'), 'password' => $request->input('password')],$remember)) {
                 $request->session()->regenerate();
+                session()->flash('success','Đăng nhập thành công');
                 return redirect()->route('dashboard');
             } else {
                 return redirect()->back()->withErrors([

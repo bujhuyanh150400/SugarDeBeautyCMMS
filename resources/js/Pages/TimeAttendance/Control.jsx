@@ -102,7 +102,7 @@ const Control = (props) => {
                                                    startIcon={<QrcodeIcon/>}
                                                    appearance="primary"
                                                    color="green">
-                                               {!!time_attendance ? 'Sửa' : 'Tạo'}QR code</Button>
+                                               {!!time_attendance ? 'Sửa' : 'Tạo'} QR code</Button>
                                        </div>
                                    </div>
                                    {short_url && (

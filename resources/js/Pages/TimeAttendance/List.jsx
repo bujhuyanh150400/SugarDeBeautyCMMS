@@ -10,18 +10,14 @@ import {
     Table,
     Divider,
     Button,
-    ButtonGroup,
     Pagination,
     Form,
-    Panel, SelectPicker, Modal
+    Panel, SelectPicker, Modal, Whisper, Popover
 } from "rsuite";
 import constant from "@/utils/constant.js";
-
 import EditIcon from '@rsuite/icons/Edit';
-import TrashIcon from '@rsuite/icons/Trash';
 import SearchIcon from '@rsuite/icons/Search';
-import PlusIcon from '@rsuite/icons/Plus';
-import RemindIcon from '@rsuite/icons/legacy/Remind';
+import QRCode from "@/Components/QRCode.jsx";
 
 const List = (props) => {
     let {facilities, users} = props;
@@ -122,25 +118,7 @@ const List = (props) => {
                     <Table.HeaderCell>ID</Table.HeaderCell>
                     <Table.Cell dataKey="id"/>
                 </Table.Column>
-                <Table.Column flexGrow={0} verticalAlign="center" align="center" fullText>
-                    <Table.HeaderCell>Avatar</Table.HeaderCell>
-                    <Table.Cell>
-                        {rowData => {
-                            let src = null;
-                            if (rowData.files.length > 0) {
-                                let avatar = rowData.files.find(file => {
-                                    return parseInt(file.file_type) === constant.FileType.FILE_TYPE_AVATAR
-                                })
-                                if (avatar) {
-                                    src = route('file.show', {filepath: avatar.file_location})
-                                }
-                            }
-                            return (
-                                <Avatar src={src} size="lg"/>
-                            )
-                        }}
-                    </Table.Cell>
-                </Table.Column>
+
                 <Table.Column flexGrow={1} verticalAlign="center" align="start" fullText>
                     <Table.HeaderCell>Tên nhân viên</Table.HeaderCell>
                     <Table.Cell>
@@ -164,13 +142,39 @@ const List = (props) => {
                         </div>)}
                     </Table.Cell>
                 </Table.Column>
-                <Table.Column verticalAlign="center" flexGrow={1.5} align="center" fullText>
+                <Table.Column flexGrow={1} verticalAlign="center" align="center" fullText>
+                    <Table.HeaderCell>QR code</Table.HeaderCell>
+                    <Table.Cell>
+                        {rowData => {
+                            if (rowData.time_attendance) {
+                                const short_url = route('short_url', {short_url: rowData.time_attendance.short_url});
+                                return (<Whisper
+                                    placement="topStart"
+                                    trigger="click"
+                                    speaker={<Popover arrow={true}><QRCode url={short_url} size={150}></QRCode></Popover>}
+                                >
+                                    <Button>
+                                        Xem QR code
+                                    </Button>
+                                </Whisper>);
+                            } else {
+                                return (<p>None</p>)
+                            }
+                        }}
+                    </Table.Cell>
+                </Table.Column>
+                <Table.Column verticalAlign="center" flexGrow={1.5} align="center">
                     <Table.HeaderCell>Action</Table.HeaderCell>
                     <Table.Cell>
-                        {rowData => (
-                            <Button as={Link} href={route('time_attendance.control', {user_id: rowData.id})}
-                                    startIcon={<EditIcon/>} color="blue" appearance="primary">Quản lý chấm công</Button>
-                        )}
+                        {rowData => {
+                            return (
+                                <div className="flex items-center gap-4">
+                                    <Button as={Link} href={route('time_attendance.control', {user_id: rowData.id})}
+                                            startIcon={<EditIcon/>} color="blue" appearance="primary">Quản lý chấm
+                                        công</Button>
+                                </div>
+                            )
+                        }}
                     </Table.Cell>
                 </Table.Column>
             </Table>

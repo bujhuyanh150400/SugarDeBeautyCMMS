@@ -8,6 +8,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\TimeAttendanceController;
+use App\Http\Controllers\ScheduleController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -59,6 +60,12 @@ Route::middleware('guest')->group(function () {
     });
 
     Route::prefix('time_attendance')->group(function () {
+        // Quản lý lịch làm
+        Route::prefix('schedule')->group(function () {
+            Route::get('/list', [ScheduleController::class, 'list'])->name('schedules.list');
+        });
+
+        // Quản lý chấm công
         Route::prefix('manager')->group(function () {
             Route::get('/list', [TimeAttendanceController::class, 'list'])->name('time_attendance.list');
             Route::match(['get', 'post'], '/control/{user_id}', [TimeAttendanceController::class, 'control'])->name('time_attendance.control')->whereNumber('user_id');
