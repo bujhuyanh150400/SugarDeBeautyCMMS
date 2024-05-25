@@ -1,21 +1,22 @@
 import {router} from "@inertiajs/react";
 import {useState} from "react";
 import {Loader} from "rsuite";
+import {useDispatch, useSelector} from "react-redux";
+import {setLoading} from "@/redux/reducers/AppSlice.js";
 
 
 const Loading = () => {
-    const [load,setLoad] = useState(false);
+    const dispatch = useDispatch();
+    const loading = useSelector(state => state.app.loading);
     router.on('start', () => {
-        setLoad(true);
+       dispatch(setLoading(true));
     })
     router.on('finish', (event) => {
-        setLoad(false);
+        dispatch(setLoading(false));
     })
-
-
     return (
         <>
-            {load && (<div className="fixed w-screen h-screen z-[9999999999]">
+            {loading && (<div className="fixed w-screen h-screen z-[9999999999]">
                 <Loader size="md" speed="slow"  backdrop content="Chờ 1 chút nhá" center />
             </div>)}
         </>

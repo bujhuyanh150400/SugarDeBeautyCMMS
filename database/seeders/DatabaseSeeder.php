@@ -7,6 +7,7 @@ use App\Helpers\PermissionAdmin;
 use App\Models\Facilities;
 use App\Models\Specialties;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -17,8 +18,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $faker = Factory::create();
+        // facilities
         DB::table('facilities')->insert([
-            'id' => 24021008224354,
+            'id' => intval(date('ymdHis') . rand(1000, 9999)),
             'name' => 'Cơ sở 1',
             'address' => 'Số 71, Phạm Tuấn Tài',
             'active' => 1,
@@ -26,7 +28,7 @@ class DatabaseSeeder extends Seeder
             'updated_at' => now(),
         ]);
         DB::table('facilities')->insert([
-            'id' => 24021008224642,
+            'id' => intval(date('ymdHis') . rand(1000, 9999)),
             'name' => 'Cơ sở 2',
             'address' => 'Số 52, Cầu Giấy',
             'active' => 1,
@@ -35,7 +37,7 @@ class DatabaseSeeder extends Seeder
         ]);
         // Specialties
         DB::table('facilities')->insert([
-            'id' => 24021016293164,
+            'id' => intval(date('ymdHis') . rand(1000, 9999)),
             'name' => 'Cơ sở 3',
             'address' => 'Số 8, Hồ Đắc Di',
             'active' => 1,
@@ -44,9 +46,41 @@ class DatabaseSeeder extends Seeder
         ]);
         // Specialties
         DB::table('specialties')->insert([
-            'id' => 24021016322362,
+            'id' => intval(date('ymdHis') . rand(1000, 9999)),
             'name' => 'Spa',
-            'description' => '<p><strong>Spa </strong>Dịch vụ chăm sóc sức khỏe</p>',
+            'description' => '<p><strong>Spa </strong>Dịch vụ chăm sóc sức da, mát xa thư dãn</p>',
+            'active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('specialties')->insert([
+            'id' => intval(date('ymdHis') . rand(1000, 9999)),
+            'name' => 'Waxing',
+            'description' => '<p><strong>Waxing </strong>Dịch vụ wax lông, triệt lông</p>',
+            'active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('specialties')->insert([
+            'id' => intval(date('ymdHis') . rand(1000, 9999)),
+            'name' => 'Mi - mắt',
+            'description' => '<p><strong>Mi - mắt </strong>Dịch vụ nối mi , làm my , định hình lông mày</p>',
+            'active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('specialties')->insert([
+            'id' => intval(date('ymdHis') . rand(1000, 9999)),
+            'name' => 'Nails',
+            'description' => '<p><strong>Nails </strong>Dịch vụ làm nails</p>',
+            'active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('specialties')->insert([
+            'id' => intval(date('ymdHis') . rand(1000, 9999)),
+            'name' => 'Tóc',
+            'description' => '<p><strong>Tóc </strong>Dịch vụ làm tóc, cắt tóc, nhuộm, tạo kiểu</p>',
             'active' => 1,
             'created_at' => now(),
             'updated_at' => now(),
@@ -62,16 +96,23 @@ class DatabaseSeeder extends Seeder
             'gender' => 1,
             'phone' => '0917095494',
             'permission' => 16,
-            'facility_id' => 24021008224354,
-            'specialties_id' => 24021016322362,
+            'facility_id' => Facilities::inRandomOrder()->first()->id,
+            'specialties_id' => Specialties::inRandomOrder()->first()->id,
             'created_at' => now(),
             'updated_at' => now(),
             'remember_token' => null,
         ]);
+        DB::table('time_attendances')->insert([
+            'id' => intval(date('ymdHis') . rand(1000, 9999)),
+            'pin' => random_int(100000, 999999),
+            'short_url' => Str::random(10),
+            'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
+            'user_id' => 15042000,
+        ]);
         $randomKey = array_rand(PermissionAdmin::getList());
         for ($i = 0; $i < 10; $i++) {
-            DB::table('users')->insert([
-                'id' => intval(date('ymdHis') . rand(10, 9999)),
+            $data_user = [
+                'id' => intval(date('ymdHis') . rand(1000, 9999)),
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
                 'password' => Hash::make('123456789'),
@@ -85,6 +126,14 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
                 'remember_token' => null,
+            ];
+            DB::table('users')->insert($data_user);
+            DB::table('time_attendances')->insert([
+                'id' => intval(date('ymdHis') . rand(1000, 9999)),
+                'pin' => random_int(10000, 99999),
+                'short_url' => Str::random(10),
+                'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
+                'user_id' => $data_user['id'],
             ]);
         }
     }

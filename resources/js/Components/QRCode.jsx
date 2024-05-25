@@ -6,8 +6,8 @@ const QRCode = ({url , size}) => {
             size={size ?? 256}
             bgColor={"#ffffff"}
             fgColor={"#000000"}
-            level={"H"}
-            includeMargin={false}
+            level={"L"}
+            includeMargin={true}
         />
     )
 }

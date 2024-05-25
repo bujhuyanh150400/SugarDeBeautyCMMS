@@ -15,7 +15,7 @@ class Controller extends BaseController
     const FILE_PATH_ADMIN = 'file_storage/admin/';
     protected function getIdAsTimestamp(): int
     {
-        return intval(date('ymdHis') . rand(10, 9999));
+        return intval(date('ymdHis') . rand(1000, 9999));
     }
 
     public function __construct()

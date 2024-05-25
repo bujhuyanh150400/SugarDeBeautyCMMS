@@ -8,21 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('time_attendances', function (Blueprint $table) {
-            $table->comment('table dùng để lưu trữ qr chấm công');
+        Schema::create('dayoff', function (Blueprint $table) {
+            $table->comment('table dùng để lưu trữ nghỉ phép của nhân viên');
             $table->id();
-            $table->string('pin')->comment('Password qr chấm công');
-            $table->string('short_url',10)->unique()->comment('url rút ngắn');
-            $table->timestamp('expires_at')->nullable()->comment('thời gian được phép đi muộn');
+            $table->string('title')->comment('Tiêu đề nghỉ phép');
+            $table->text('description')->comment('Nội dung xin nghỉ phép nghỉ phép');
+            $table->timestamp('day_off')->comment('Ngày xin nghỉ của nhân viên');
+            $table->smallInteger('status')->comment('Trạng thái đơn');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
             $table->unsignedBigInteger('user_id')->unique();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
-
     public function down(): void
     {
-        Schema::dropIfExists('time_attendances');
+        Schema::dropIfExists('dayoff');
     }
 };

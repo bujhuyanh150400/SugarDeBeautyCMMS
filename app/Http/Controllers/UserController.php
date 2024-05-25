@@ -6,13 +6,17 @@ use App\Helpers\AppConstant;
 use App\Helpers\PermissionAdmin;
 use App\Models\Facilities;
 use App\Models\Specialties;
+use App\Models\TimeAttendance;
 use App\Models\User;
 use App\Models\File as FileModels;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -29,6 +33,7 @@ class UserController extends Controller
         $this->facilityIds = Facilities::pluck('id')->toArray();
         $this->specialtyIds = Specialties::pluck('id')->toArray();
     }
+
     public function list(Request $request): Response
     {
 
@@ -50,6 +55,7 @@ class UserController extends Controller
             'facilities' => $facilities
         ]);
     }
+
     public function view_add(): Response
     {
         $title = "Thêm nhân sự mới";
@@ -61,6 +67,7 @@ class UserController extends Controller
             'specialties' => $specialties
         ]);
     }
+
     public function add(Request $request): RedirectResponse
     {
         $validator = Validator::make(
@@ -107,41 +114,50 @@ class UserController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        $data = [
-            'id' => $this->getIdAsTimestamp(),
-            'email' => $request->input('email'),
-            'name' => $request->input('name'),
-            'password' => Hash::make($request->input('password')),
-            'address' => $request->input('address'),
-            'permission' => $request->input('permission'),
-            'phone' => $request->input('phone'),
-            'birth' => $request->date('birth')->setTimezone(config('app.timezone'))->format('Y-m-d'),
-            'gender' => $request->integer('gender'),
-            'facility_id' => $request->integer('facility_id'),
-            'specialties_id' => $request->integer('specialties_id'),
-        ];
-        $user = User::create($data);
-        if ($request->hasFile('avatar')) {
-            $avatar = FileController::saveFile($request->file('avatar'), AppConstant::FILE_TYPE_AVATAR);
-            $savedAvatar = FileModels::create($avatar);
-            $user->files()->attach($savedAvatar->id);
-        }
-        if ($request->hasFile('file_upload')) {
-            $files = $request->file('file_upload');
-            foreach ($files as $file) {
-                $file_upload = FileController::saveFile($file);
-                $savedFileUpload = FileModels::create($file_upload);
-                $user->files()->attach($savedFileUpload->id);
+        try {
+            $data = [
+                'id' => $this->getIdAsTimestamp(),
+                'email' => $request->input('email'),
+                'name' => $request->input('name'),
+                'password' => Hash::make($request->input('password')),
+                'address' => $request->input('address'),
+                'permission' => $request->input('permission'),
+                'phone' => $request->input('phone'),
+                'birth' => $request->date('birth')->setTimezone(config('app.timezone'))->format('Y-m-d'),
+                'gender' => $request->integer('gender'),
+                'facility_id' => $request->integer('facility_id'),
+                'specialties_id' => $request->integer('specialties_id'),
+            ];
+            $user = User::create($data);
+            if ($request->hasFile('avatar')) {
+                $avatar = FileController::saveFile($request->file('avatar'), AppConstant::FILE_TYPE_AVATAR);
+                $savedAvatar = FileModels::create($avatar);
+                $user->files()->attach($savedAvatar->id);
             }
-        }
-        if ($user) {
+            if ($request->hasFile('file_upload')) {
+                $files = $request->file('file_upload');
+                foreach ($files as $file) {
+                    $file_upload = FileController::saveFile($file);
+                    $savedFileUpload = FileModels::create($file_upload);
+                    $user->files()->attach($savedFileUpload->id);
+                }
+            }
+            // Sau khi tạo xong sẽ tạo luôn QR code cho nhân viên
+            TimeAttendance::create([
+                'id' => $this->getIdAsTimestamp(),
+                'pin' => random_int(100000, 999999),
+                'short_url' => Str::random(10),
+                'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
+                'user_id' => $user->id,
+            ]);
             session()->flash('success', 'Lưu trữ dữ liệu thành công!');
             return redirect()->route('user.list');
-        } else {
+        } catch (QueryException|\Exception $exception) {
             session()->flash('error', 'Có lỗi gì đó khi thao tác, vui lòng liên hệ quản trị viên');
             return redirect()->back()->withInput();
         }
     }
+
     public function view_edit($user_id): Response|RedirectResponse
     {
         $user = User::with('facility', 'specialties', 'files')->find($user_id);
@@ -159,7 +175,8 @@ class UserController extends Controller
             return redirect()->back();
         }
     }
-    public function edit($user_id,Request $request): RedirectResponse
+
+    public function edit($user_id, Request $request): RedirectResponse
     {
         $user = User::find($user_id);
         if ($user) {
@@ -229,6 +246,7 @@ class UserController extends Controller
             return redirect()->back();
         }
     }
+
     public function deleted($user_id): RedirectResponse
     {
         $user = User::find($user_id);
@@ -246,6 +264,7 @@ class UserController extends Controller
         return redirect()->back();
 
     }
+
     public function deletedFile(Request $request): RedirectResponse
     {
         $user = User::find($request->integer('user_id'));

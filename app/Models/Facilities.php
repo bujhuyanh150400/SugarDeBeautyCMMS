@@ -41,4 +41,8 @@ class Facilities extends Model
     {
         return $this->hasMany(User::class,'facility_id');
     }
+    public function schedules(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Schedule::class,'facility_id');
+    }
 }

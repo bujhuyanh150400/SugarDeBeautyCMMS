@@ -8,16 +8,14 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\TimeAttendanceController;
-use App\Http\Controllers\ScheduleController;
-
+use App\Http\Controllers\SchedulesController;
+use App\Http\Controllers\DayOffController;
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
 
-Route::get('short/{short_url}', [TimeAttendanceController::class, 'handle_short_url'])->name('short_url');
-
-Route::match(['get', 'post'], '/timekeeping', [TimeAttendanceController::class, 'timekeeping'])->name('time_attendance.timekeeping');
+Route::match(['get', 'post'],'short/{short_url}', [TimeAttendanceController::class, 'timeAttendance'])->name('short_url');
 
 Route::middleware('guest')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -59,17 +57,27 @@ Route::middleware('guest')->group(function () {
         });
     });
 
+
+    // Lịch làm
     Route::prefix('time_attendance')->group(function () {
         // Quản lý lịch làm
         Route::prefix('schedule')->group(function () {
-            Route::get('/list', [ScheduleController::class, 'list'])->name('schedules.list');
+            Route::get('/list', [SchedulesController::class, 'list'])->name('schedules.list');
+            Route::get('/manager_schedules/{facilities_id}', [SchedulesController::class, 'managerSchedules'])->name('schedules.managerSchedules')->whereNumber('facilities_id');
+            Route::get('/view/{facilities_id}', [SchedulesController::class, 'view'])->name('schedules.view')->whereNumber('facilities_id')->middleware('auth');
+            Route::post('/register/{facilities_id}', [SchedulesController::class, 'register'])->name('schedules.register')->whereNumber('facilities_id');
+            Route::patch('/edit/{schedule_id}', [SchedulesController::class, 'edit'])->name('schedules.edit')->whereNumber('schedule_id');
+            Route::patch('/deleted/{schedule_id}', [SchedulesController::class, 'deleted'])->name('schedules.deleted')->whereNumber('schedule_id');
         });
-
         // Quản lý chấm công
         Route::prefix('manager')->group(function () {
             Route::get('/list', [TimeAttendanceController::class, 'list'])->name('time_attendance.list');
             Route::match(['get', 'post'], '/control/{user_id}', [TimeAttendanceController::class, 'control'])->name('time_attendance.control')->whereNumber('user_id');
         });
+    });
+
+    Route::prefix('dayoff')->group(function () {
+        Route::get('/list', [DayOffController::class, 'list'])->name('dayoff.list');
     });
 });
 

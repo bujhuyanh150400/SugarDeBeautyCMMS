@@ -4,6 +4,7 @@ export const AppSlice = createSlice({
     initialState: {
         collapsedMenu:true,
         darkTheme:false,
+        loading:false,
     },
     reducers: {
         setCollapsedMenu : (state, action) => {
@@ -11,11 +12,15 @@ export const AppSlice = createSlice({
         },
         setThemeDark : (state, action) => {
             state.darkTheme = action.payload
+        },
+        setLoading: (state, action) => {
+            state.loading = action.payload
         }
     },
 });
 export const {
     setCollapsedMenu,
-    setThemeDark
+    setThemeDark,
+    setLoading
 } = AppSlice.actions;
 export default AppSlice.reducer;

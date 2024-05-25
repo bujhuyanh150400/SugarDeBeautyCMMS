@@ -1,5 +1,5 @@
 import Layout from "@/Layouts/index.jsx";
-import {useForm} from "@inertiajs/react";
+import {Link, useForm} from "@inertiajs/react";
 import {
     Button,
     Form,
@@ -87,9 +87,8 @@ const Control = (props) => {
                                                            /\d/, // Các chữ số từ 0 đến 9
                                                            /\d/, // Các chữ số từ 0 đến 9
                                                            /\d/, // Các chữ số từ 0 đến 9
-                                                           /\d/, // Các chữ số từ 0 đến 9
                                                        ]}
-                                                       placeholder="Nhập 6 số"
+                                                       placeholder="Nhập 5 số"
                                                        onChange={(value) => setData('pin', value)} value={data.pin}
                                                    />
                                                    <InputGroup.Button onClick={setRandomPin}>Random Mã
@@ -109,6 +108,7 @@ const Control = (props) => {
                                        <div className="flex flex-col gap-3">
                                            <Heading level={5}>Mã QRCode của nhân viên</Heading>
                                            <QRCode url={short_url} />
+                                           <Link href={short_url}>{short_url}</Link>
                                        </div>
                                    )}
                                </div>

@@ -6,19 +6,104 @@
 body .roboto {
     font-family: 'Roboto', sans-serif !important;
 }
-body::-webkit-scrollbar-track
+*::-webkit-scrollbar-track
 {
     background-color: #cccc;
 }
 
-body::-webkit-scrollbar
+*::-webkit-scrollbar
 {
     width: 5px;
     background-color: #cccc;
 }
 
-body::-webkit-scrollbar-thumb
+*::-webkit-scrollbar-thumb
 {
     background: #25B3F5;
     border-radius: 50px;
+}
+
+:root {
+    --black: #333333;
+    --blue: #686de0;
+    --gray: #d3d3d3;
+    --green: #6ab04c;
+    --red: #dc3545;
+    --white: #ffffff;
+}
+
+code {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+}
+
+.pin-field-container {
+    display: grid;
+    grid-auto-columns: max-content;
+    grid-auto-flow: column;
+    justify-content: center;
+    margin: 4rem 0;
+}
+
+.pin-field {
+    border: 1px solid var(--gray);
+    border-right: none;
+    font-size: 2rem;
+    outline: none;
+    text-align: center;
+    transition-duration: 250ms;
+    transition-property: color, border, box-shadow, transform;
+}
+
+.pin-field:first-of-type {
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.pin-field:last-of-type {
+    border-radius: 0 0.5rem 0.5rem 0;
+    border-right: 1px solid var(--gray);
+}
+
+.pin-field:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0.25rem rgba(104, 109, 224, 0.5);
+    outline: none;
+}
+
+.pin-field:focus + .pin-field {
+    border-left-color: var(--blue);
+}
+
+.pin-field:invalid {
+    animation: shake 5 linear 75ms;
+    border-color: var(--red);
+    box-shadow: 0 0 0.25rem rgba(220, 53, 69, 0.5);
+}
+
+.pin-field:invalid + .pin-field {
+    border-left-color: var(--red);
+}
+
+.pin-field.complete {
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.pin-field.complete[disabled] {
+    background: rgba(106, 176, 76, 0.1);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pin-field.complete + .pin-field {
+    border-left-color: var(--green);
+}
+
+@keyframes shake {
+    from {
+        transform: translateY(-5%);
+    }
+    to {
+        transform: translateY(5%);
+    }
 }

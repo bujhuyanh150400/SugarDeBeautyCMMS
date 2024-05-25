@@ -13,6 +13,6 @@ class AppConstant
 
     public static function getIdAsTimestamp():int
     {
-        return intval(date('ymdHis') . rand(10, 9999));
+        return intval(date('ymdHisv') . rand(10, 9999));
     }
 }

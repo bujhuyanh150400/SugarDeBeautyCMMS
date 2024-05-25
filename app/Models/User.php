@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Scopes\NotDeletedScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -27,6 +28,7 @@ class User extends Authenticatable
         'avatar',
         'facility_id',
         'specialties_id',
+        'time_attendance_id'
     ];
     protected $hidden = [
         'password',
@@ -35,7 +37,10 @@ class User extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
-
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new NotDeletedScope);
+    }
 
     public function scopeKeywordFilter(Builder $query, $keyword = null): void
     {
@@ -82,5 +87,9 @@ class User extends Authenticatable
     public function schedules(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Schedule::class);
+    }
+    public function dayoff(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(DayOff::class);
     }
 }
