@@ -2,11 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Helpers\PermissionAdmin;
-use App\Helpers\ScheduleStatus;
+use App\Helpers\Constant\PermissionAdmin;
+use App\Helpers\Constant\ScheduleStatus;
+use App\Helpers\Menu;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use App\Helpers\Menu;
 
 class HandleInertiaRequests extends Middleware
 {

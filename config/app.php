@@ -182,10 +182,10 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        'PermissionAdmin' => \App\Helpers\PermissionAdmin::class,
+        'PermissionAdmin' => \App\Helpers\Constant\PermissionAdmin::class,
         'Menu' => \App\Helpers\Menu::class,
-        'AppConstant' => \App\Helpers\AppConstant::class,
-        'ScheduleStatus'=> \App\Helpers\ScheduleStatus::class,
+        'AppConstant' => \App\Helpers\Constant\AppConstant::class,
+        'ScheduleStatus'=> \App\Helpers\Constant\ScheduleStatus::class,
     ])->toArray(),
 
 ];

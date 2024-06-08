@@ -20,7 +20,6 @@ class File extends Model
         'updated_at',
         'created_at',
     ];
-
     /**
     -------------- Relations -------------
      */

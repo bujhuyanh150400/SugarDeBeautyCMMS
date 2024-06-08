@@ -19,6 +19,10 @@ return new class extends Migration
             $table->string('phone')->nullable()->comment('SĐT Nhân viên');
             $table->text('address')->nullable()->comment('Địa chỉ nơi ở nhân viên');
             $table->smallInteger('permission')->nullable()->comment('Phân quyền trong Admin');
+            $table->string('bin_bank')->nullable()->comment('ngân hàng nhân viên sử dụng của nhân viên');
+            $table->text('account_bank')->nullable()->comment('Mã ngân hàng của nhân viên , đã được mã hoá');
+            $table->text('account_bank_name')->nullable()->comment('Tên chủ thể ngân hàng, đã được mã hoá');
+            $table->text('salary_per_month')->nullable()->comment('Lương cứng hàng tháng, đã được mã hoá');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
             $table->smallInteger('is_deleted')->default(0)->comment('0 - chưa xóa | 1 - đã xóa');

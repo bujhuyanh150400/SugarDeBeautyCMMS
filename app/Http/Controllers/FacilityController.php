@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\AppConstant;
+use App\Helpers\Constant\AppConstant;
 use App\Models\Facilities;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

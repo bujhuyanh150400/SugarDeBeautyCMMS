@@ -76,6 +76,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Specialties::class);
     }
+    public function rank(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Rank::class, 'rank_id');
+    }
     public function files(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(File::class, 'file_user', 'user_id', 'file_id');

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Helpers\Constant;
+namespace App\Helpers;
 
+use App\Helpers\Constant\PermissionAdmin;
 use Illuminate\Support\Str;
 
 class Menu
@@ -57,10 +58,12 @@ class Menu
                     ]),
                     $this->setMenu('Quản lý nhân sự', 'PeoplesIcon', '/user/manager/list' , 'user' ,[
                         $this->setChildMenu('Quản lý nhân sự', '/user/manager/list' , 'manager'),
+                        $this->setChildMenu('Quản lý cấp bậc', '/user/rank/list' , 'rank'),
                         $this->setChildMenu('Quản lý cơ sở', '/user/facilities/list' , 'facilities'),
                         $this->setChildMenu('Quản lý chuyên môn', '/user/specialties/list','specialties'),
                     ]),
                     $this->setMenu('Quản lý nghỉ phép', 'IdMappingIcon', '/dayoff/list' , 'dayoff'),
+                    $this->setMenu('Thưởng/Phạt', 'RateIcon', '/payoff/manager' , 'payoff'),
                     $this->setMenu('Quản lý lương', 'QrcodeIcon', '/salary/manager' , 'salary'),
                     $this->setMenu('Quản lý đào tạo', 'PeoplesIcon', '/education/workflow/list' , 'education' ,[
                         $this->setChildMenu('Workflow', '/education/workflow/list' , 'workflow'),

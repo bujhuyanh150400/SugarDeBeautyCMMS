@@ -3,18 +3,25 @@ import {useForm} from "@inertiajs/react";
 import {
     Button,
     Form,
-    SelectPicker,
+    SelectPicker, Text,
 } from "rsuite";
 import constant from "@/utils/constant.js";
 import PlusIcon from "@rsuite/icons/Plus.js";
 import Editor from "@/Components/Editor.jsx";
+import {v4 as uuidv4} from 'uuid';
 
 const Add = () => {
     const {data, setData, post, errors} = useForm({
         name: '',
         description: '',
         active: '',
+        service: {},
     });
+
+    const addService = () => {
+        setData("service", {...data.service, [uuidv4()]: {title: '', money: '', percent: '',}})
+    }
+    console.log(data)
     const submit = async () => {
         await post(route('specialties.add'), data);
     }
@@ -49,10 +56,23 @@ const Add = () => {
                     <Form.ControlLabel>Mô tả</Form.ControlLabel>
                     <Editor data={data.description} onChange={(event, editor) => {
                         let value = editor.getData();
-                        setData('description',value);
+                        setData('description', value);
                     }}/>
                     <Form.ErrorMessage show={!!errors.description}>{errors.description}</Form.ErrorMessage>
                 </Form.Group>
+                <div className="mt-12   ">
+                    <Text size={'lg'} weight={'semibold'}>Dịch vụ của chuyên môn</Text>
+                    <Button className={`my-4`} size={'sm'} onClick={addService} type="button" appearance="primary"
+                            color="green" startIcon={<PlusIcon/>}>Thêm</Button>
+                    <div className={`flex flex-col gap-2`}>
+                        {data.service.length > 0 && Object.entries(data.service).map(([uid, service]) => (
+                            <div>
+
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="flex items-center justify-end">
                     <Button type="submit" appearance="primary" color="green" startIcon={<PlusIcon/>}>
                         Tạo chuyên môn mới</Button>

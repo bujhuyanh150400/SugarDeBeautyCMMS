@@ -33,4 +33,4 @@ createInertiaApp({
         );
     },
     progress: false,
-}).then(r => console.log('----- App made by Bui Huy Anh -------'));
+}).then(r => console.warn('----- App made by Bui Huy Anh -------'));

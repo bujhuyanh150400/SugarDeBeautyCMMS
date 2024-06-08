@@ -10,6 +10,7 @@ use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\TimeAttendanceController;
 use App\Http\Controllers\SchedulesController;
 use App\Http\Controllers\DayOffController;
+use App\Http\Controllers\RankController;
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
@@ -36,6 +37,14 @@ Route::middleware('guest')->group(function () {
             Route::post('/edit/{user_id}', [UserController::class, 'edit'])->name('user.edit')->whereNumber('user_id');
             Route::patch('/deleted/{user_id}', [UserController::class, 'deleted'])->name('user.deleted')->whereNumber('user_id');
             Route::patch('/deleted_file', [UserController::class, 'deletedFile'])->name('user.deleted_file');
+        });
+        // Quản lý cấp bậc
+        Route::prefix('rank')->group(function (){
+            Route::get('/list', [RankController::class, 'list'])->name('rank.list');
+            Route::get('/view_add', [RankController::class, 'view_add'])->name('rank.view_add');
+            Route::post('/add', [RankController::class, 'add'])->name('rank.add');
+            Route::get('/view_edit/{rank_id}', [RankController::class, 'view_edit'])->name('rank.view_edit')->whereNumber('rank_id');
+            Route::patch('/edit/{rank_id}', [RankController::class, 'edit'])->name('rank.edit')->whereNumber('rank_id');
         });
         // Quản lý cơ sở
         Route::prefix('facilities')->group(function () {
@@ -78,6 +87,11 @@ Route::middleware('guest')->group(function () {
 
     Route::prefix('dayoff')->group(function () {
         Route::get('/list', [DayOffController::class, 'list'])->name('dayoff.list');
+        Route::get('/view_add', [DayOffController::class, 'view_add'])->name('dayoff.view_add');
+        Route::post('/add', [DayOffController::class, 'add'])->name('dayoff.add');
+        Route::patch('/change_status/{dayoff_id}', [DayOffController::class, 'changeStatus'])->name('dayoff.change_status')->whereNumber('dayoff_id');
+
+
     });
 });
 

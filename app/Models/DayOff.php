@@ -17,7 +17,8 @@ class DayOff extends Model
         'id',
         'title',
         'description',
-        'day_off',
+        'start_date',
+        'end_date',
         'status',
         'created_at',
         'updated_at',
@@ -60,7 +61,7 @@ class DayOff extends Model
      * -------------- Relations -------------
      */
 
-    public function users(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }

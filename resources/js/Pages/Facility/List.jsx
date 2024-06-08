@@ -164,7 +164,7 @@ const List = (props) => {
                                 onChangePage={handlePagination}/>
                 </div>
             )}
-            {/*Modal alert xoá nhân viên*/}
+            {/*Modal alert đổi trạng thái */}
             <Modal backdrop="static" role="alertdialog" open={alertActiveStatus.openAlert} size="xs">
                 <Modal.Body>
                     <RemindIcon className="text-amber-500 text-2xl"/>

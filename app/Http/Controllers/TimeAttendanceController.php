@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\AppConstant;
-use App\Helpers\ScheduleStatus;
+use App\Helpers\Constant\AppConstant;
+use App\Helpers\Constant\ScheduleStatus;
+use App\Helpers\Helpers;
 use App\Models\Facilities;
 use App\Models\Schedule;
 use App\Models\TimeAttendance;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Carbon;
 
 class TimeAttendanceController extends Controller
 {
@@ -49,7 +50,9 @@ class TimeAttendanceController extends Controller
         $user = User::find($user_id);
         if ($user) {
             $time_attendance = TimeAttendance::where('user_id', $user_id)->first();
-
+            if (!empty($time_attendance)){
+                $time_attendance->pin = Helpers::decryptData($time_attendance->pin);
+            }
             if ($request->method() === 'POST') {
                 $validator = Validator::make(
                     $request->all(),
@@ -71,17 +74,18 @@ class TimeAttendanceController extends Controller
                     $minutes = Carbon::parse($request->expires_at)->format('i');
                     $seconds = Carbon::parse($request->expires_at)->format('s');
                     $expires_at = Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute($minutes)->second($seconds)->toDateTimeString();
+                    $pin = Helpers::encryptData($request->integer('pin'));
                     try {
                         // Nếu tồn tại thì cập nhật
                         if ($time_attendance) {
-                            $time_attendance->pin = $request->integer('pin');
+                            $time_attendance->pin = $pin;
                             $time_attendance->expires_at = $expires_at;
                             $time_attendance->save();
                         } // Không thì tạo mới
                         else {
                             $data_qrcode = [
                                 'id' => $this->getIdAsTimestamp(),
-                                'pin' => $request->integer('pin'),
+                                'pin' => $pin,
                                 'short_url' => Str::random(10),
                                 'expires_at' => $expires_at,
                                 'user_id' => $user->id,
@@ -110,7 +114,7 @@ class TimeAttendanceController extends Controller
     }
 
 
-    public function timeAttendance(Request $request, string $short_url)
+    public function timeAttendance(Request $request, string $short_url): Response
     {
         $time_attendance = TimeAttendance::where('short_url', $short_url)->with('user')->first();
         if (empty($time_attendance)) {
@@ -132,7 +136,8 @@ class TimeAttendanceController extends Controller
         if (strtoupper($request->method()) === 'POST') {
             $request->validate([
                 'pin' => ['required', 'between:1,5', function ($attribute, $value, $fail) use ($time_attendance) {
-                    if ($time_attendance->pin !== trim($value)){
+                    $pin = Helpers::decryptData($time_attendance->pin);
+                    if ($pin !== trim($value)) {
                         $fail('Mã pin bạn nhập không đúng');
                     }
                 }],
@@ -146,9 +151,9 @@ class TimeAttendanceController extends Controller
             $totalTime = $time_allowed_late->copy()->addHours($start_time_registered->hour)->addMinutes($start_time_registered->minute)->addSeconds($start_time_registered->second);
             // Thời gian hiện tại
             $currentTime = now();
-            if ($totalTime->lessThanOrEqualTo($currentTime)){
+            if ($totalTime->lessThanOrEqualTo($currentTime)) {
                 $schedule->status = ScheduleStatus::LATE;
-            }else{
+            } else {
                 $schedule->status = ScheduleStatus::DONE;
             }
             $schedule->attendance_at = now();

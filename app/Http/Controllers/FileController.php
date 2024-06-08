@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\AppConstant;
+use App\Helpers\Constant\AppConstant;
 use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller

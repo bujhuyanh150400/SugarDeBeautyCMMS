@@ -26,6 +26,14 @@ const FileType = Object.freeze({
     FILE_TYPE_AVATAR: 15,
     FILE_TYPE_UPLOAD: 16
 })
+
+const DayOffStatus = Object.freeze({
+    ACTIVE: 15,
+    DENIED: 20,
+    WAIT:25,
+})
+
+
 export default {
     Validate,
     PermissionAdmin,
@@ -33,5 +41,6 @@ export default {
     FileType,
     ActiveStatus,
     ACTIVE,
-    IN_ACTIVE
+    IN_ACTIVE,
+    DayOffStatus
 };

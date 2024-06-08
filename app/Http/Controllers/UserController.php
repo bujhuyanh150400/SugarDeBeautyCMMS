@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\AppConstant;
-use App\Helpers\PermissionAdmin;
+use App\Helpers\Constant\AppConstant;
+use App\Helpers\Constant\PermissionAdmin;
 use App\Models\Facilities;
+use App\Models\File as FileModels;
 use App\Models\Specialties;
 use App\Models\TimeAttendance;
 use App\Models\User;
-use App\Models\File as FileModels;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -42,9 +42,7 @@ class UserController extends Controller
         $users = User::KeywordFilter($request->get('keyword') ?? '')
             ->PermissionFilter($request->get('permission') ?? '')
             ->FacilityFilter($request->get('facility') ?? '')
-            ->with('facility')
-            ->with('specialties')
-            ->with('files')
+            ->with(['facility','specialties','files','rank'])
             ->where('is_deleted', AppConstant::NOT_DELETED)
             ->orderBy('created_at', 'desc')
             ->paginate(self::PER_PAGE);
