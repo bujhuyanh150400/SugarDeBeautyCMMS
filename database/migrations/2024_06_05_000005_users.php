@@ -24,7 +24,9 @@ return new class extends Migration
             $table->smallInteger('is_deleted')->default(0)->comment('0 - chưa xóa | 1 - đã xóa');
             $table->unsignedBigInteger('facility_id')->nullable()->comment('Cơ sở làm việc');
             $table->unsignedBigInteger('specialties_id')->nullable()->comment('Chuyên ngành làm việc');
+            $table->unsignedBigInteger('rank_id')->nullable()->comment('Cấp bậc nhân viên');
             $table->foreign('facility_id')->references('id')->on('facilities')->onDelete('cascade');
+            $table->foreign('rank_id')->references('id')->on('ranks')->onDelete('cascade');
             $table->foreign('specialties_id')->references('id')->on('specialties')->onDelete('cascade');
             $table->rememberToken();
         });

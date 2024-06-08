@@ -13,11 +13,12 @@ return new class extends Migration
             $table->id();
             $table->string('title')->comment('Tiêu đề nghỉ phép');
             $table->text('description')->comment('Nội dung xin nghỉ phép nghỉ phép');
-            $table->timestamp('day_off')->comment('Ngày xin nghỉ của nhân viên');
+            $table->timestamp('start_date')->comment('Ngày xin nghỉ của nhân viên');
+            $table->timestamp('end_date')->comment('Ngày xin nghỉ của nhân viên');
             $table->smallInteger('status')->comment('Trạng thái đơn');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
-            $table->unsignedBigInteger('user_id')->unique();
+            $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

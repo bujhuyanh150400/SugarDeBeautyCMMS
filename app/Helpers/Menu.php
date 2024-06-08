@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers;
+namespace App\Helpers\Constant;
 
 use Illuminate\Support\Str;
 
@@ -60,8 +60,8 @@ class Menu
                         $this->setChildMenu('Quản lý cơ sở', '/user/facilities/list' , 'facilities'),
                         $this->setChildMenu('Quản lý chuyên môn', '/user/specialties/list','specialties'),
                     ]),
-                    $this->setMenu('Quản lý lương', 'QrcodeIcon', '/salary/manager' , 'salary'),
                     $this->setMenu('Quản lý nghỉ phép', 'IdMappingIcon', '/dayoff/list' , 'dayoff'),
+                    $this->setMenu('Quản lý lương', 'QrcodeIcon', '/salary/manager' , 'salary'),
                     $this->setMenu('Quản lý đào tạo', 'PeoplesIcon', '/education/workflow/list' , 'education' ,[
                         $this->setChildMenu('Workflow', '/education/workflow/list' , 'workflow'),
                         $this->setChildMenu('Thư viện bài test', '/education/library/list' , 'library'),
