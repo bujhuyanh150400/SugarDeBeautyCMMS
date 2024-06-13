@@ -21,11 +21,13 @@ const handleErrorApi = (error, dispatch, openToast) => {
         }));
     }
 };
-
+function toThousands(value) {
+    return value ? `${value}`.replace(/\d{1,3}(?=(\d{3})+(\.\d*)?$)/g, '$&,') : value;
+}
 const convertDateTime = (date) => {
     return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
 }
 
 export default {
-    handleErrorApi, convertDateTime
+    handleErrorApi, convertDateTime,toThousands
 };

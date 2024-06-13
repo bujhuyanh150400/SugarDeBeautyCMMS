@@ -6,18 +6,18 @@ import {
     MaskedInput,
     Uploader,
     SelectPicker,
-    DatePicker, Loader
+    DatePicker, Loader, InputNumber
 } from "rsuite";
 import constant from "@/utils/constant.js";
 import {useEffect, useState} from "react";
-
 import AvatarIcon from "rsuite/cjs/Avatar/AvatarIcon.js";
 import TrashIcon from '@rsuite/icons/Trash';
 import FileUploadIcon from '@rsuite/icons/FileUpload';
 import PlusIcon from '@rsuite/icons/Plus';
+import HelperFunction from "@/utils/HelperFunction.js";
 
 const Add = (props) => {
-    const {facilities, specialties} = props;
+    const {facilities, specialties, banks, ranks} = props;
     const {data, setData, post, errors} = useForm({
         name: '',
         email: '',
@@ -29,6 +29,11 @@ const Add = (props) => {
         permission: '',
         facility_id: '',
         specialties_id: '',
+        salary_per_month: 0,
+        bin_bank: '',
+        account_bank: '',
+        account_bank_name: '',
+        rank: 0,
         avatar: null,
         file_upload: [],
     })
@@ -89,7 +94,7 @@ const Add = (props) => {
                     </Form.Group>
                     <Form.Group controlId="phone">
                         <Form.ControlLabel>Số điện thoại</Form.ControlLabel>
-                        <MaskedInput
+                        <Form.Control
                             name="phone" id="phone"
                             mask={[
                                 '+', // Dấu "+"
@@ -185,6 +190,80 @@ const Add = (props) => {
                             id="specialties_id"
                             placeholder="Chuyên môn"/>
                         <Form.ErrorMessage show={!!errors.specialties_id}>{errors.specialties_id}</Form.ErrorMessage>
+                    </Form.Group>
+                    <Form.Group controlId="bin_bank">
+                        <Form.ControlLabel>Ngân hàng sử dụng</Form.ControlLabel>
+                        <SelectPicker
+                            block
+                            data={[
+                                {label: 'Lựa chọn', value: ""},
+                                ...banks.map(bank => ({
+                                    label: `${bank.name} - ${bank.short_name}`,
+                                    value: bank.bin
+                                }))
+                            ]}
+                            value={data.bin_bank}
+                            onChange={(value) => setData('bin_bank', value)}
+                            name="bin_bank"
+                            id="bin_bank"
+                            placeholder="Ngân hàng sử dụng"/>
+                        <Form.ErrorMessage show={!!errors.bin_bank}>{errors.bin_bank}</Form.ErrorMessage>
+                    </Form.Group>
+                    <Form.Group controlId="account_bank">
+                        <Form.ControlLabel>Mã ngân hàng</Form.ControlLabel>
+                        <Form.Control
+                            block
+                            value={data.account_bank}
+                            onChange={(value) => setData('account_bank', value)}
+                            name="account_bank"
+                            id="account_bank"
+                            placeholder="Nhập mã ngân hàng"/>
+                        <Form.ErrorMessage show={!!errors.account_bank}>{errors.account_bank}</Form.ErrorMessage>
+                    </Form.Group>
+                    <Form.Group controlId="account_bank">
+                        <Form.ControlLabel>Tên chủ thể ngân hàng</Form.ControlLabel>
+                        <Form.Control
+                            block
+                            value={data.account_bank_name}
+                            onChange={(value) => {
+                                value = value.toUpperCase();
+                                setData('account_bank_name', value)
+                            }}
+                            name="account_bank_name"
+                            id="account_bank_name"
+                            placeholder="Nhập tên chủ thể (Không viết có dấu)"/>
+                        <Form.ErrorMessage show={!!errors.account_bank_name}>{errors.account_bank_name}</Form.ErrorMessage>
+                    </Form.Group>
+                    <Form.Group controlId="salary_per_month">
+                        <Form.ControlLabel>Luơng cứng</Form.ControlLabel>
+                        <InputNumber
+                            block
+                            postfix="VND"
+                            formatter={HelperFunction.toThousands}
+                            value={data.salary_per_month}
+                            onChange={(value) => setData('salary_per_month', value)}
+                            name="salary_per_month"
+                            id="salary_per_month"
+                            placeholder="Lương cứng hàng tháng"/>
+                        <Form.ErrorMessage show={!!errors.salary_per_month}>{errors.salary_per_month}</Form.ErrorMessage>
+                    </Form.Group>
+                    <Form.Group controlId="rank">
+                        <Form.ControlLabel>Cấp bậc</Form.ControlLabel>
+                        <SelectPicker
+                            block
+                            data={[
+                                {label: 'Lựa chọn', value: ""},
+                                ...ranks.map(rank => ({
+                                    label:rank.title,
+                                    value: rank.id,
+                                }))
+                            ]}
+                            value={data.rank}
+                            onChange={(value) => setData('rank', value)}
+                            name="rank"
+                            id="rank"
+                            placeholder="Cấp bậc"/>
+                        <Form.ErrorMessage show={!!errors.rank}>{errors.rank}</Form.ErrorMessage>
                     </Form.Group>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">

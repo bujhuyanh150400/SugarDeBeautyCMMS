@@ -16,9 +16,12 @@ return new class extends Migration
             $table->id();
             $table->smallInteger('type')->comment('Trạng thái Thưởng / phạt');
             $table->text('money')->comment('Số tiền, sẽ được mã hoá');
+            $table->timestamp('payoff_at')->comment('Thời gian ghi nhận phạt');
             $table->text('description')->comment('Nội dung, sẽ được mã hoá');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
+            $table->unsignedBigInteger('created_by');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

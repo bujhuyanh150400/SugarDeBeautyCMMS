@@ -11,7 +11,7 @@ import {
     SelectPicker,
     Whisper,
     Tooltip,
-    DatePicker, Modal
+    DatePicker, Modal, InputNumber
 } from "rsuite";
 import constant from "@/utils/constant.js";
 
@@ -21,11 +21,12 @@ import FileUploadIcon from '@rsuite/icons/FileUpload';
 import EditIcon from '@rsuite/icons/Edit';
 import AttachmentIcon from '@rsuite/icons/Attachment';
 import RemindIcon from "@rsuite/icons/legacy/Remind.js";
+import HelperFunction from "@/utils/HelperFunction.js";
 
 
 const Edit = (props) => {
-    const {facilities, specialties, user} = props;
-    const {data, setData,post, errors} = useForm({
+    const {facilities, specialties, user, banks, ranks} = props;
+    const {data, setData, post, errors} = useForm({
         name: user.name,
         email: user.email,
         birth: new Date(user.birth),
@@ -36,6 +37,11 @@ const Edit = (props) => {
         facility_id: user.facility_id,
         specialties_id: user.specialties_id,
         avatar: null,
+        salary_per_month: user.salary_per_month,
+        bin_bank: user.bin_bank,
+        account_bank: user.account_bank,
+        account_bank_name: user.account_bank_name,
+        rank: user.rank_id,
         file_upload: [],
     });
     let avatar = user.files.find(file => file.file_type === constant.FileType.FILE_TYPE_AVATAR) || null;
@@ -195,6 +201,80 @@ const Edit = (props) => {
                             placeholder="Chuyên môn"/>
                         <Form.ErrorMessage show={!!errors.specialties_id}>{errors.specialties_id}</Form.ErrorMessage>
                     </Form.Group>
+                    <Form.Group controlId="bin_bank">
+                        <Form.ControlLabel>Ngân hàng sử dụng</Form.ControlLabel>
+                        <SelectPicker
+                            block
+                            data={[
+                                {label: 'Lựa chọn', value: ""},
+                                ...banks.map(bank => ({
+                                    label: `${bank.name} - ${bank.short_name}`,
+                                    value: bank.bin
+                                }))
+                            ]}
+                            value={data.bin_bank}
+                            onChange={(value) => setData('bin_bank', value)}
+                            name="bin_bank"
+                            id="bin_bank"
+                            placeholder="Ngân hàng sử dụng"/>
+                        <Form.ErrorMessage show={!!errors.bin_bank}>{errors.bin_bank}</Form.ErrorMessage>
+                    </Form.Group>
+                    <Form.Group controlId="account_bank">
+                        <Form.ControlLabel>Mã ngân hàng</Form.ControlLabel>
+                        <Form.Control
+                            block
+                            value={data.account_bank}
+                            onChange={(value) => setData('account_bank', value)}
+                            name="account_bank"
+                            id="account_bank"
+                            placeholder="Nhập mã ngân hàng"/>
+                        <Form.ErrorMessage show={!!errors.account_bank}>{errors.account_bank}</Form.ErrorMessage>
+                    </Form.Group>
+                    <Form.Group controlId="account_bank_name">
+                        <Form.ControlLabel>Tên chủ thể ngân hàng</Form.ControlLabel>
+                        <Form.Control
+                            block
+                            value={data.account_bank_name}
+                            onChange={(value) => {
+                                value = value.toUpperCase();
+                                setData('account_bank_name', value)
+                            }}
+                            name="account_bank_name"
+                            id="account_bank_name"
+                            placeholder="Nhập tên chủ thể (Không viết có dấu)"/>
+                        <Form.ErrorMessage show={!!errors.account_bank_name}>{errors.account_bank_name}</Form.ErrorMessage>
+                    </Form.Group>
+                    <Form.Group controlId="salary_per_month">
+                        <Form.ControlLabel>Luơng cứng</Form.ControlLabel>
+                        <InputNumber
+                            block
+                            postfix="VND"
+                            formatter={HelperFunction.toThousands}
+                            value={data.salary_per_month}
+                            onChange={(value) => setData('salary_per_month', value)}
+                            name="salary_per_month"
+                            id="salary_per_month"
+                            placeholder="Lương cứng hàng tháng"/>
+                        <Form.ErrorMessage show={!!errors.salary_per_month}>{errors.salary_per_month}</Form.ErrorMessage>
+                    </Form.Group>
+                    <Form.Group controlId="rank">
+                        <Form.ControlLabel>Cấp bậc</Form.ControlLabel>
+                        <SelectPicker
+                            block
+                            data={[
+                                {label: 'Lựa chọn', value: ""},
+                                ...ranks.map(rank => ({
+                                    label:rank.title,
+                                    value: rank.id,
+                                }))
+                            ]}
+                            value={data.rank}
+                            onChange={(value) => setData('rank', value)}
+                            name="rank"
+                            id="rank"
+                            placeholder="Cấp bậc"/>
+                        <Form.ErrorMessage show={!!errors.rank}>{errors.rank}</Form.ErrorMessage>
+                    </Form.Group>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                     <Form.Group controlId="avatar">
@@ -230,10 +310,10 @@ const Edit = (props) => {
                                     className="!w-fit"
                                     type="button" appearance="primary" color="red"
                                     onClick={() => {
-                                        if (avatar){
+                                        if (avatar) {
                                             setAlertDeletedAvatar(true);
                                             setIdDeleted(id_avatar);
-                                        }else{
+                                        } else {
                                             setDemoAvatar(null);
                                             setData('avatar', null);
                                         }
@@ -277,10 +357,10 @@ const Edit = (props) => {
                                                     icon={
                                                         <AttachmentIcon/>}>{file_had_upload.file_real_name}</IconButton>
                                     </Whisper>
-                                    <IconButton onClick={()=>{
+                                    <IconButton onClick={() => {
                                         setAlertDeleted(true);
                                         setIdDeleted(file_had_upload.id);
-                                    }} icon={<TrashIcon/>}  appearance="ghost" color="red"/>
+                                    }} icon={<TrashIcon/>} appearance="ghost" color="red"/>
                                 </ButtonGroup>
                             ))}
                         </div>
@@ -295,18 +375,18 @@ const Edit = (props) => {
             {/*Modal alert xoá file*/}
             <Modal backdrop="static" role="alertdialog" open={alertDeleted} size="xs">
                 <Modal.Body>
-                   <div className="flex items-center gap-2">
-                       <RemindIcon className="text-amber-500 text-2xl"/>
-                       Bạn có muốn xoá file này không ?
-                   </div>
+                    <div className="flex items-center gap-2">
+                        <RemindIcon className="text-amber-500 text-2xl"/>
+                        Bạn có muốn xoá file này không ?
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={() => {
                         setAlertDeleted(false)
-                        router.patch(route('user.deleted_file'),{
+                        router.patch(route('user.deleted_file'), {
                             user_id: user.id,
                             file_id: idDeleted
-                        },{ preserveScroll: true })
+                        }, {preserveScroll: true})
                     }} appearance="primary" color="red">
                         Có
                     </Button>
@@ -331,10 +411,10 @@ const Edit = (props) => {
                     <Button onClick={() => {
                         setAlertDeletedAvatar(false)
                         setDemoAvatar(null)
-                        router.patch(route('user.deleted_file'),{
+                        router.patch(route('user.deleted_file'), {
                             user_id: user.id,
                             file_id: idDeleted
-                        },{ preserveScroll: true })
+                        }, {preserveScroll: true})
                     }} appearance="primary" color="red">
                         Có
                     </Button>

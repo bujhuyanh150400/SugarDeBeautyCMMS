@@ -10,12 +10,15 @@ use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\TimeAttendanceController;
 use App\Http\Controllers\SchedulesController;
 use App\Http\Controllers\DayOffController;
+use App\Http\Controllers\PayoffController;
 use App\Http\Controllers\RankController;
+
+
+
+
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
-
-
 Route::match(['get', 'post'],'short/{short_url}', [TimeAttendanceController::class, 'timeAttendance'])->name('short_url');
 
 Route::middleware('guest')->group(function () {
@@ -62,6 +65,8 @@ Route::middleware('guest')->group(function () {
             Route::post('/add', [SpecialtyController::class, 'add'])->name('specialties.add');
             Route::get('/view_edit/{specialty_id}', [SpecialtyController::class, 'view_edit'])->name('specialties.view_edit')->whereNumber('specialty_id');
             Route::patch('/edit/{specialty_id}', [SpecialtyController::class, 'edit'])->name('specialties.edit')->whereNumber('specialty_id');
+            Route::patch('/edit_service/{service_id}', [SpecialtyController::class,'edit_service'])->name('specialties.edit_service')->whereNumber('service_id');
+            Route::delete('/deleted_service/{service_id}', [SpecialtyController::class,'deleted_service'])->name('specialties.deleted_service')->whereNumber('service_id');
             Route::patch('/change_active/{specialty_id}', [SpecialtyController::class, 'change_active'])->name('specialties.change_active')->whereNumber('specialty_id');
         });
     });
@@ -85,13 +90,21 @@ Route::middleware('guest')->group(function () {
         });
     });
 
+    // Quản lý nghỉ phép
     Route::prefix('dayoff')->group(function () {
         Route::get('/list', [DayOffController::class, 'list'])->name('dayoff.list');
         Route::get('/view_add', [DayOffController::class, 'view_add'])->name('dayoff.view_add');
         Route::post('/add', [DayOffController::class, 'add'])->name('dayoff.add');
         Route::patch('/change_status/{dayoff_id}', [DayOffController::class, 'changeStatus'])->name('dayoff.change_status')->whereNumber('dayoff_id');
+    });
 
 
+    // Quản lý thưởng phạt
+    Route::prefix('payoff')->group(function () {
+        Route::get('/list', [PayoffController::class, 'list'])->name('payoff.list');
+        Route::get('/view_add', [PayoffController::class, 'view_add'])->name('payoff.view_add');
+        Route::post('/add', [PayoffController::class, 'add'])->name('payoff.add');
+        Route::patch('/change_status/{payoff_id}', [PayoffController::class, 'changeStatus'])->name('payoff.change_status')->whereNumber('payoff_id');
     });
 });
 

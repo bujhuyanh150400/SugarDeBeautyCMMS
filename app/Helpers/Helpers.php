@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
 class Helpers
 {
     // Sử dụng thuật toán mã hoá aes-128-cbc
@@ -30,4 +32,14 @@ class Helpers
         }
         return $new_key;
     }
+
+    public static function handleCryptAttribute(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string|null $value) => !empty($value) ? Helpers::decryptData($value) : '',
+            set: fn (string|null $value) => !empty($value) ? Helpers::encryptData($value) : '',
+        );
+    }
+
+
 }

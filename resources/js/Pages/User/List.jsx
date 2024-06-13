@@ -13,7 +13,7 @@ import {
     ButtonGroup,
     Pagination,
     Form,
-    Panel, SelectPicker, Modal
+    Panel, SelectPicker, Modal, Whisper, Popover
 } from "rsuite";
 import constant from "@/utils/constant.js";
 
@@ -22,6 +22,8 @@ import TrashIcon from '@rsuite/icons/Trash';
 import SearchIcon from '@rsuite/icons/Search';
 import PlusIcon from '@rsuite/icons/Plus';
 import RemindIcon from '@rsuite/icons/legacy/Remind';
+import dayjs from "dayjs";
+import HelperFunction from "@/utils/HelperFunction.js";
 
 const List = (props) => {
     let {facilities, users} = props;
@@ -190,8 +192,22 @@ const List = (props) => {
                     <Table.Cell>
                         {rowData => (
                             <ButtonGroup>
-                                <Button as={Link} href={route('user.view_edit',{user_id: rowData.id})} startIcon={<EditIcon/>} color="green" appearance="primary">Sửa</Button>
-                                <Button startIcon={<TrashIcon/>} color="red" appearance="primary"
+                                <Whisper  placement="leftStart" trigger="click" speaker={(
+                                    <Popover title={`Chi tiết nhân viên ${rowData.name}`}>
+                                        <ul className={`list-none m-0 p-0`}>
+                                            <li className={`flex gap-2 items-center`}><Text  weight={`semibold`} color={`blue`}>Tên nhân viên: </Text> {rowData.name}</li>
+                                            <li className={`flex gap-2 items-center`}><Text  weight={`semibold`} color={`blue`}>Ngày sinh: </Text> {dayjs(rowData.birth).format('DD-MM-YYYY')} </li>
+                                            <li className={`flex gap-2 items-center`}><Text  weight={`semibold`} color={`blue`}>Địa chỉ: </Text> {rowData.address}</li>
+                                            <li className={`flex gap-2 items-center`}><Text  weight={`semibold`} color={`blue`}>Giới tính : </Text> {rowData.gender === 1 ? 'Nam' : 'Nữ'}</li>
+                                            <li className={`flex gap-2 items-center`}><Text  weight={`semibold`} color={`blue`}>Cấp: </Text> {rowData.rank.title}</li>
+                                            <li className={`flex gap-2 items-center`}><Text  weight={`semibold`} color={`blue`}>Lương cứng: </Text> {HelperFunction.toThousands(rowData.salary_per_month)} VNĐ</li>
+                                        </ul>
+                                    </Popover>
+                                )}>
+                                    <Button  color="blue" appearance="primary">Chi tiết</Button>
+                                </Whisper>
+                                <Button as={Link} href={route('user.view_edit',{user_id: rowData.id})}  color="green" appearance="primary">Sửa</Button>
+                                <Button  color="red" appearance="primary"
                                         onClick={() => {
                                             setIdDeleted(rowData.id);
                                             setAlertDeleted(true);

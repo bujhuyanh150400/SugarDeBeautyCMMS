@@ -1,39 +1,65 @@
 import Layout from "@/Layouts/index.jsx";
-import {useForm} from "@inertiajs/react";
+import {router, useForm} from "@inertiajs/react";
 import {
     Button,
-    Form,
+    Form, IconButton, InputNumber, Panel,
     SelectPicker, Text,
 } from "rsuite";
 import constant from "@/utils/constant.js";
 import PlusIcon from "@rsuite/icons/Plus.js";
 import Editor from "@/Components/Editor.jsx";
 import {v4 as uuidv4} from 'uuid';
-
-const Add = () => {
-    const {data, setData, post, errors} = useForm({
+import {useState} from "react";
+import _ from "lodash";
+import HelperFunction from "@/utils/HelperFunction.js";
+import TrashIcon from '@rsuite/icons/Trash';
+import Swal from 'sweetalert2'
+const Add = (props) => {
+    const {errors} = props;
+    const [data, setData] = useState({
         name: '',
         description: '',
         active: '',
         service: {},
-    });
-
+    })
+    const setForm = (key, value) => setData((prevState) => ({...prevState, [key]: value}))
     const addService = () => {
-        setData("service", {...data.service, [uuidv4()]: {title: '', money: '', percent: '',}})
+        setForm("service", {...data.service, [uuidv4()]: {title: '', money: 0, percent: 0,}})
     }
-    console.log(data)
+    const handleServiceChange = (id, field, value) => {
+        setData((prevState) => ({
+            ...prevState,
+            service: {
+                ...prevState.service,
+                [id]: {
+                    ...prevState.service[id],
+                    [field]: value,
+                },
+            },
+        }));
+    };
+    // Hàm xử lý xóa
+    const handleDeleteService = (id) => {
+        const updatedServices = {...data.service};
+        delete updatedServices[id];
+
+        setData((prevData) => ({
+            ...prevData,
+            service: updatedServices,
+        }));
+    };
     const submit = async () => {
-        await post(route('specialties.add'), data);
+        await router.post(route('specialties.add'), data);
     }
     return (
         <Layout back_to={route('specialties.list')}>
             <Form onSubmit={submit} fluid>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-8">
                     <Form.Group controlId="name">
-                        <Form.ControlLabel>Tên cơ sở</Form.ControlLabel>
+                        <Form.ControlLabel>Tên chuyên môn</Form.ControlLabel>
                         <Form.Control
                             name="name" id="name"
-                            onChange={(value) => setData('name', value)} value={data.name}
+                            onChange={(value) => setForm('name', value)} value={data.name}
                             placeholder="Tên chuyên môn"
                             errorMessage={errors.name}
                         />
@@ -44,7 +70,7 @@ const Add = () => {
                             block
                             data={constant.ActiveStatus}
                             value={data.active}
-                            onChange={(value) => setData('active', value)}
+                            onChange={(value) => setForm('active', value)}
                             name="active"
                             searchable={false}
                             id="active"
@@ -56,23 +82,68 @@ const Add = () => {
                     <Form.ControlLabel>Mô tả</Form.ControlLabel>
                     <Editor data={data.description} onChange={(event, editor) => {
                         let value = editor.getData();
-                        setData('description', value);
+                        setForm('description', value);
                     }}/>
                     <Form.ErrorMessage show={!!errors.description}>{errors.description}</Form.ErrorMessage>
                 </Form.Group>
-                <div className="mt-12   ">
+                <div className="my-8">
                     <Text size={'lg'} weight={'semibold'}>Dịch vụ của chuyên môn</Text>
                     <Button className={`my-4`} size={'sm'} onClick={addService} type="button" appearance="primary"
                             color="green" startIcon={<PlusIcon/>}>Thêm</Button>
-                    <div className={`flex flex-col gap-2`}>
-                        {data.service.length > 0 && Object.entries(data.service).map(([uid, service]) => (
-                            <div>
-
+                    <div className={`flex flex-col gap-2 mt-4`}>
+                        {_.size(data.service) > 0 && _.map(data.service, (service, id) => (
+                            <div className={`grid grid-cols-4 gap-4`} key={id}>
+                                <Form.Group controlId={`service-money-${id}`}>
+                                    <Form.ControlLabel>Tên dịch vụ</Form.ControlLabel>
+                                    <Form.Control
+                                        name={`service-title-${id}`} id={`service-title-${id}`}
+                                        onChange={(value) => handleServiceChange(id, 'title', value)}
+                                        value={data.service[id].title}
+                                        placeholder="Tên chuyên môn"
+                                    />
+                                    <Form.ErrorMessage show={!!errors?.[`service.${id}.title`]}>
+                                        {errors?.[`service.${id}.title`] ?? ''}
+                                    </Form.ErrorMessage>
+                                </Form.Group>
+                                <Form.Group controlId={`service-money-${id}`}>
+                                    <Form.ControlLabel>Số tiền mỗi dịch vụ</Form.ControlLabel>
+                                    <InputNumber
+                                        block
+                                        postfix="VND"
+                                        formatter={HelperFunction.toThousands}
+                                        value={data.service[id].money}
+                                        onChange={(value) => handleServiceChange(id, 'money', value)}
+                                        name={`service-money-${id}`}
+                                        id={`service-money-${id}`}
+                                        placeholder="Số tiền"/>
+                                    <Form.ErrorMessage show={!!errors?.[`service.${id}.money`]}>
+                                        {errors?.[`service.${id}.money`] ?? ''}
+                                    </Form.ErrorMessage>
+                                </Form.Group>
+                                <Form.Group controlId={`service-percent-${id}`}>
+                                    <Form.ControlLabel>% hoa hồng</Form.ControlLabel>
+                                    <InputNumber
+                                        block
+                                        min={0}
+                                        max={100}
+                                        postfix="%"
+                                        formatter={HelperFunction.toThousands}
+                                        value={data.service[id].percent}
+                                        onChange={(value) => handleServiceChange(id, 'percent', value)}
+                                        name={`service-percent-${id}`}
+                                        id={`service-percent-${id}`}
+                                        placeholder="% hoa hồng"/>
+                                    <Form.ErrorMessage show={!!errors?.[`service.${id}.percent`]}>
+                                        {errors?.[`service.${id}.percent`] ?? ''}
+                                    </Form.ErrorMessage>
+                                </Form.Group>
+                                <div className={`self-center`}>
+                                    <IconButton color={`red`} appearance={`primary`} icon={<TrashIcon/>} onClick={() => handleDeleteService(id)}/>
+                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
-
                 <div className="flex items-center justify-end">
                     <Button type="submit" appearance="primary" color="green" startIcon={<PlusIcon/>}>
                         Tạo chuyên môn mới</Button>

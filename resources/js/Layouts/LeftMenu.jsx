@@ -6,7 +6,7 @@ import {v4 as uuid} from "uuid"
 const LeftMenu = () => {
     const page = usePage();
     const parentPath = page.url.split('/').splice(1, 2).shift();
-    const childPath = page.url.split('/').splice(2, 3).shift();
+    const childPath = page.url.split('/').splice(2, 3).shift() ;
     const menus = page.props.auth.menu;
     const collapsedMenu = useSelector(state => state.app.collapsedMenu);
     const RenderMenu = ({menu,parent}) => {

@@ -283,7 +283,7 @@ class DatabaseSeeder extends Seeder
             'gender' => 1,
             'rank_id' => 2406052325224804,
             'salary_per_month'=> Helpers::encryptData(200000000),
-            'phone' => '0917095494',
+            'phone' => $faker->e164PhoneNumber,
             'permission' => 16,
             'facility_id' => Facilities::inRandomOrder()->first()->id,
             'specialties_id' => Specialties::inRandomOrder()->first()->id,

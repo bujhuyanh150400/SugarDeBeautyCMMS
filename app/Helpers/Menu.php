@@ -63,13 +63,12 @@ class Menu
                         $this->setChildMenu('Quản lý chuyên môn', '/user/specialties/list','specialties'),
                     ]),
                     $this->setMenu('Quản lý nghỉ phép', 'IdMappingIcon', '/dayoff/list' , 'dayoff'),
-                    $this->setMenu('Thưởng/Phạt', 'RateIcon', '/payoff/manager' , 'payoff'),
+                    $this->setMenu('Thưởng/Phạt', 'RateIcon', '/payoff/list' , 'payoff'),
                     $this->setMenu('Quản lý lương', 'QrcodeIcon', '/salary/manager' , 'salary'),
-                    $this->setMenu('Quản lý đào tạo', 'PeoplesIcon', '/education/workflow/list' , 'education' ,[
-                        $this->setChildMenu('Workflow', '/education/workflow/list' , 'workflow'),
-                        $this->setChildMenu('Thư viện bài test', '/education/library/list' , 'library'),
-                        $this->setChildMenu('Đào tạo (Lý thuyết)', '/education/test/list','test'),
-                        $this->setChildMenu('Đào tạo (Thực hành)', '/education/practice/list','practice'),
+                    $this->setMenu('Quản lý đào tạo', 'PeoplesIcon', '/workflow/list' , 'education' ,[
+                        $this->setChildMenu('Workflow', '/workflow/list' , 'workflow'),
+                        $this->setChildMenu('Thư viện bài test', '/test_question/list' , 'test_question'),
+                        $this->setChildMenu('Đào tạo', '/training_route/list','test'),
                     ]),
                 ],
                 default => [],

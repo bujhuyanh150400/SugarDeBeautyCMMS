@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('training_route_id');
             $table->unsignedBigInteger('user_id');
             $table->float('score')->nullable()->comment('số điểm của nhân viên với bài đánh giá này');
+            $table->timestamp('time_did')->nullable()->comment('Thời gian làm bài');
             $table->foreign('training_route_id')->references('id')->on('training_route')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->primary(['user_id', 'training_route_id']);

@@ -105,8 +105,8 @@ class DayOffController extends Controller
             'created_at'=> now(),
             'user_id' => $request->integer('user_id'),
         ];
-        $specialty = DayOff::create($data);
-        if ($specialty) {
+        $dayoff = DayOff::create($data);
+        if ($dayoff) {
             session()->flash('success', 'Tạo đơn xin nghỉ thành công, Hãy chờ cho quản lý xét duyệt');
             return redirect()->route('dayoff.list');
         } else {

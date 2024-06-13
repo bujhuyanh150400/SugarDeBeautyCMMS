@@ -6,9 +6,11 @@ use App\Helpers\Constant\AppConstant;
 use App\Helpers\Constant\PermissionAdmin;
 use App\Models\Facilities;
 use App\Models\File as FileModels;
+use App\Models\Rank;
 use App\Models\Specialties;
 use App\Models\TimeAttendance;
 use App\Models\User;
+use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,13 +38,12 @@ class UserController extends Controller
 
     public function list(Request $request): Response
     {
-
         $title = "Danh sách nhân sự";
         $facilities = Facilities::all();
         $users = User::KeywordFilter($request->get('keyword') ?? '')
             ->PermissionFilter($request->get('permission') ?? '')
             ->FacilityFilter($request->get('facility') ?? '')
-            ->with(['facility','specialties','files','rank'])
+            ->with(['facility', 'specialties', 'files', 'rank'])
             ->where('is_deleted', AppConstant::NOT_DELETED)
             ->orderBy('created_at', 'desc')
             ->paginate(self::PER_PAGE);
@@ -57,17 +58,26 @@ class UserController extends Controller
     public function view_add(): Response
     {
         $title = "Thêm nhân sự mới";
+        $banks = $this->getListBanks();
         $facilities = Facilities::all();
         $specialties = Specialties::all();
+        $ranks = Rank::all();
         return Inertia::render('User/Add', [
             'title' => $title,
             'facilities' => $facilities,
-            'specialties' => $specialties
+            'specialties' => $specialties,
+            'banks' => $banks,
+            'ranks' => $ranks
         ]);
     }
 
     public function add(Request $request): RedirectResponse
     {
+        $banks = $this->getListBanks();
+        if (empty($banks)) {
+            return redirect()->back()->withInput();
+        }
+        $banks = array_column($banks, 'bin');
         $validator = Validator::make(
             $request->all(),
             [
@@ -82,6 +92,9 @@ class UserController extends Controller
                 'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
                 'facility_id' => ['required', Rule::in($this->facilityIds)],
                 'specialties_id' => ['required', Rule::in($this->specialtyIds)],
+                'bin_bank' => [Rule::in($banks)],
+                'salary_per_month' => ['required', 'integer'],
+                'rank' => ['required', 'exists:ranks,id'],
             ],
             [
                 'email.required' => 'Vui lòng nhập địa chỉ email.',
@@ -108,6 +121,12 @@ class UserController extends Controller
                 'facility_id.in' => 'Cơ sở không tồn tại trong hệ thống.',
                 'specialties_id.required' => 'Vui lòng chọn chuyên môn.',
                 'specialties_id.in' => 'Chuyên môn không tồn tại trong hệ thống.',
+                'bin_bank.in' => 'Mã ngân hàng không tồn tại.',
+                'salary_per_month.required' => 'Hãy nhập lương cứng hàng tháng',
+                'salary_per_month.integer' => 'Lương phải là số',
+                'rank.required' => 'Trường cấp bậc là bắt buộc.',
+                'rank.integer' => 'Cấp bậc phải là một số nguyên.',
+                'rank.exists' => 'Cấp bậc đã chọn không tồn tại trong bảng cấp bậc.',
             ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -125,6 +144,10 @@ class UserController extends Controller
                 'gender' => $request->integer('gender'),
                 'facility_id' => $request->integer('facility_id'),
                 'specialties_id' => $request->integer('specialties_id'),
+                'bin_bank' => $request->input('bin_bank'),
+                'account_bank' => $request->input('account_bank'),
+                'account_bank_name' => $request->input('account_bank_name'),
+                'salary_per_month' => $request->input('salary_per_month'),
             ];
             $user = User::create($data);
             if ($request->hasFile('avatar')) {
@@ -150,7 +173,7 @@ class UserController extends Controller
             ]);
             session()->flash('success', 'Lưu trữ dữ liệu thành công!');
             return redirect()->route('user.list');
-        } catch (QueryException|\Exception $exception) {
+        } catch (QueryException|Exception $exception) {
             session()->flash('error', 'Có lỗi gì đó khi thao tác, vui lòng liên hệ quản trị viên');
             return redirect()->back()->withInput();
         }
@@ -160,13 +183,17 @@ class UserController extends Controller
     {
         $user = User::with('facility', 'specialties', 'files')->find($user_id);
         if ($user) {
+            $banks = $this->getListBanks();
+            $ranks = Rank::all();
             $facilities = Facilities::all();
             $specialties = Specialties::all();
             return Inertia::render('User/Edit', [
                 'title' => 'Chỉnh sửa nhân sự ' . $user->name,
                 'user' => $user,
                 'facilities' => $facilities,
-                'specialties' => $specialties
+                'specialties' => $specialties,
+                'banks' => $banks,
+                'ranks' => $ranks
             ]);
         } else {
             session()->flash('error', 'Không tìm thấy người dùng');
@@ -223,6 +250,10 @@ class UserController extends Controller
             $user->facility_id = $request->integer('facility_id');
             $user->specialties_id = $request->integer('specialties_id');
             $user->updated_at = now();
+            $user->bin_bank = $request->input('bin_bank');
+            $user->account_bank = $request->input('account_bank');
+            $user->account_bank_name = $request->input('account_bank_name');
+            $user->salary_per_month = $request->input('salary_per_month');
             $user->save();
             if ($request->hasFile('avatar')) {
                 $avatar = FileController::saveFile($request->file('avatar'), AppConstant::FILE_TYPE_AVATAR);

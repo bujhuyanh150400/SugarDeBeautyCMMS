@@ -130,6 +130,14 @@ const List = (props) => {
                         )}
                     </Table.Cell>
                 </Table.Column>
+                <Table.Column flexGrow={1} verticalAlign="center" align="start" fullText>
+                    <Table.HeaderCell>Số dịch vụ</Table.HeaderCell>
+                    <Table.Cell>
+                        {rowData => (
+                            <span>{rowData.service.length} dịch vụ</span>
+                        )}
+                    </Table.Cell>
+                </Table.Column>
                 <Table.Column verticalAlign="center" flexGrow={1.5} align="center" fullText>
                     <Table.HeaderCell>Action</Table.HeaderCell>
                     <Table.Cell>

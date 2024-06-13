@@ -4,7 +4,6 @@ import '@ckeditor/ckeditor5-build-classic/build/translations/vi';
 const Editor = ({data, onChange}) => {
     const handleChange = (event, editor) => {
         const data = editor.getData();
-        console.log(data);
     };
     if (typeof onChange !== 'function') {
         onChange = handleChange;
