@@ -113,7 +113,12 @@ const Detail = (props) => {
                                     <div className={`flex flex-col gap-2 items-start justify-start`}>
                                         <Text weight={`bold`}>Nội dung chuyển khoản:</Text>
                                         <Input name='desc' as="textarea" rows={3} value={description}
-                                               onChange={(values) => setDescription(values)}></Input>
+                                               onChange={(values) => {
+                                                   if (description.length > 50) {
+                                                        return toast.error('Nội dung không được quá 50 kí tự')
+                                                   }
+                                                   setDescription(values);
+                                               }}></Input>
                                     </div>
                                     <div className={`flex items-center gap-2`}>
                                         <Button onClick={getQRcodeBank} appearance={`primary`} color={`blue`}>Lấy QR code bank</Button>

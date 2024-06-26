@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('total_workday_money')->comment('Tiền lương tổng khi tính toán ngày làm, sẽ được mã hoá');
             $table->text('service_money')->comment('Tiền lương dịch vụ, sẽ được mã hoá');
             $table->text('description')->nullable()->comment('Nội dung');
-            $table->string('description_bank')->nullable()->comment('Nội dung chuyển khoản');
+            $table->string('description_bank',50)->nullable()->comment('Nội dung chuyển khoản');
             $table->tinyInteger('status')->comment('Trạng thái lương');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
