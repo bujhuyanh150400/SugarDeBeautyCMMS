@@ -96,7 +96,7 @@ class PayoffController extends Controller
         $payoff = PayOff::create($data);
         if ($payoff) {
             session()->flash('success', 'Tạo đơn  thành công');
-            return redirect()->route('dayoff.list');
+            return redirect()->route('payoff.list');
         } else {
             session()->flash('error', 'Có lỗi gì đó khi thao tác, vui lòng liên hệ quản trị viên');
             return redirect()->back()->withInput();

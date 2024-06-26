@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Exception;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Helpers
@@ -24,11 +25,19 @@ class Helpers
         $encrypted_data = substr($data, $init_vector_length);
         return openssl_decrypt($encrypted_data, 'aes-128-cbc', self::AesKey(), OPENSSL_RAW_DATA, $init_vector);
     }
+
+    /**
+     * @throws Exception
+     */
     private static function AesKey(): string
     {
+        $SECRET_STRING_ASC = env('SECRET_STRING_AES');
+        if (empty($SECRET_STRING_ASC)){
+            throw new Exception('Cant turn on this app, sorry');
+        }
         $new_key = str_repeat(chr(0), 16);
-        for ($i = 0, $len = strlen(SECRET_STRING); $i < $len; $i++) {
-            $new_key[$i % 16] = $new_key[$i % 16] ^ SECRET_STRING[$i];
+        for ($i = 0, $len = strlen($SECRET_STRING_ASC); $i < $len; $i++) {
+            $new_key[$i % 16] = $new_key[$i % 16] ^ $SECRET_STRING_ASC[$i];
         }
         return $new_key;
     }

@@ -6,8 +6,11 @@ use App\Helpers\Constant\AppConstant;
 use App\Helpers\Constant\DayOffStatus;
 use App\Models\DayOff;
 use App\Models\Facilities;
+use App\Models\Schedule;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -53,7 +56,7 @@ class DayOffController extends Controller
         $validator = Validator::make($request->all(), [
             'start_date' => ['required', 'date', 'after_or_equal:today', 'date_format:Y-m-d H:i:s'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date', 'date_format:Y-m-d H:i:s'],
-            'user_id' => ['required', 'exists:users,id' ,  function ($attribute, $value, $fail) use ($request) {
+            'user_id' => ['required', 'exists:users,id', function ($attribute, $value, $fail) use ($request) {
                 $startDate = $request->input('start_date');
                 $endDate = $request->input('end_date');
                 $existingDayoff = DayOff::where('user_id', $value)
@@ -96,13 +99,13 @@ class DayOffController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
         $data = [
-            'id'=> $this->getIdAsTimestamp(),
+            'id' => $this->getIdAsTimestamp(),
             'title' => $request->input('title'),
-            'description' =>$request->input('description'),
-            'start_date' => $request->date('start_date'),
-            'end_date' => $request->date('end_date'),
+            'description' => $request->input('description'),
+            'start_date' => $request->date('start_date')->setHour(0)->setMinute(0)->setSecond(0),
+            'end_date' => $request->date('end_date')->setHour(0)->setMinute(0)->setSecond(0),
             'status' => DayOffStatus::WAIT,
-            'created_at'=> now(),
+            'created_at' => now(),
             'user_id' => $request->integer('user_id'),
         ];
         $dayoff = DayOff::create($data);
@@ -115,7 +118,8 @@ class DayOffController extends Controller
         }
     }
 
-    public function changeStatus(int $dayoff_id, Request $request){
+    public function changeStatus(int $dayoff_id, Request $request)
+    {
 
         $dayoff = DayOff::find($dayoff_id);
         if ($dayoff) {
@@ -130,12 +134,31 @@ class DayOffController extends Controller
                 $errors = $validator->errors()->get('status');
                 $errors = reset($errors);
                 session()->flash('error', $errors);
-            }else{
-                $dayoff->status = $request->integer('status');
-                $dayoff->save();
-                session()->flash('success', 'Cập nhật thành công');
+            } else {
+                DB::beginTransaction();
+                try {
+                    $status = $request->integer('status');
+                    $start_date = Carbon::parse($dayoff->start_date)->setHour(0)->setMinute(0)->setSecond(0);
+                    $end_date = Carbon::parse($dayoff->end_date)->setHour(0)->setMinute(0)->setSecond(0);
+                    $message = 'Cập nhật thành công';
+                    if ($status === DayOffStatus::ACTIVE) {
+                        $schedules = Schedule::whereBetween('day_registered', [$start_date, $end_date])->where('user_id', $dayoff->user_id)->get();
+                        if ($schedules->isNotEmpty()) {
+                            // Xóa các bản ghi
+                            Schedule::whereIn('id', $schedules->pluck('id'))->update(['is_deleted' => AppConstant::DELETED]);
+                            $message = "Nhân viên {$dayoff->user->name} có {$schedules->count()} lịch làm trong ngày nghỉ phép, hệ thống sẽ tự động xóa, đơn của bạn đã được duyệt";
+                        }
+                    }
+                    $dayoff->status = $status;
+                    $dayoff->save();
+                    DB::commit();
+                    session()->flash('success', $message);
+                } catch (\Exception $exception) {
+                    DB::rollBack();
+                    session()->flash('error', 'Có lỗi gì đó khi thao tác, vui lòng liên hệ quản trị viên');
+                }
             }
-        }else {
+        } else {
             session()->flash('error', 'Không tìm đơn xin nghỉ');
         }
         return redirect()->back();

@@ -13,6 +13,10 @@ use Inertia\Response;
 
 class RankController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
     public function list(): Response
     {
         $ranks = Rank::orderBy('created_at', 'desc')

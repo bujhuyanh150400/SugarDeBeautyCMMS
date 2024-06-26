@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('salary_id');
             $table->unsignedBigInteger('service_id');
             $table->integer('total_service')->nullable()->comment('Số dịch vụ đã làm trong tháng đó');
+            $table->text('money')->nullable()->comment('Tổng số tiền, đã được mã hóa');
             $table->foreign('salary_id')->references('id')->on('salary')->onDelete('cascade');
             $table->foreign('service_id')->references('id')->on('service')->onDelete('cascade');
             $table->primary(['salary_id', 'service_id']);

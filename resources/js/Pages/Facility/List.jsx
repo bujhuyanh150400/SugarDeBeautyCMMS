@@ -2,11 +2,9 @@ import Layout from "@/Layouts/index.jsx";
 import {useState} from "react";
 import {Link, router} from "@inertiajs/react";
 import {
-    Avatar,
     Button,
     ButtonGroup,
     Col,
-    Divider,
     Form,
     Grid, Modal,
     Pagination,
@@ -20,10 +18,8 @@ import SearchIcon from "@rsuite/icons/Search.js";
 import PlusIcon from "@rsuite/icons/Plus.js";
 import constant from "@/utils/constant.js";
 import EditIcon from "@rsuite/icons/Edit.js";
-import TrashIcon from "@rsuite/icons/Trash.js";
 import OffIcon from '@rsuite/icons/Off';
 import RemindIcon from "@rsuite/icons/legacy/Remind.js";
-import {value} from "lodash/seq.js";
 
 const List = (props) => {
     const {facilities} = props;

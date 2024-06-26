@@ -32,4 +32,12 @@ class Service extends Model
     {
         return $this->belongsTo(Specialties::class);
     }
+
+    public function salary(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Salary::class)
+            ->withPivot('total_service', 'money')
+            ->withTimestamps();
+    }
+
 }

@@ -1,6 +1,7 @@
 import Constant from "@/utils/constant.js";
 import {v4 as uuidv4} from 'uuid';
 import dayjs from "dayjs";
+
 const handleErrorApi = (error, dispatch, openToast) => {
     if (error.code === 422) {
         error.message = Object.values(error.message);
@@ -21,13 +22,15 @@ const handleErrorApi = (error, dispatch, openToast) => {
         }));
     }
 };
+
 function toThousands(value) {
     return value ? `${value}`.replace(/\d{1,3}(?=(\d{3})+(\.\d*)?$)/g, '$&,') : value;
 }
-const convertDateTime = (date) => {
-    return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+
+const convertDateTime = (date, format = 'YYYY-MM-DD HH:mm:ss') => {
+    return date ? dayjs(date).format(format) : '';
 }
 
 export default {
-    handleErrorApi, convertDateTime,toThousands
+    handleErrorApi, convertDateTime, toThousands
 };

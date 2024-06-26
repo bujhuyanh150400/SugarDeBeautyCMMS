@@ -14,10 +14,13 @@ return new class extends Migration
         Schema::create('salary', function (Blueprint $table) {
             $table->comment('table dùng để lưu trữ luơng của nhân viên hàng tháng');
             $table->id();
-            $table->timestamp('day_pay')->comment('Ngày trả lương');
-            $table->text('money')->comment('Tiền lương, sẽ được mã hoá');
-            $table->text('description')->comment('Nội dung');
-            $table->string('description_bank')->comment('Nội dung chuyển khoản');
+            $table->timestamp('day_pay')->nullable()->comment('Ngày trả lương');
+            $table->text('total_salary')->comment('Tiền lương tổng, sẽ được mã hoá');
+            $table->text('total_workday_money')->comment('Tiền lương tổng khi tính toán ngày làm, sẽ được mã hoá');
+            $table->text('service_money')->comment('Tiền lương dịch vụ, sẽ được mã hoá');
+            $table->text('description')->nullable()->comment('Nội dung');
+            $table->string('description_bank')->nullable()->comment('Nội dung chuyển khoản');
+            $table->tinyInteger('status')->comment('Trạng thái lương');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
             $table->unsignedBigInteger('user_id');
@@ -30,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('salary');
     }
 };

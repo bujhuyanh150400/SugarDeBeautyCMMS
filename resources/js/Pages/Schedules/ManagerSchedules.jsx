@@ -38,7 +38,6 @@ const ManagerSchedules = (props) => {
         endOfWeek,
         errors
     } = props;
-
     useEffect(()=>{
         Object.values(errors).map((error)=>toast.error(error))
     },[errors])
@@ -61,8 +60,8 @@ const ManagerSchedules = (props) => {
             start_time_registered,
             end_time_registered,
             note: schedule.note ?? '',
-            type: schedule.type,
-            status: schedule.status,
+            type: schedule.type.value,
+            status: schedule.status.value,
             user_id: schedule.user_id,
         })
         setSchedulesState((prevState) => ({
@@ -168,23 +167,20 @@ const ManagerSchedules = (props) => {
                                                 const day_registered = dayjs(schedule_user.day_registered).format('DD/MM');
                                                 const start_time_registered = dayjs(schedule_user.start_time_registered).format('HH:mm');
                                                 const end_time_registered = dayjs(schedule_user.end_time_registered).format('HH:mm');
-                                                const status = scheduleStatus[schedule_user.status];
-                                                const type = scheduleType[schedule_user.type];
                                                 let attendance_at = null;
                                                 if (schedule_user.attendance_at){
                                                     attendance_at = dayjs(schedule_user.attendance_at).format('DD/MM/YYYY HH:mm:ss');
                                                 }
                                                 return (
-                                                    <List.Item key={schedule_user.id}
-                                                               className="grid grid-cols-5 gap-4">
+                                                    <List.Item key={schedule_user.id} className="grid grid-cols-5 gap-4">
                                                         <div className="flex flex-col gap-2 self-center">
                                                             <span>Ngày: {day_registered}</span>
-                                                            <Text weight="bold" color={status.color}>{status.text}</Text>
+                                                            <Text weight="bold" color={schedule_user.status.color}>{schedule_user.status.text}</Text>
                                                             {attendance_at && <Text size={'sm'}>Chấm công lúc: {attendance_at}</Text>}
                                                         </div>
                                                         <div className="flex flex-col gap-2 self-center">
-                                                            <Text color={type.color}
-                                                                  className="self-center">{type.text}</Text>
+                                                            <Text color={schedule_user.type.color}
+                                                                  className="self-center">{schedule_user.type.text}</Text>
                                                             <Text className="self-center">Ca
                                                                 làm: {start_time_registered} - {end_time_registered}</Text>
                                                         </div>
@@ -390,19 +386,17 @@ const ManagerSchedules = (props) => {
                                                 const day_registered = dayjs(schedule_user.day_registered).format('DD/MM');
                                                 const start_time_registered = dayjs(schedule_user.start_time_registered).format('HH:mm');
                                                 const end_time_registered = dayjs(schedule_user.end_time_registered).format('HH:mm');
-                                                const status = scheduleStatus[schedule_user.status];
-                                                const type = scheduleType[schedule_user.type];
                                                 return (
                                                     <List.Item key={schedule_user.id}
                                                                className="grid grid-cols-5 gap-4">
                                                         <div className="flex flex-col gap-2 self-center">
                                                             <span>Ngày: {day_registered}</span>
                                                             <Text weight="bold"
-                                                                  color={status.color}>{status.text}</Text>
+                                                                  color={schedule_user.status.color}>{schedule_user.status.text}</Text>
                                                         </div>
                                                         <div className="flex flex-col gap-2 self-center">
-                                                            <Text color={type.color}
-                                                                  className="self-center">{type.text}</Text>
+                                                            <Text color={schedule_user.type.color}
+                                                                  className="self-center">{schedule_user.type.text}</Text>
                                                             <Text className="self-center">Ca
                                                                 làm: {start_time_registered} - {end_time_registered}</Text>
                                                         </div>

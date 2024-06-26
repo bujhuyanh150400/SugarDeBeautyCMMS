@@ -104,7 +104,7 @@ const List = (props) => {
                     <Table.HeaderCell>Đơn</Table.HeaderCell>
                     <Table.Cell>
                         {rowData => (
-                            <span>{payoffStatus[rowData.type].text}</span>
+                            <span>{rowData.type.text}</span>
                         )}
                     </Table.Cell>
                 </Table.Column>

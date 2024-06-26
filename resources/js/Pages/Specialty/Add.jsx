@@ -42,7 +42,6 @@ const Add = (props) => {
     const handleDeleteService = (id) => {
         const updatedServices = {...data.service};
         delete updatedServices[id];
-
         setData((prevData) => ({
             ...prevData,
             service: updatedServices,
@@ -67,7 +66,6 @@ const Add = (props) => {
                     <Form.Group controlId="active">
                         <Form.ControlLabel>Trạng thái hoạt động</Form.ControlLabel>
                         <SelectPicker
-                            block
                             data={constant.ActiveStatus}
                             value={data.active}
                             onChange={(value) => setForm('active', value)}
@@ -108,7 +106,6 @@ const Add = (props) => {
                                 <Form.Group controlId={`service-money-${id}`}>
                                     <Form.ControlLabel>Số tiền mỗi dịch vụ</Form.ControlLabel>
                                     <InputNumber
-                                        block
                                         postfix="VND"
                                         formatter={HelperFunction.toThousands}
                                         value={data.service[id].money}
@@ -123,7 +120,6 @@ const Add = (props) => {
                                 <Form.Group controlId={`service-percent-${id}`}>
                                     <Form.ControlLabel>% hoa hồng</Form.ControlLabel>
                                     <InputNumber
-                                        block
                                         min={0}
                                         max={100}
                                         postfix="%"

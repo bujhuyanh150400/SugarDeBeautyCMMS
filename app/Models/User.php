@@ -40,6 +40,7 @@ class User extends Authenticatable
         'account_bank',
         'account_bank_name',
         'salary_per_month',
+        'number_of_day_offs'
     ];
     protected $hidden = [
         'password',
@@ -128,5 +129,9 @@ class User extends Authenticatable
     public function dayoff(): HasMany
     {
         return $this->hasMany(DayOff::class);
+    }
+    public function salary(): HasMany
+    {
+        return $this->hasMany(Salary::class);
     }
 }

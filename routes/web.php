@@ -12,8 +12,8 @@ use App\Http\Controllers\SchedulesController;
 use App\Http\Controllers\DayOffController;
 use App\Http\Controllers\PayoffController;
 use App\Http\Controllers\RankController;
-
-
+use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\ConfigAppController;
 
 
 Route::get('/', function () {
@@ -105,6 +105,21 @@ Route::middleware('guest')->group(function () {
         Route::get('/view_add', [PayoffController::class, 'view_add'])->name('payoff.view_add');
         Route::post('/add', [PayoffController::class, 'add'])->name('payoff.add');
         Route::patch('/change_status/{payoff_id}', [PayoffController::class, 'changeStatus'])->name('payoff.change_status')->whereNumber('payoff_id');
+    });
+    // Quản lý lương
+    Route::prefix('salary')->group(function () {
+        Route::get('/list', [SalaryController::class, 'list'])->name('salary.list');
+        Route::match(['get','post'],'/add/{user_id}', [SalaryController::class, 'add'])->name('salary.add')->whereNumber('user_id');
+        Route::match(['get','patch'],'/detail/{salary_id}', [SalaryController::class, 'detail'])->name('salary.detail')->whereNumber('salary_id');
+        Route::get('/view/{salary_id}',[SalaryController::class, 'view'])->name('salary.view')->whereNumber('salary_id');
+    });
+
+    // config
+    Route::prefix('config')->group(function () {
+        Route::get('/list', [ConfigAppController::class, 'list'])->name('config.list');
+        Route::post('/add', [ConfigAppController::class, 'add'])->name('config.add');
+        Route::match(['get','patch'],'/edit/{config_id}', [ConfigAppController::class, 'edit'])->name('config.edit')->whereNumber('config_id');
+        Route::delete('/deleted/{config_id}', [ConfigAppController::class,'deleted'])->name('config.deleted')->whereNumber('config_id');
     });
 });
 

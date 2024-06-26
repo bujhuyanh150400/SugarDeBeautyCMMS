@@ -5,9 +5,8 @@ import { useSelector} from "react-redux";
 import {Container, Content, Placeholder, CustomProvider} from "rsuite";
 import {useEffect} from "react";
 import toast from "react-hot-toast";
-import CreativeIcon from '@rsuite/icons/Creative';
 
-const Layout = ({children,back_to}) => {
+const Layout = ({children,back_to,className}) => {
     const flashMessage = usePage().props.flash;
     useEffect(()=>{
         if (flashMessage.success || flashMessage.error || flashMessage.warning || flashMessage.info) {
@@ -33,7 +32,7 @@ const Layout = ({children,back_to}) => {
                 <LeftMenu/>
                 <Container>
                     <HeaderAdmin back_to={back_to}/>
-                    <Content className="p-4">
+                    <Content  className={`${className} p-4`}>
                         {children}
                     </Content>
                 </Container>

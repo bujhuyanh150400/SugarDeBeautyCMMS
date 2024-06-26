@@ -97,7 +97,7 @@ class SchedulesController extends Controller
         $facility = Facilities::find($facilities_id);
         if ($facility) {
             $validator = Validator::make($request->all(), [
-                'day_registered' => ['required', 'date', 'after_or_equal:today'], // Ngày đăng ký không được là ngày quá khứ
+                'day_registered' => ['required', 'date', 'after_or_equal:today'],
                 'user_id' => ['required', 'exists:users,id,facility_id,' . $facility->id],
                 'start_time_registered' => [
                     'required',

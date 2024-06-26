@@ -19,6 +19,7 @@ import SearchIcon from "@rsuite/icons/Search.js";
 import PlusIcon from "@rsuite/icons/Plus.js";
 import constant from "@/utils/constant.js";
 import dayjs from "dayjs";
+import Swal from "sweetalert2";
 
 const List = (props) => {
     let {facilities, list_day_off, dayoffStatus} = props;
@@ -155,12 +156,34 @@ const List = (props) => {
                             (rowData.status === constant.DayOffStatus.WAIT ?
                                 (<ButtonGroup>
                                     <Button
-                                        onClick={() => router.patch(route('dayoff.change_status', {dayoff_id: rowData.id}), {status: constant.DayOffStatus.ACTIVE})}
+                                        onClick={() =>
+                                            Swal.fire({
+                                                title: 'Bạn có muốn duyệt đơn',
+                                                text: 'Bạn có chắc chắn muốn làm điều này?',
+                                                icon: 'success',
+                                                showCancelButton: true,
+                                                confirmButtonText: 'Có, tôi chắc chắn!',
+                                                cancelButtonText: 'Không, hủy bỏ!'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    router.patch(route('dayoff.change_status', {dayoff_id: rowData.id}), {status: constant.DayOffStatus.ACTIVE})}
+                                            })}
                                         color="green" appearance="primary">
                                         Đồng ý
                                     </Button>
                                     <Button
-                                        onClick={() => router.patch(route('dayoff.change_status', {dayoff_id: rowData.id}), {status: constant.DayOffStatus.DENIED})}
+                                        onClick={() =>
+                                            Swal.fire({
+                                                title: 'Bạn không muốn không duyệt đơn',
+                                                text: 'Bạn có chắc chắn muốn làm điều này?',
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonText: 'Có, tôi chắc chắn!',
+                                                cancelButtonText: 'Không, hủy bỏ!'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    router.patch(route('dayoff.change_status', {dayoff_id: rowData.id}), {status: constant.DayOffStatus.DENIED})}
+                                            })}
                                         color="red" appearance="primary">
                                         Huỷ
                                     </Button>

@@ -67,7 +67,7 @@ const Add = (props) => {
                             appearance={`subtle`}
                             isoWeek={true}
                             showWeekNumbers={true}
-                            format={`dd-MM-yyyy HH:mm:ss`}
+                            format={`dd-MM-yyyy`}
                             defaultValue={[data.start_date, data.end_date]}
                             value={[data.start_date, data.end_date]}
                             onChange={(value_date) => {

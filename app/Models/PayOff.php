@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\Constant\PayoffStatus;
 use App\Helpers\Helpers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -28,6 +29,13 @@ class PayOff extends Model
     protected function Money(): Attribute
     {
         return Helpers::handleCryptAttribute();
+    }
+
+    protected function Type(): Attribute
+    {
+        return Attribute::make(
+            get: fn (int $value) => PayoffStatus::getList()[$value] ?? 'Không rõ trạng thái',
+        );
     }
     public function scopeKeywordFilter(Builder $query, $keyword = null): void
     {

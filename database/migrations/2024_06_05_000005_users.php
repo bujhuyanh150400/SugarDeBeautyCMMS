@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('account_bank')->nullable()->comment('Mã ngân hàng của nhân viên , đã được mã hoá');
             $table->text('account_bank_name')->nullable()->comment('Tên chủ thể ngân hàng, đã được mã hoá');
             $table->text('salary_per_month')->nullable()->comment('Lương cứng hàng tháng, đã được mã hoá');
+            $table->smallInteger('number_of_day_offs')->default(0)->comment('Số ngày được phép nghỉ phép');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
             $table->smallInteger('is_deleted')->default(0)->comment('0 - chưa xóa | 1 - đã xóa');

@@ -33,6 +33,7 @@ const Add = (props) => {
         bin_bank: '',
         account_bank: '',
         account_bank_name: '',
+        number_of_day_offs: 0,
         rank: 0,
         avatar: null,
         file_upload: [],
@@ -265,6 +266,16 @@ const Add = (props) => {
                             placeholder="Cấp bậc"/>
                         <Form.ErrorMessage show={!!errors.rank}>{errors.rank}</Form.ErrorMessage>
                     </Form.Group>
+                    <InputNumber
+                        block
+                        postfix="Ngày"
+                        formatter={HelperFunction.toThousands}
+                        value={data.number_of_day_offs}
+                        onChange={(value) => setData('number_of_day_offs', value)}
+                        name="number_of_day_offs"
+                        id="number_of_day_offs"
+                        placeholder="Lương cứng hàng tháng"/>
+                    <Form.ErrorMessage show={!!errors.number_of_day_offs}>{errors.number_of_day_offs}</Form.ErrorMessage>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                     <Form.Group controlId="avatar">

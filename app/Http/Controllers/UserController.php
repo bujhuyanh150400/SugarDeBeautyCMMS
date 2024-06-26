@@ -94,6 +94,7 @@ class UserController extends Controller
                 'specialties_id' => ['required', Rule::in($this->specialtyIds)],
                 'bin_bank' => [Rule::in($banks)],
                 'salary_per_month' => ['required', 'integer'],
+                'number_of_day_offs' => ['required','integer','min:0'],
                 'rank' => ['required', 'exists:ranks,id'],
             ],
             [
@@ -124,6 +125,9 @@ class UserController extends Controller
                 'bin_bank.in' => 'Mã ngân hàng không tồn tại.',
                 'salary_per_month.required' => 'Hãy nhập lương cứng hàng tháng',
                 'salary_per_month.integer' => 'Lương phải là số',
+                'number_of_day_offs.required' => 'Số ngày được phép nghỉ trong 1 tháng không được để trống',
+                'number_of_day_offs.integer' => 'Số ngày được phép nghỉ trong 1 tháng phải là một số nguyên.',
+                'number_of_day_offs.min' => 'Số ngày được phép nghỉ trong 1 tháng phải lớn hơn :min',
                 'rank.required' => 'Trường cấp bậc là bắt buộc.',
                 'rank.integer' => 'Cấp bậc phải là một số nguyên.',
                 'rank.exists' => 'Cấp bậc đã chọn không tồn tại trong bảng cấp bậc.',
@@ -148,6 +152,7 @@ class UserController extends Controller
                 'account_bank' => $request->input('account_bank'),
                 'account_bank_name' => $request->input('account_bank_name'),
                 'salary_per_month' => $request->input('salary_per_month'),
+                'number_of_day_offs' => $request->input('number_of_day_offs'),
             ];
             $user = User::create($data);
             if ($request->hasFile('avatar')) {
@@ -205,6 +210,11 @@ class UserController extends Controller
     {
         $user = User::find($user_id);
         if ($user) {
+            $banks = $this->getListBanks();
+            if (empty($banks)) {
+                return redirect()->back()->withInput();
+            }
+            $banks = array_column($banks, 'bin');
             $validator = Validator::make(
                 $request->all(),
                 [
@@ -217,9 +227,13 @@ class UserController extends Controller
                     'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
                     'facility_id' => ['required', Rule::in($this->facilityIds)],
                     'specialties_id' => ['required', Rule::in($this->specialtyIds)],
+                    'bin_bank' => ['nullable',Rule::in($banks)],
+                    'salary_per_month' => ['required', 'integer'],
+                    'number_of_day_offs' => ['required','integer','min:0'],
+                    'rank' => ['required', 'exists:ranks,id'],
                 ],
                 [
-                    'name.required' => 'Vui lòng nhập tên.',
+                    'name.required' => 'Vui lòng nhập tên',
                     'address.required' => 'Vui lòng nhập địa chỉ.',
                     'address.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
                     'phone.required' => 'Vui lòng nhập số điện thoại.',
@@ -237,6 +251,15 @@ class UserController extends Controller
                     'facility_id.in' => 'Cơ sở không tồn tại trong hệ thống.',
                     'specialties_id.required' => 'Vui lòng chọn chuyên môn.',
                     'specialties_id.in' => 'Chuyên môn không tồn tại trong hệ thống.',
+                    'bin_bank.in' => 'Mã ngân hàng không tồn tại.',
+                    'salary_per_month.required' => 'Hãy nhập lương cứng hàng tháng',
+                    'salary_per_month.integer' => 'Lương phải là số',
+                    'number_of_day_offs.required' => 'Số ngày được phép nghỉ trong 1 tháng không được để trống',
+                    'number_of_day_offs.integer' => 'Số ngày được phép nghỉ trong 1 tháng phải là một số nguyên.',
+                    'number_of_day_offs.min' => 'Số ngày được phép nghỉ trong 1 tháng phải lớn hơn :min',
+                    'rank.required' => 'Trường cấp bậc là bắt buộc.',
+                    'rank.integer' => 'Cấp bậc phải là một số nguyên.',
+                    'rank.exists' => 'Cấp bậc đã chọn không tồn tại trong bảng cấp bậc.',
                 ]);
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
@@ -254,6 +277,7 @@ class UserController extends Controller
             $user->account_bank = $request->input('account_bank');
             $user->account_bank_name = $request->input('account_bank_name');
             $user->salary_per_month = $request->input('salary_per_month');
+            $user->number_of_day_offs = $request->input('number_of_day_offs');
             $user->save();
             if ($request->hasFile('avatar')) {
                 $avatar = FileController::saveFile($request->file('avatar'), AppConstant::FILE_TYPE_AVATAR);
