@@ -32,6 +32,7 @@ const DayOffStatus = Object.freeze({
     DENIED: 20,
     WAIT:25,
 })
+const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp'];
 
 
 export default {
@@ -42,5 +43,6 @@ export default {
     ActiveStatus,
     ACTIVE,
     IN_ACTIVE,
-    DayOffStatus
+    DayOffStatus,
+    imageExtensions
 };

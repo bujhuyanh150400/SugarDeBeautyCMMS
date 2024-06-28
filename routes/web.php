@@ -14,7 +14,7 @@ use App\Http\Controllers\PayoffController;
 use App\Http\Controllers\RankController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\ConfigAppController;
-
+use App\Http\Controllers\WorkflowController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -112,6 +112,15 @@ Route::middleware('guest')->group(function () {
         Route::match(['get','post'],'/add/{user_id}', [SalaryController::class, 'add'])->name('salary.add')->whereNumber('user_id');
         Route::match(['get','patch'],'/detail/{salary_id}', [SalaryController::class, 'detail'])->name('salary.detail')->whereNumber('salary_id');
         Route::get('/view/{salary_id}',[SalaryController::class, 'view'])->name('salary.view')->whereNumber('salary_id');
+    });
+    // Workflow
+    Route::prefix('workflow')->group(function (){
+        Route::get('/list',[WorkflowController::class,'list'])->name('workflow.list');
+        Route::get('/view_add',[WorkflowController::class,'view_add'])->name('workflow.view_add');
+        Route::post('/add',[WorkflowController::class,'add'])->name('workflow.add');
+        Route::get('/view/{workflow_id}',[WorkflowController::class,'view'])->name('workflow.view')->whereNumber('workflow_id');
+        Route::get('/view_edit/{workflow_id}',[WorkflowController::class,'view_edit'])->name('workflow.view_edit');
+        Route::patch('/edit/{workflow_id}',[WorkflowController::class,'edit'])->name('workflow.edit');
     });
 
     // config

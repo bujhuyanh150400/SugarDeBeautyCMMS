@@ -45,4 +45,8 @@ class Specialties extends Model
     {
         return $this->hasMany(Service::class);
     }
+    public function workflow(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Workflow::class);
+    }
 }

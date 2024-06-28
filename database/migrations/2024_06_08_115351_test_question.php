@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title')->comment('Tiêu đề');
             $table->text('description')->comment('Nội dung');
             $table->smallInteger('type')->comment('Loại bài kiểm tra (trắc nghiệm 1 câu, nhiều câu , textarea)');
+            $table->tinyInteger('is_deleted')->default(0);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
         });

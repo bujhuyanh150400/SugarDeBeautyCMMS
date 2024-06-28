@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description')->comment('Nội dung quy trình');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
+            $table->tinyInteger('is_deleted')->default(0);
             $table->unsignedBigInteger('specialties_id')->nullable()->comment('quy trình sẽ liên quan đến chuyên ngành nào');
             $table->foreign('specialties_id')->references('id')->on('specialties')->onDelete('cascade');
         });
