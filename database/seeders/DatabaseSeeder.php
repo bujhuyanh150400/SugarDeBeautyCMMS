@@ -299,8 +299,8 @@ class DatabaseSeeder extends Seeder
             'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
             'user_id' => 15042000,
         ]);
-        $randomKey = array_rand(PermissionAdmin::getList());
         for ($i = 0; $i < 50; $i++) {
+            $randomKey = array_rand(PermissionAdmin::getList());
             $data_user = [
                 'id' => intval(date('ymdHis') . rand(1000, 9999)),
                 'name' => $faker->name,

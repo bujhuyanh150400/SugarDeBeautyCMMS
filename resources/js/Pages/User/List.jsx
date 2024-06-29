@@ -52,7 +52,7 @@ const List = (props) => {
     const filterForm = async () => {
         await router.get(route('user.list'), filter, optionsRouter);
     }
-
+    console.log(users)
     const [alertDeleted, setAlertDeleted] = useState(false);
     const [idDeleted, setIdDeleted] = useState(null)
     return (
@@ -76,7 +76,7 @@ const List = (props) => {
                                 <Form.Group controlId="facility">
                                     <Form.ControlLabel>Lọc theo cơ sở</Form.ControlLabel>
                                     <SelectPicker
-                                        block
+                                        block={true}
                                         data={[
                                             {label: 'Lựa chọn', value: ""},
                                             ...facilities.map(facility => ({
@@ -95,7 +95,7 @@ const List = (props) => {
                                 <Form.Group controlId="permission">
                                     <Form.ControlLabel>Lọc theo quyền hành</Form.ControlLabel>
                                     <SelectPicker
-                                        block
+                                        block={true}
                                         data={[
                                             {label: 'Lựa chọn', value: ""},
                                             ...Object.values(props.auth.permission).map(permission => ({

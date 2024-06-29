@@ -14,7 +14,7 @@ const Add = () => {
         await post(route('rank.add'), data);
     }
     return (
-        <Layout back_to={route('facilities.list')}>
+        <Layout back_to={route('rank.list')}>
             <Form onSubmit={submit} fluid>
                 <div className="flex flex-col gap-2 mb-4">
                     <Form.Group controlId="name">

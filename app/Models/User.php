@@ -40,7 +40,8 @@ class User extends Authenticatable
         'account_bank',
         'account_bank_name',
         'salary_per_month',
-        'number_of_day_offs'
+        'number_of_day_offs',
+        'rank_id'
     ];
     protected $hidden = [
         'password',
@@ -74,6 +75,7 @@ class User extends Authenticatable
             $keyword = strtolower($keyword);
             $query->whereRaw('LOWER(email) LIKE ?', '%' . $keyword . '%')
                 ->orWhereRaw('LOWER(name) LIKE ?', '%' . $keyword . '%')
+                ->orWhereRaw('LOWER(phone) LIKE ?', '%' . $keyword . '%')
                 ->orWhere('id', '=', intval($keyword));
         }
     }

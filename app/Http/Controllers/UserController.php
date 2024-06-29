@@ -153,6 +153,7 @@ class UserController extends Controller
                 'account_bank_name' => $request->input('account_bank_name'),
                 'salary_per_month' => $request->input('salary_per_month'),
                 'number_of_day_offs' => $request->input('number_of_day_offs'),
+                'rank_id' => $request->input('rank')
             ];
             $user = User::create($data);
             if ($request->hasFile('avatar')) {
@@ -278,6 +279,7 @@ class UserController extends Controller
             $user->account_bank_name = $request->input('account_bank_name');
             $user->salary_per_month = $request->input('salary_per_month');
             $user->number_of_day_offs = $request->input('number_of_day_offs');
+            $user->rank_id = $request->input('rank');
             $user->save();
             if ($request->hasFile('avatar')) {
                 $avatar = FileController::saveFile($request->file('avatar'), AppConstant::FILE_TYPE_AVATAR);

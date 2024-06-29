@@ -172,7 +172,7 @@ const List = (props) => {
                                     Tìm kiếm
                                 </Button>
                                 <Button type="button" startIcon={<PlusIcon/>} appearance="primary" color={`green`} onClick={createSalary}>
-                                    Tìm kiếm
+                                    Tạo bảng lương
                                 </Button>
                                 <SelectPicker
                                     block

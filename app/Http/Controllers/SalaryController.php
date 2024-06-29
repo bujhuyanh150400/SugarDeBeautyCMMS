@@ -45,7 +45,7 @@ class SalaryController extends Controller
     {
         $month_salary = Carbon::parse($salary->created_at)->format('n');
         $bank_account_name = $salary->user->account_bank_name;
-        return "SUGARDEBEAUTE LUONG T{$month_salary} NV {$bank_account_name} {$salary->id}";
+        return "LUONG T{$month_salary} NV {$bank_account_name}";
     }
 
     private function getDataSalaryMonth(User $user, Carbon $created_at = null): \Illuminate\Support\Collection
