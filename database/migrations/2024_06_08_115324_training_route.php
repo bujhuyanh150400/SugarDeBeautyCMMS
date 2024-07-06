@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('title')->comment('Tiêu đề');
             $table->text('description')->comment('Nội dung mô tả quy trình');
-            $table->timestamp('time')->comment('thời gian làm bài kiểm tra');
+            $table->integer('time')->comment('thời gian làm bài kiểm tra');
             $table->tinyInteger('is_deleted')->default(0);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();

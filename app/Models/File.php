@@ -31,4 +31,8 @@ class File extends Model
     {
         return $this->belongsToMany(User::class, 'file_workflow', 'file_id', 'workflow_id');
     }
+    public function testQuestion(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'file_workflow', 'file_id', 'test_question_id');
+    }
 }

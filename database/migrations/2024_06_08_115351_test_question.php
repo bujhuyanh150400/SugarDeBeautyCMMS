@@ -20,6 +20,8 @@ return new class extends Migration
             $table->tinyInteger('is_deleted')->default(0);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
+            $table->unsignedBigInteger('specialties_id')->nullable()->comment('baài kiểm tra sẽ liên quan đến chuyên ngành nào');
+            $table->foreign('specialties_id')->references('id')->on('specialties')->onDelete('cascade');
         });
     }
 

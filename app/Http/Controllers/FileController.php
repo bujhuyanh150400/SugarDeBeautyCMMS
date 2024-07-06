@@ -31,13 +31,12 @@ class FileController extends Controller
     {
         $extension = $file->extension();
         $file_real_name = $file->getClientOriginalName();
-        $file_name = AppConstant::getIdAsTimestamp() . '.' . $extension;
-        $path = $file->storeAs(self::FILE_PATH_ADMIN, $file_name);
+        $path = $file->storeAs(self::FILE_PATH_ADMIN, $file_real_name);
         return [
             'id' => AppConstant::getIdAsTimestamp(),
             'file_location' => base64_encode($path),
             'file_type' => $type,
-            'file_name' => $file_name,
+            'file_name' => $file_real_name,
             'file_real_name' => $file_real_name,
             'file_extension' => $extension,
         ];

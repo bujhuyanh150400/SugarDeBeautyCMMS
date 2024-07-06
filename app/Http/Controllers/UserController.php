@@ -16,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -40,13 +41,28 @@ class UserController extends Controller
     {
         $title = "Danh sách nhân sự";
         $facilities = Facilities::all();
-        $users = User::KeywordFilter($request->get('keyword') ?? '')
-            ->PermissionFilter($request->get('permission') ?? '')
-            ->FacilityFilter($request->get('facility') ?? '')
-            ->with(['facility', 'specialties', 'files', 'rank'])
-            ->where('is_deleted', AppConstant::NOT_DELETED)
+        $user_query = User::query();
+        if (Gate::allows('allow_admin')) {
+            $user_query->FacilityFilter($request->get('facility') ?? '')->PermissionFilter($request->get('permission') ?? '');
+        } else {
+            $user_query->whereIn('permission', [PermissionAdmin::MANAGER, PermissionAdmin::EMPLOYEE])->FacilityFilter(\auth()->user()->facility_id);
+        }
+        $users = $user_query->with(['facility', 'specialties', 'files', 'rank'])
             ->orderBy('created_at', 'desc')
             ->paginate(self::PER_PAGE);
+
+        if (!$users->isEmpty()) {
+            $banks = $this->getListBanks();
+            foreach ($users as $user) {
+                if (!empty($user->bin_bank)) {
+                    $filter_bank = array_filter($banks, function ($bank) use ($user) {
+                        return $bank['bin'] == $user->bin_bank;
+                    });
+                    $filter_bank = reset($filter_bank);
+                $user->bin_bank = $filter_bank['name'];
+                }
+            }
+        }
         return Inertia::render('User/List', [
             'title' => $title,
             'users' => fn() => $users,
@@ -94,7 +110,7 @@ class UserController extends Controller
                 'specialties_id' => ['required', Rule::in($this->specialtyIds)],
                 'bin_bank' => [Rule::in($banks)],
                 'salary_per_month' => ['required', 'integer'],
-                'number_of_day_offs' => ['required','integer','min:0'],
+                'number_of_day_offs' => ['required', 'integer', 'min:0'],
                 'rank' => ['required', 'exists:ranks,id'],
             ],
             [
@@ -228,9 +244,9 @@ class UserController extends Controller
                     'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
                     'facility_id' => ['required', Rule::in($this->facilityIds)],
                     'specialties_id' => ['required', Rule::in($this->specialtyIds)],
-                    'bin_bank' => ['nullable',Rule::in($banks)],
+                    'bin_bank' => ['nullable', Rule::in($banks)],
                     'salary_per_month' => ['required', 'integer'],
-                    'number_of_day_offs' => ['required','integer','min:0'],
+                    'number_of_day_offs' => ['required', 'integer', 'min:0'],
                     'rank' => ['required', 'exists:ranks,id'],
                 ],
                 [

@@ -1,33 +1,16 @@
 import Layout from "@/Layouts/index.jsx";
-import {useState} from "react";
+import {Button, ButtonGroup, Col, Form, Grid, Pagination, Panel, Row, SelectPicker, Table} from "rsuite";
 import {Link, router} from "@inertiajs/react";
-import {
-    Avatar,
-    Button,
-    ButtonGroup,
-    Col,
-    Divider,
-    Form,
-    Grid, Pagination,
-    Panel, Popover,
-    Row,
-    SelectPicker,
-    Table,
-    Text,
-    Whisper
-} from "rsuite";
-import constant from "@/utils/constant.js";
-import SearchIcon from "@rsuite/icons/Search";
-import PlusIcon from "@rsuite/icons/Plus";
-import dayjs from "dayjs";
-import HelperFunction from "@/utils/HelperFunction.js";
-import OffIcon from "@rsuite/icons/Off.js";
-import EditIcon from "@rsuite/icons/Edit";
-import TrashIcon from "@rsuite/icons/Trash";
+import SearchIcon from "@rsuite/icons/Search.js";
+import PlusIcon from "@rsuite/icons/Plus.js";
+import {useState} from "react";
+import EditIcon from "@rsuite/icons/Edit.js";
+import TrashIcon from "@rsuite/icons/Trash.js";
 import Swal from "sweetalert2";
 
+
 const List = (props) => {
-    const {specialties,workflows} = props;
+    const {specialties,test_questions} = props;
 
     const [filter, setFilter] = useState({
         keyword: '',
@@ -42,17 +25,18 @@ const List = (props) => {
     const optionsRouter = {
         replace: true,
         preserveState: true,
-        only: ['workflows']
+        only: ['test_questions']
     }
     const handlePagination = async (page) => {
-        await router.get(route('workflow.list'), {
+        await router.get(route('test_question.list'), {
             page: page,
             ...filter
         }, optionsRouter);
     }
     const filterForm = async () => {
-        await router.get(route('workflow.list'), filter, optionsRouter);
+        await router.get(route('test_question.list'), filter, optionsRouter);
     }
+
     return (
         <Layout>
             <Panel header={<div className="roboto">Tìm kiếm <SearchIcon/></div>} bordered shaded className="mb-8">
@@ -96,17 +80,16 @@ const List = (props) => {
                                     Tìm kiếm
                                 </Button>
                                 <Button type="button" startIcon={<PlusIcon/>}
-                                        onClick={() => router.get(route('workflow.view_add'))} color="green"
+                                        onClick={() => router.get(route('test_question.view_add'))} color="green"
                                         appearance="primary">
-                                    Thêm quy trình
+                                    Thêm bài test
                                 </Button>
                             </Col>
                         </Row>
                     </Grid>
                 </Form>
             </Panel>
-
-            <Table affixHeader rowHeight={100} autoHeight data={workflows.data}>
+            <Table affixHeader rowHeight={100} autoHeight data={test_questions.data}>
                 <Table.Column flexGrow={1} verticalAlign="center" align="center" fullText>
                     <Table.HeaderCell>ID</Table.HeaderCell>
                     <Table.Cell dataKey="id"/>
@@ -128,23 +111,22 @@ const List = (props) => {
                     <Table.Cell>
                         {rowData => (
                             <ButtonGroup>
-                                <Button as={Link} href={route('workflow.view', {workflow_id: rowData.id})} color="blue" appearance="primary">Xem chi tiết</Button>
-                                <Button as={Link} href={route('workflow.view_edit', {workflow_id: rowData.id})}
-                                        startIcon={<EditIcon/>} color="green" appearance="primary">Sửa</Button>
+                                <Button as={Link} href={route('test_question.view_edit', {test_question_id: rowData.id})} startIcon={<EditIcon/>} color="green" appearance="primary">Sửa</Button>
                                 <Button startIcon={<TrashIcon/>} color="red" appearance="primary"
                                         onClick={() => {
                                             Swal.fire({
-                                                title: 'Bạn có muốn xóa workflow không ?',
-                                                text: `Bạn có chắc chắn muốn xóa workflow ?`,
+                                                title: 'Bạn có muốn xóa bài test không ?',
+                                                text: `Bạn có chắc chắn muốn xóa bài test ?`,
                                                 icon: 'error',
                                                 showCancelButton: true,
                                                 confirmButtonText: 'Có, tôi chắc chắn!',
                                                 cancelButtonText: 'Không, hủy bỏ!'
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    router.patch(route('workflow.deleted',{workflow_id: rowData.id}), {}, {preserveScroll: true})
+                                                    router.patch(route('test_question.deleted',{test_question_id: rowData.id}), {}, {preserveScroll: true})
                                                 }
                                             });
+
                                         }}
                                 >Xóa</Button>
                             </ButtonGroup>
@@ -152,14 +134,15 @@ const List = (props) => {
                     </Table.Cell>
                 </Table.Column>
             </Table>
-            {workflows.total > 0 && (
+            {test_questions.total > 0 && (
                 <div className="my-8 flex w-full justify-center items-center">
-                    <Pagination prev next ellipsis size="lg" limit={workflows.per_page} activePage={workflows.current_page} total={workflows.total}
+                    <Pagination prev next ellipsis size="lg" limit={test_questions.per_page} activePage={test_questions.current_page} total={test_questions.total}
                                 onChangePage={handlePagination}/>
                 </div>
             )}
         </Layout>
     )
+
 }
 
 export default List;

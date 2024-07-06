@@ -6,7 +6,7 @@ import {Container, Content, Placeholder, CustomProvider} from "rsuite";
 import {useEffect} from "react";
 import toast from "react-hot-toast";
 
-const Layout = ({children,back_to,className}) => {
+const Layout = ({children,back_to,className,hiddenHeader = false, hiddenLeftMenu = false}) => {
     const flashMessage = usePage().props.flash;
     useEffect(()=>{
         if (flashMessage.success || flashMessage.error || flashMessage.warning || flashMessage.info) {
@@ -26,12 +26,21 @@ const Layout = ({children,back_to,className}) => {
         }
     },[flashMessage]);
     const darkTheme = useSelector(state => state.app.darkTheme);
+
+    useEffect(() => {
+        if (darkTheme) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [darkTheme]);
+
     return (
         <CustomProvider theme={darkTheme ? "dark" : "light"} >
             <Container>
-                <LeftMenu/>
+                {hiddenLeftMenu === false && <LeftMenu />}
                 <Container>
-                    <HeaderAdmin back_to={back_to}/>
+                    {hiddenHeader === false && <HeaderAdmin back_to={back_to}/>}
                     <Content  className={`${className} p-4`}>
                         {children}
                     </Content>

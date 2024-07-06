@@ -34,6 +34,8 @@ const DayOffStatus = Object.freeze({
 })
 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp'];
 
+const TYPE_CHECKBOX = 15;
+const TYPE_RADIO = 20;
 
 export default {
     Validate,
@@ -44,5 +46,7 @@ export default {
     ACTIVE,
     IN_ACTIVE,
     DayOffStatus,
-    imageExtensions
+    imageExtensions,
+    TYPE_CHECKBOX,
+    TYPE_RADIO,
 };

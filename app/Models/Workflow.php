@@ -55,4 +55,8 @@ class Workflow extends Model
     {
         return $this->belongsTo(Specialties::class);
     }
+    public function trainingRoutes(): BelongsToMany
+    {
+        return $this->belongsToMany(TrainingRoute::class, 'training_route_workflow');
+    }
 }

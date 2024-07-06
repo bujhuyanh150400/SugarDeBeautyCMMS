@@ -50,15 +50,18 @@ class User extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
+
     protected function SalaryPerMonth(): Attribute
     {
         return Helpers::handleCryptAttribute();
 
     }
+
     protected function AccountBankName(): Attribute
     {
-       return Helpers::handleCryptAttribute();
+        return Helpers::handleCryptAttribute();
     }
+
     protected function AccountBank(): Attribute
     {
         return Helpers::handleCryptAttribute();
@@ -132,8 +135,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(DayOff::class);
     }
+
     public function salary(): HasMany
     {
         return $this->hasMany(Salary::class);
+    }
+
+    public function trainingRoutes(): BelongsToMany
+    {
+        return $this->belongsToMany(TrainingRoute::class, 'training_route_user')
+            ->withPivot('score', 'time_did', 'time_start', 'results')
+            ->withTimestamps();
     }
 }

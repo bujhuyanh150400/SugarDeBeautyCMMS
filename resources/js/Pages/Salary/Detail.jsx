@@ -38,7 +38,6 @@ const Detail = (props) => {
             confirmButtonText: 'Đã thanh toán',
             cancelButtonText: 'Hủy bỏ việc thanh toán'
         }).then((result) => {
-            console.log(result)
             if (result.isConfirmed) {
                 router.patch(route('salary.detail', {salary_id:salary.id}), {
                     description,

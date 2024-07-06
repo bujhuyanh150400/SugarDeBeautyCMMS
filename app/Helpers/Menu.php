@@ -72,6 +72,19 @@ class Menu
                     ]),
                     $this->setMenu('Config', 'GearIcon', '/config/list' , 'config'),
                 ],
+                PermissionAdmin::MANAGER => [
+                    $this->setMenu('Trang chủ', 'DashboardIcon', '/dashboard' , 'dashboard'),
+                    $this->setMenu('Quản lý nhân sự', 'PeoplesIcon', '/user/manager/list' , 'user'),
+                    $this->setMenu('Quản lý lịch làm','CalendarIcon', '/time_attendance/schedule/manager_schedules/'.auth()->user()->facility_id , 'schedule'),
+                    $this->setMenu('Quản lý nghỉ phép', 'IdMappingIcon', '/dayoff/list' , 'dayoff'),
+                    $this->setMenu('Thưởng/Phạt', 'RateIcon', '/payoff/list' , 'payoff'),
+                    $this->setMenu('Quản lý lương', 'QrcodeIcon', '/salary/list' , 'salary'),
+                    $this->setMenu('Quản lý đào tạo', 'PeoplesIcon', '/workflow/list' , 'education' ,[
+                        $this->setChildMenu('Workflow', '/workflow/list' , 'workflow'),
+                        $this->setChildMenu('Thư viện bài test', '/test_question/list' , 'test_question'),
+                        $this->setChildMenu('Đào tạo', '/training_route/list','test'),
+                    ]),
+                ],
                 default => [],
             };
         }
