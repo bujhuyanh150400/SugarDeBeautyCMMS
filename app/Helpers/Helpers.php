@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Helpers
 {
+    // Tạm thời fix tạm
+    private static string $SECRET_STRING_ASC = '$2y$07$vGA1o9FmCKrwvGA1o9CKrw$';
     // Sử dụng thuật toán mã hoá aes-128-cbc
     public static function encryptData(mixed $value): string
     {
@@ -31,7 +33,8 @@ class Helpers
      */
     private static function AesKey(): string
     {
-        $SECRET_STRING_ASC = env('SECRET_STRING_AES');
+//        $SECRET_STRING_ASC = env('SECRET_STRING_AES');
+        $SECRET_STRING_ASC = self::$SECRET_STRING_ASC;
         if (empty($SECRET_STRING_ASC)){
             throw new Exception('Cant turn on this app, sorry');
         }

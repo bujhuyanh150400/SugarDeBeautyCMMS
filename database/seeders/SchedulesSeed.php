@@ -28,7 +28,7 @@ class SchedulesSeed extends Seeder
         foreach ($users as $user) {
             foreach (collect(range(0, $daysInMonth - 1)) as $day) {
                 $date = $startOfMonth->copy()->addDays($day);
-                $status = [ScheduleStatus::DONE, ScheduleStatus::LATE, ScheduleStatus::CANCEL];
+                $status = [ScheduleStatus::DONE, ScheduleStatus::LATE];
                 $randomStatus = $status[array_rand($status)];
                 if ($randomStatus === ScheduleStatus::DONE){
                     $attendance_at =  $date->copy()->setHour(8)->setMinute(1)->setSecond(0);

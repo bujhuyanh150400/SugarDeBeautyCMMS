@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Constant\AppConstant;
+use App\Helpers\Constant\PermissionAdmin;
 use App\Helpers\Constant\TestQuestionType;
 use App\Models\File as FileModels;
 use App\Models\Specialties;
@@ -41,7 +42,8 @@ class TrainingRouteController extends Controller
 
     public function view_add(): \Inertia\Response
     {
-        $users = User::with('specialties', 'facility')->get();
+        $users = User::PermissionFilter(PermissionAdmin::EMPLOYEE)->with('specialties', 'facility')->get();
+//        $users = User::with('specialties', 'facility')->get();
         $workflows = Workflow::with('specialties')->get();
         $test_questions = TestQuestion::with('specialties')->get();
         return Inertia::render('TrainingRoute/Add', [

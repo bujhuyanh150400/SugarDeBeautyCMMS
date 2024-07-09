@@ -170,8 +170,7 @@ const List = (props) => {
                             return (
                                 <div className="flex items-center gap-4">
                                     <Button as={Link} href={route('time_attendance.control', {user_id: rowData.id})}
-                                            startIcon={<EditIcon/>} color="blue" appearance="primary">Quản lý chấm
-                                        công</Button>
+                                            startIcon={<EditIcon/>} color="blue" appearance="primary">Sửa chấm công</Button>
                                 </div>
                             )
                         }}

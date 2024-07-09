@@ -92,7 +92,7 @@ const List = (props) => {
                                 <Button type="button" startIcon={<PlusIcon/>}
                                         onClick={() => router.get(route('specialties.view_add'))} color="green"
                                         appearance="primary">
-                                    Thêm chuyên ngành
+                                    Thêm chuyên môn
                                 </Button>
                             </Col>
                         </Row>

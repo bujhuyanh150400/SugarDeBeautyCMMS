@@ -312,7 +312,7 @@ class DatabaseSeeder extends Seeder
                 'salary_per_month' => Helpers::encryptData(rand(1, 9) * 1000000),
                 'rank_id' => 2406052325224804,
                 'phone' => $faker->e164PhoneNumber,
-                'permission' => PermissionAdmin::getList()[$randomKey]['value'],
+                'permission' => PermissionAdmin::getListNotAdmin()[$randomKey]['value'],
                 'facility_id' => Facilities::inRandomOrder()->first()->id,
                 'specialties_id' => Specialties::inRandomOrder()->first()->id,
                 'number_of_day_offs' => 4,

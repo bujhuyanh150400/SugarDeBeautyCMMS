@@ -8,6 +8,8 @@ use App\Models\Scopes\NotDeletedScope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Schedule extends Model
 {
@@ -54,5 +56,9 @@ class Schedule extends Model
     public function facility(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Facilities::class,'facility_id');
+    }
+    public function timeAttendance(): BelongsTo
+    {
+        return $this->BelongsTo(TimeAttendance::class);
     }
 }

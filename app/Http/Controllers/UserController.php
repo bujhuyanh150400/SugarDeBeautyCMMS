@@ -47,6 +47,7 @@ class UserController extends Controller
         } else {
             $user_query->whereIn('permission', [PermissionAdmin::MANAGER, PermissionAdmin::EMPLOYEE])->FacilityFilter(\auth()->user()->facility_id);
         }
+        $user_query->KeywordFilter($request->get('keyword') ?? '');
         $users = $user_query->with(['facility', 'specialties', 'files', 'rank'])
             ->orderBy('created_at', 'desc')
             ->paginate(self::PER_PAGE);

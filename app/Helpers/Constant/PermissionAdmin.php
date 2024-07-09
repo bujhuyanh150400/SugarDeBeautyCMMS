@@ -24,4 +24,17 @@ class PermissionAdmin
             ]
         ];
     }
+    static function getListNotAdmin(): array
+    {
+        return [
+            self::MANAGER => [
+                'value' => self::MANAGER,
+                'text' => 'Quản lý cơ sở'
+            ],
+            self::EMPLOYEE => [
+                'value' => self::EMPLOYEE,
+                'text' => 'Nhân viên'
+            ]
+        ];
+    }
 }

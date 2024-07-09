@@ -236,7 +236,7 @@ const Edit = (props) => {
                 </div>
                 <div className="flex items-center justify-end">
                     <Button type="submit" appearance="primary" color="green" startIcon={<EditIcon/>}>
-                        Sửa cơ sở</Button>
+                        Lưu</Button>
                 </div>
             </Form>
         </Layout>

@@ -39,12 +39,12 @@ Route::middleware('guest')->group(function () {
             Route::get('/view_add', [UserController::class, 'view_add'])->name('user.view_add')->middleware('permission:allow_admin');
             Route::post('/add', [UserController::class, 'add'])->name('user.add')->middleware('permission:allow_admin');
             Route::patch('/deleted/{user_id}', [UserController::class, 'deleted'])->name('user.deleted')->whereNumber('user_id')->middleware('permission:allow_admin');
+            Route::patch('/deleted/{user_id}', [UserController::class, 'deleted'])->name('user.deleted')->whereNumber('user_id')->middleware('permission:allow_admin');
             Route::middleware('permission:allow_manager')->group(function (){
                 Route::get('/list', [UserController::class, 'list'])->name('user.list');
                 Route::get('/view_add', [UserController::class, 'view_add'])->name('user.view_add');
                 Route::get('/view_edit/{user_id}', [UserController::class, 'view_edit'])->name('user.view_edit')->whereNumber('user_id');
                 Route::post('/edit/{user_id}', [UserController::class, 'edit'])->name('user.edit')->whereNumber('user_id');
-                Route::patch('/deleted/{user_id}', [UserController::class, 'deleted'])->name('user.deleted')->whereNumber('user_id');
                 Route::patch('/deleted_file', [UserController::class, 'deletedFile'])->name('user.deleted_file');
             });
         });

@@ -11,17 +11,17 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response|\Illuminate\Http\RedirectResponse
     {
         $response = parent::render($request,$e);
-        if (in_array($response->status(),[404,403])){
-            switch ($response->status()){
-                case 404:
-                    session()->flash('error', 'Trang không tìm thấy');
-                    break;
-                case 403:
-                    session()->flash('error', 'Forbidden');
-                    break;
-            }
-            return redirect()->route('dashboard');
-        }
+//        if (in_array($response->status(),[404,403])){
+//            switch ($response->status()){
+//                case 404:
+//                    session()->flash('error', 'Trang không tìm thấy');
+//                    break;
+//                case 403:
+//                    session()->flash('error', 'Forbidden');
+//                    break;
+//            }
+//            return redirect()->route('dashboard');
+//        }
         return $response;
     }
 
