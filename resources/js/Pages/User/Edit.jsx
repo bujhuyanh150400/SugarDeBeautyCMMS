@@ -26,6 +26,7 @@ import HelperFunction from "@/utils/HelperFunction.js";
 
 const Edit = (props) => {
     const {facilities, specialties, user, banks, ranks} = props;
+    const login = props.auth.user;
     const {data, setData, post, errors} = useForm({
         name: user.name,
         email: user.email,
@@ -72,7 +73,7 @@ const Edit = (props) => {
         await post(route('user.edit', {user_id: user.id}));
     }
     return (
-        <Layout back_to={route('user.list')}>
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
                     <Form.Group controlId="email">
@@ -148,60 +149,6 @@ const Edit = (props) => {
                             placeholder="Giới tính"/>
                         <Form.ErrorMessage show={!!errors.gender}>{errors.gender}</Form.ErrorMessage>
                     </Form.Group>
-                    <Form.Group controlId="facility_id">
-                        <Form.ControlLabel>Cơ sở trực thuộc</Form.ControlLabel>
-                        <SelectPicker
-                            block
-                            data={[
-                                {label: 'Lựa chọn', value: ""},
-                                ...facilities.map(facility => ({
-                                    label: `${facility.name} - ${facility.address}`,
-                                    value: facility.id
-                                }))
-                            ]}
-                            value={data.facility_id}
-                            onChange={(value) => setData('facility_id', value)}
-                            name="facility_id"
-                            id="facility_id"
-                            placeholder="Cơ sở làm việc"/>
-                        <Form.ErrorMessage show={!!errors.facility_id}>{errors.facility_id}</Form.ErrorMessage>
-                    </Form.Group>
-                    <Form.Group controlId="permission">
-                        <Form.ControlLabel>Quyền hành</Form.ControlLabel>
-                        <SelectPicker
-                            block
-                            data={[
-                                {label: 'Lựa chọn', value: ""},
-                                ...Object.values(props.auth.permission).map(permission => ({
-                                    label: permission.text,
-                                    value: permission.value
-                                }))
-                            ]}
-                            value={data.permission}
-                            onChange={(value) => setData('permission', value)}
-                            name="permission"
-                            id="permission"
-                            placeholder="Quyền hành"/>
-                        <Form.ErrorMessage show={!!errors.facility_id}>{errors.facility_id}</Form.ErrorMessage>
-                    </Form.Group>
-                    <Form.Group controlId="specialties_id">
-                        <Form.ControlLabel>Chuyên môn</Form.ControlLabel>
-                        <SelectPicker
-                            block
-                            data={[
-                                {label: 'Lựa chọn', value: ""},
-                                ...specialties.map(specialty => ({
-                                    label: specialty.name,
-                                    value: specialty.id
-                                }))
-                            ]}
-                            value={data.specialties_id}
-                            onChange={(value) => setData('specialties_id', value)}
-                            name="specialties_id"
-                            id="specialties_id"
-                            placeholder="Chuyên môn"/>
-                        <Form.ErrorMessage show={!!errors.specialties_id}>{errors.specialties_id}</Form.ErrorMessage>
-                    </Form.Group>
                     <Form.Group controlId="bin_bank">
                         <Form.ControlLabel>Ngân hàng sử dụng</Form.ControlLabel>
                         <SelectPicker
@@ -245,50 +192,108 @@ const Edit = (props) => {
                             placeholder="Nhập tên chủ thể (Không viết có dấu)"/>
                         <Form.ErrorMessage show={!!errors.account_bank_name}>{errors.account_bank_name}</Form.ErrorMessage>
                     </Form.Group>
-                    <Form.Group controlId="salary_per_month">
-                        <Form.ControlLabel>Luơng cứng</Form.ControlLabel>
-                        <InputNumber
-                            block
-                            postfix="VND"
-                            formatter={HelperFunction.toThousands}
-                            value={data.salary_per_month}
-                            onChange={(value) => setData('salary_per_month', value)}
-                            name="salary_per_month"
-                            id="salary_per_month"
-                            placeholder="Lương cứng hàng tháng"/>
-                        <Form.ErrorMessage show={!!errors.salary_per_month}>{errors.salary_per_month}</Form.ErrorMessage>
-                    </Form.Group>
-                    <Form.Group controlId="rank">
-                        <Form.ControlLabel>Cấp bậc</Form.ControlLabel>
-                        <SelectPicker
-                            block
-                            data={[
-                                {label: 'Lựa chọn', value: ""},
-                                ...ranks.map(rank => ({
-                                    label:rank.title,
-                                    value: rank.id,
-                                }))
-                            ]}
-                            value={data.rank}
-                            onChange={(value) => setData('rank', value)}
-                            name="rank"
-                            id="rank"
-                            placeholder="Cấp bậc"/>
-                        <Form.ErrorMessage show={!!errors.rank}>{errors.rank}</Form.ErrorMessage>
-                    </Form.Group>
-                    <Form.Group controlId="number_of_day_offs">
-                        <Form.ControlLabel>Ngày được phép nghỉ trong 1 tháng</Form.ControlLabel>
-                        <InputNumber
-                            block
-                            postfix="Ngày"
-                            formatter={HelperFunction.toThousands}
-                            value={data.number_of_day_offs}
-                            onChange={(value) => setData('number_of_day_offs', value)}
-                            name="number_of_day_offs"
-                            id="number_of_day_offs"
-                            placeholder="Lương cứng hàng tháng"/>
-                        <Form.ErrorMessage show={!!errors.number_of_day_offs}>{errors.number_of_day_offs}</Form.ErrorMessage>
-                    </Form.Group>
+                    {login.permission === constant.PermissionAdmin.ADMIN && (
+                        <>
+                            <Form.Group controlId="salary_per_month">
+                                <Form.ControlLabel>Luơng cứng</Form.ControlLabel>
+                                <InputNumber
+                                    block
+                                    postfix="VND"
+                                    formatter={HelperFunction.toThousands}
+                                    value={data.salary_per_month}
+                                    onChange={(value) => setData('salary_per_month', value)}
+                                    name="salary_per_month"
+                                    id="salary_per_month"
+                                    placeholder="Lương cứng hàng tháng"/>
+                                <Form.ErrorMessage show={!!errors.salary_per_month}>{errors.salary_per_month}</Form.ErrorMessage>
+                            </Form.Group>
+                            <Form.Group controlId="rank">
+                                <Form.ControlLabel>Cấp bậc</Form.ControlLabel>
+                                <SelectPicker
+                                    block
+                                    data={[
+                                        {label: 'Lựa chọn', value: ""},
+                                        ...ranks.map(rank => ({
+                                            label:rank.title,
+                                            value: rank.id,
+                                        }))
+                                    ]}
+                                    value={data.rank}
+                                    onChange={(value) => setData('rank', value)}
+                                    name="rank"
+                                    id="rank"
+                                    placeholder="Cấp bậc"/>
+                                <Form.ErrorMessage show={!!errors.rank}>{errors.rank}</Form.ErrorMessage>
+                            </Form.Group>
+                            <Form.Group controlId="number_of_day_offs">
+                                <Form.ControlLabel>Ngày được phép nghỉ trong 1 tháng</Form.ControlLabel>
+                                <InputNumber
+                                    block
+                                    postfix="Ngày"
+                                    formatter={HelperFunction.toThousands}
+                                    value={data.number_of_day_offs}
+                                    onChange={(value) => setData('number_of_day_offs', value)}
+                                    name="number_of_day_offs"
+                                    id="number_of_day_offs"
+                                    placeholder="Lương cứng hàng tháng"/>
+                                <Form.ErrorMessage show={!!errors.number_of_day_offs}>{errors.number_of_day_offs}</Form.ErrorMessage>
+                            </Form.Group>
+                            <Form.Group controlId="facility_id">
+                                <Form.ControlLabel>Cơ sở trực thuộc</Form.ControlLabel>
+                                <SelectPicker
+                                    block
+                                    data={[
+                                        {label: 'Lựa chọn', value: ""},
+                                        ...facilities.map(facility => ({
+                                            label: `${facility.name} - ${facility.address}`,
+                                            value: facility.id
+                                        }))
+                                    ]}
+                                    value={data.facility_id}
+                                    onChange={(value) => setData('facility_id', value)}
+                                    name="facility_id"
+                                    id="facility_id"
+                                    placeholder="Cơ sở làm việc"/>
+                                <Form.ErrorMessage show={!!errors.facility_id}>{errors.facility_id}</Form.ErrorMessage>
+                            </Form.Group>
+                            <Form.Group controlId="permission">
+                                <Form.ControlLabel>Quyền hành</Form.ControlLabel>
+                                <SelectPicker
+                                    block
+                                    data={[
+                                        {label: 'Lựa chọn', value: ""},
+                                        ...Object.values(props.auth.permission).map(permission => ({
+                                            label: permission.text,
+                                            value: permission.value
+                                        }))
+                                    ]}
+                                    value={data.permission}
+                                    onChange={(value) => setData('permission', value)}
+                                    name="permission"
+                                    id="permission"
+                                    placeholder="Quyền hành"/>
+                                <Form.ErrorMessage show={!!errors.facility_id}>{errors.facility_id}</Form.ErrorMessage>
+                            </Form.Group>
+                            <Form.Group controlId="specialties_id">
+                                <Form.ControlLabel>Chuyên môn</Form.ControlLabel>
+                                <SelectPicker
+                                    block
+                                    data={[
+                                        {label: 'Lựa chọn', value: ""},
+                                        ...specialties.map(specialty => ({
+                                            label: specialty.name,
+                                            value: specialty.id
+                                        }))
+                                    ]}
+                                    value={data.specialties_id}
+                                    onChange={(value) => setData('specialties_id', value)}
+                                    name="specialties_id"
+                                    id="specialties_id"
+                                    placeholder="Chuyên môn"/>
+                                <Form.ErrorMessage show={!!errors.specialties_id}>{errors.specialties_id}</Form.ErrorMessage>
+                            </Form.Group>
+                        </>
+                    )}
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                     <Form.Group controlId="avatar">

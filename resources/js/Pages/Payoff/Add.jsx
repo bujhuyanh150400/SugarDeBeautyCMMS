@@ -39,7 +39,7 @@ const Add = (props) => {
         });
     }
     return (
-        <Layout back_to={route('payoff.list')}>
+        <Layout>
             <Message className={`mb-8`} type="warning" showIcon>
                 <strong>Lưu ý!</strong> Đơn thưởng phạt 1 khi tạo sẽ không được sửa hoặc xoá, <strong>Hãy chú ý nhập
                 đúng dữ liệu</strong> !

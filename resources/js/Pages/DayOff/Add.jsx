@@ -12,17 +12,19 @@ const currentDate = new Date();
 const defaultStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 0, 0, 0, 0);
 const defaultEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1, 0, 0, 0, 0);
 
-const initStateForm = {
-    user_id: '',
-    title: '',
-    description: '',
-    start_date: defaultStartDate,
-    end_date: defaultEndDate,
-}
+
 
 const Add = (props) => {
     const {users, errors} = props
+    const login = props.auth.user;
 
+    const initStateForm = {
+        user_id: login.permission === constant.PermissionAdmin.EMPLOYEE ? login.id : '',
+        title: '',
+        description: '',
+        start_date: defaultStartDate,
+        end_date: defaultEndDate,
+    }
 
     const [data, setData] = useState(initStateForm)
 
@@ -36,9 +38,9 @@ const Add = (props) => {
         });
     }
     return (
-        <Layout back_to={route('dayoff.list')}>
+        <Layout >
             <Form onSubmit={submit} fluid>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                {login.permission !== constant.PermissionAdmin.EMPLOYEE && (
                     <Form.Group controlId="user">
                         <Form.ControlLabel>Nhân viên xin nghỉ</Form.ControlLabel>
                         <SelectPicker
@@ -58,32 +60,32 @@ const Add = (props) => {
                             placeholder="Nhân viên nghỉ phép"/>
                         <Form.ErrorMessage show={!!errors.user_id}>{errors.user_id}</Form.ErrorMessage>
                     </Form.Group>
-                    <Form.Group controlId="day_off">
-                        <Form.ControlLabel>Ngày bắt đầu nghỉ</Form.ControlLabel>
-                        <DateRangePicker
-                            block={true}
-                            name="day_off"
-                            id="day_off"
-                            appearance={`subtle`}
-                            isoWeek={true}
-                            showWeekNumbers={true}
-                            format={`dd-MM-yyyy`}
-                            defaultValue={[data.start_date, data.end_date]}
-                            value={[data.start_date, data.end_date]}
-                            onChange={(value_date) => {
-                                if (value_date) {
-                                    setForm('start_date', value_date[0]);
-                                    setForm('end_date', value_date[1])
-                                }else {
-                                    setForm('start_date', defaultStartDate);
-                                    setForm('end_date', defaultEndDate);
-                                }
+                )}
+                <Form.Group controlId="day_off">
+                    <Form.ControlLabel>Ngày bắt đầu nghỉ</Form.ControlLabel>
+                    <DateRangePicker
+                        block={true}
+                        name="day_off"
+                        id="day_off"
+                        appearance={`subtle`}
+                        isoWeek={true}
+                        showWeekNumbers={true}
+                        format={`dd-MM-yyyy`}
+                        defaultValue={[data.start_date, data.end_date]}
+                        value={[data.start_date, data.end_date]}
+                        onChange={(value_date) => {
+                            if (value_date) {
+                                setForm('start_date', value_date[0]);
+                                setForm('end_date', value_date[1])
+                            }else {
+                                setForm('start_date', defaultStartDate);
+                                setForm('end_date', defaultEndDate);
+                            }
 
-                            }}/>
-                        <Form.ErrorMessage show={!!errors.start_date}>{errors.start_date}</Form.ErrorMessage>
-                        <Form.ErrorMessage show={!!errors.end_date}>{errors.end_date}</Form.ErrorMessage>
-                    </Form.Group>
-                </div>
+                        }}/>
+                    <Form.ErrorMessage show={!!errors.start_date}>{errors.start_date}</Form.ErrorMessage>
+                    <Form.ErrorMessage show={!!errors.end_date}>{errors.end_date}</Form.ErrorMessage>
+                </Form.Group>
                 <Form.Group controlId="title">
                     <Form.ControlLabel>Tiêu đề nghỉ phép</Form.ControlLabel>
                     <Form.Control

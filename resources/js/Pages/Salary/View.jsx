@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 const View = (props) => {
     const {schedules, user, day_offs, pay_offs, statistical, salary,} = props;
     return (
-        <Layout className={`space-y-4`} back_to={route('salary.list')}>
+        <Layout className={`space-y-4`}>
             <Accordion bordered>
                 <Accordion.Panel header="Thống kê" eventKey={2} defaultExpanded={true}>
                     <div className={`grid grid-cols-2 gap-4 `}>

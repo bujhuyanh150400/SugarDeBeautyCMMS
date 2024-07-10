@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -35,6 +36,11 @@ class SchedulesController extends Controller
     {
         $facility = Facilities::find($facilities_id);
         if ($facility) {
+            if ((Gate::allows('just_manager') && \auth()->user()->facility_id !== $facilities_id)
+            ){
+                session()->flash('error', 'Bạn không có quyền truy cập');
+                return redirect()->route('dashboard');
+            }
             $startOfWeek = Carbon::now()->startOfWeek();
             $endOfWeek = Carbon::now()->endOfWeek();
             $users_schedule = User::whereHas('facility', function ($query) use ($facilities_id) {

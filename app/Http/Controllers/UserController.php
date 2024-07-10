@@ -206,6 +206,12 @@ class UserController extends Controller
     {
         $user = User::with('facility', 'specialties', 'files')->find($user_id);
         if ($user) {
+            if ((Gate::allows('just_manager') && \auth()->user()->facility_id !== $user->facility_id) ||
+                (Gate::allows('allow_user') && \auth()->user()->id !== $user->id)
+            ){
+                session()->flash('error', 'Bạn không có quyền');
+                return redirect()->route('dashboard');
+            }
             $banks = $this->getListBanks();
             $ranks = Rank::all();
             $facilities = Facilities::all();
@@ -220,7 +226,7 @@ class UserController extends Controller
             ]);
         } else {
             session()->flash('error', 'Không tìm thấy người dùng');
-            return redirect()->back();
+            return redirect()->route('user.list');
         }
     }
 
@@ -228,6 +234,12 @@ class UserController extends Controller
     {
         $user = User::find($user_id);
         if ($user) {
+            if ((Gate::allows('just_manager') && \auth()->user()->facility_id !== $user->facility_id) ||
+                (Gate::allows('allow_user') && \auth()->user()->id !== $user->id)
+            ){
+                session()->flash('error', 'Bạn không có quyền');
+                return redirect()->route('user.list');
+            }
             $banks = $this->getListBanks();
             if (empty($banks)) {
                 return redirect()->back()->withInput();
@@ -353,6 +365,16 @@ class UserController extends Controller
             session()->flash('error', 'Không tìm thấy người dùng hoặc file');
         }
         return redirect()->back();
+    }
+
+
+    public function profile(Request $request) {
+        $user = Auth::user()->load('specialties','facility','files','rank','timeAttendance');
+        $user->permission = PermissionAdmin::getList()[$user->permission];
+        return Inertia::render('User/Profile', [
+            'title' => 'Thông tin cá nhân',
+            'user' => fn() => $user,
+        ]);
     }
 
 }

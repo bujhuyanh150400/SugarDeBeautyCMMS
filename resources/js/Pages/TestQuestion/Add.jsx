@@ -138,7 +138,7 @@ const Add = (props) => {
         router.post(route('test_question.add'), data);
     }
     return (
-        <Layout back_to={route('test_question.list')}>
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="flex flex-col gap-4 mb-8">
                     <Form.Group controlId="name">

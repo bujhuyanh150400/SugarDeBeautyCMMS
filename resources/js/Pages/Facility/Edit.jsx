@@ -20,7 +20,7 @@ const Edit = (props) => {
         await patch(route('facilities.edit',{facility_id: facility.id}), data);
     }
     return (
-        <Layout back_to={route('facilities.list')}>
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
                     <Form.Group controlId="name">

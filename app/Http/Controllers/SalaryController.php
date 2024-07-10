@@ -205,6 +205,12 @@ class SalaryController extends Controller
 
     public function add(int $user_id, Request $request): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
+
+        $currentMonth = date('n'); // Lấy tháng hiện tại (1 đến 12)
+        if ($request->integer('month') >= $currentMonth) {
+            session()->flash('error', 'Chỉ tính được lương của tháng trước đó!');
+            return redirect()->route('salary.list');
+        }
         $user = User::with('facility', 'specialties', 'specialties.service', 'rank')->find($user_id);
         if ($user) {
             $start_month = Carbon::now()->startOfMonth();
@@ -213,7 +219,8 @@ class SalaryController extends Controller
             if ($salary_exist) {
                 session()->flash('error', 'Nhân viên này tháng này đã có bảng lương');
             } else {
-                $data_salary = $this->getDataSalaryMonth($user);
+                $create_choose = Carbon::createFromFormat('m', $request->integer('month'))->setDay(1);
+                $data_salary = $this->getDataSalaryMonth($user,$create_choose);
                 if (!$data_salary->isEmpty()) {
                     if ($request->method() === 'POST') {
                         $validator = Validator::make($request->all(), [
@@ -276,7 +283,7 @@ class SalaryController extends Controller
                         ]);
                     }
                 } else {
-                    session()->flash('error', 'Nhân viên chưa có lịch làm nào trong tháng này ');
+                    session()->flash('error', 'Nhân viên không có lịch làm nào trong tháng đã chọn');
                 }
             }
         } else {

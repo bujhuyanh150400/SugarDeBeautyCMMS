@@ -51,7 +51,7 @@ const Add = (props) => {
         await router.post(route('specialties.add'), data);
     }
     return (
-        <Layout back_to={route('specialties.list')}>
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-8">
                     <Form.Group controlId="name">

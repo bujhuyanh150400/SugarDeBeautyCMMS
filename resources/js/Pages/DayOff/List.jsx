@@ -12,7 +12,7 @@ import {
     Popover,
     Row,
     SelectPicker,
-    Table,
+    Table, Text,
     Whisper
 } from "rsuite";
 import SearchIcon from "@rsuite/icons/Search.js";
@@ -23,11 +23,10 @@ import Swal from "sweetalert2";
 
 const List = (props) => {
     let {facilities, list_day_off, dayoffStatus} = props;
+    const login = props.auth.user;
     const [filter, setFilter] = useState({
         keyword: '',
-        start_date: '',
         facility: '',
-        end_date: '',
     })
     const handleChangeFilter = (key, value) => {
         setFilter(values => ({
@@ -66,25 +65,27 @@ const List = (props) => {
                                         placeholder="ID,Email,SĐT nhân viên, hoặc id của đơn"/>
                                 </Form.Group>
                             </Col>
-                            <Col xl={6} lg={12} md={24}>
-                                <Form.Group controlId="facility">
-                                    <Form.ControlLabel>Lọc theo cơ sở</Form.ControlLabel>
-                                    <SelectPicker
-                                        block
-                                        data={[
-                                            {label: 'Lựa chọn', value: ""},
-                                            ...facilities.map(facility => ({
-                                                label: `${facility.name} - ${facility.address}`,
-                                                value: facility.id
-                                            }))
-                                        ]}
-                                        value={filter.facility}
-                                        onChange={(value) => handleChangeFilter('facility', value)}
-                                        name="facility"
-                                        id="facility"
-                                        placeholder="Tìm kiếm theo cơ sở làm việc"/>
-                                </Form.Group>
-                            </Col>
+                            {login.permission === constant.PermissionAdmin.ADMIN &&
+                                <Col xl={6} lg={12} md={24}>
+                                    <Form.Group controlId="facility">
+                                        <Form.ControlLabel>Lọc theo cơ sở</Form.ControlLabel>
+                                        <SelectPicker
+                                            block
+                                            data={[
+                                                {label: 'Lựa chọn', value: ""},
+                                                ...facilities.map(facility => ({
+                                                    label: `${facility.name} - ${facility.address}`,
+                                                    value: facility.id
+                                                }))
+                                            ]}
+                                            value={filter.facility}
+                                            onChange={(value) => handleChangeFilter('facility', value)}
+                                            name="facility"
+                                            id="facility"
+                                            placeholder="Tìm kiếm theo cơ sở làm việc"/>
+                                    </Form.Group>
+                                </Col>
+                            }
                         </Row>
                         <Row gutter={12}>
                             <Col xl={24} as={"div"} className="flex items-center gap-2">
@@ -103,8 +104,14 @@ const List = (props) => {
             </Panel>
             <Table affixHeader rowHeight={100} autoHeight data={list_day_off.data}>
                 <Table.Column flexGrow={1.5} verticalAlign="center" align="center" fullText>
-                    <Table.HeaderCell>ID</Table.HeaderCell>
-                    <Table.Cell dataKey="id"/>
+                    <Table.HeaderCell>Nhân viên</Table.HeaderCell>
+                    <Table.Cell>
+                        {rowData => {
+                            return (
+                                <Text>{rowData.user.name} - {rowData.user.facility.name}</Text>
+                            )
+                        }}
+                    </Table.Cell>
                 </Table.Column>
                 <Table.Column flexGrow={2} verticalAlign="start" align="start" fullText>
                     <Table.HeaderCell>Tiêu đề</Table.HeaderCell>
@@ -152,44 +159,50 @@ const List = (props) => {
                 <Table.Column verticalAlign="center" flexGrow={1.5} align="center" fullText>
                     <Table.HeaderCell>Action</Table.HeaderCell>
                     <Table.Cell>
-                        {rowData =>
-                            (rowData.status === constant.DayOffStatus.WAIT ?
-                                (<ButtonGroup>
-                                    <Button
-                                        onClick={() =>
-                                            Swal.fire({
-                                                title: 'Bạn có muốn duyệt đơn',
-                                                text: 'Bạn có chắc chắn muốn làm điều này?',
-                                                icon: 'success',
-                                                showCancelButton: true,
-                                                confirmButtonText: 'Có, tôi chắc chắn!',
-                                                cancelButtonText: 'Không, hủy bỏ!'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    router.patch(route('dayoff.change_status', {dayoff_id: rowData.id}), {status: constant.DayOffStatus.ACTIVE})}
-                                            })}
-                                        color="green" appearance="primary">
-                                        Đồng ý
-                                    </Button>
-                                    <Button
-                                        onClick={() =>
-                                            Swal.fire({
-                                                title: 'Bạn không muốn không duyệt đơn',
-                                                text: 'Bạn có chắc chắn muốn làm điều này?',
-                                                icon: 'warning',
-                                                showCancelButton: true,
-                                                confirmButtonText: 'Có, tôi chắc chắn!',
-                                                cancelButtonText: 'Không, hủy bỏ!'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    router.patch(route('dayoff.change_status', {dayoff_id: rowData.id}), {status: constant.DayOffStatus.DENIED})}
-                                            })}
-                                        color="red" appearance="primary">
-                                        Huỷ
-                                    </Button>
-                                </ButtonGroup>) :(<span>Đơn đã đuợc duyệt</span>)
-                            )
-                        }
+                        {(rowData) => {
+                            if (login.permission === constant.PermissionAdmin.ADMIN || login.id !== rowData.user_id) {
+                                return (rowData.status === constant.DayOffStatus.WAIT ?
+                                    (<ButtonGroup>
+                                        <Button
+                                            onClick={() =>
+                                                Swal.fire({
+                                                    title: 'Bạn có muốn duyệt đơn',
+                                                    text: 'Bạn có chắc chắn muốn làm điều này?',
+                                                    icon: 'success',
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Có, tôi chắc chắn!',
+                                                    cancelButtonText: 'Không, hủy bỏ!'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        router.patch(route('dayoff.change_status', {dayoff_id: rowData.id}), {status: constant.DayOffStatus.ACTIVE})
+                                                    }
+                                                })}
+                                            color="green" appearance="primary">
+                                            Đồng ý
+                                        </Button>
+                                        <Button
+                                            onClick={() =>
+                                                Swal.fire({
+                                                    title: 'Bạn không muốn không duyệt đơn',
+                                                    text: 'Bạn có chắc chắn muốn làm điều này?',
+                                                    icon: 'warning',
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Có, tôi chắc chắn!',
+                                                    cancelButtonText: 'Không, hủy bỏ!'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        router.patch(route('dayoff.change_status', {dayoff_id: rowData.id}), {status: constant.DayOffStatus.DENIED})
+                                                    }
+                                                })}
+                                            color="red" appearance="primary">
+                                            Huỷ
+                                        </Button>
+                                    </ButtonGroup>) :
+                                    (<span>Đơn đã đuợc duyệt</span>))
+                            } else {
+                                return  (<span></span>)
+                            }
+                        }}
                     </Table.Cell>
                 </Table.Column>
             </Table>

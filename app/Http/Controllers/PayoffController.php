@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Constant\AppConstant;
 use App\Helpers\Constant\PayoffStatus;
+use App\Models\DayOff;
 use App\Models\Facilities;
 use App\Models\PayOff;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -25,31 +27,42 @@ class PayoffController extends Controller
 
     public function list(Request $request): Response
     {
-        $payoffs = PayOff::KeywordFilter($request->get('keyword') ?? '')
-            ->FacilityFilter($request->get('facility') ?? '')
+        $payoffs_query = PayOff::query();
+        if (Gate::allows('allow_admin')) {
+            $payoffs_query->FacilityFilter($request->get('facility') ?? '');
+        } else {
+            $payoffs_query->FacilityFilter(\auth()->user()->facility_id);
+        }
+        $payoffs_query->KeywordFilter($request->get('keyword') ?? '');
+        $payoffs = $payoffs_query
             ->with(['user', 'user.facility', 'creator', 'creator.facility'])
-            ->orderBy('payoff_at', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(self::PER_PAGE);
-        $facilities = Facilities::where('active', AppConstant::ACTIVE)->get();
+        if (Gate::allows('allow_admin')){
+            $facilities = Facilities::where('active', AppConstant::ACTIVE)->get();
+        }
         return Inertia::render('Payoff/List', [
             'title' => "Quản lý Thưởng / Phạt",
             'payoffs' => fn() => $payoffs,
             'query' => $request->query() ?: null,
-            'facilities' => $facilities,
+            'facilities' => $facilities ?? [],
             'payoffStatus' => PayoffStatus::getList()
         ]);
     }
 
     public function view_add(): Response
     {
-        $users = User::with(['facility', 'specialties'])->get();
+        if (Gate::allows('just_manager')) {
+            $users = User::FacilityFilter(\auth()->user()->facility_id)->with(['facility', 'specialties'])->get();
+        } elseif (Gate::allows('allow_admin')){
+            $users = User::with(['facility', 'specialties'])->get();
+        }
         return Inertia::render('Payoff/Add', [
             'title' => "Tạo đơn Thưởng / Phạt",
             'users' => fn() => $users,
             'payoffStatus' => PayoffStatus::getList()
         ]);
     }
-
     public function add(Request $request): RedirectResponse
     {
         $validator = Validator::make($request->all(), [

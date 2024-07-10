@@ -3,7 +3,7 @@ import {Link, useForm} from "@inertiajs/react";
 import {
     Button,
     Form,
-    MaskedInput, Heading, HeadingGroup, Text, Animation, DatePicker, InputGroup,Whisper,Tooltip
+    MaskedInput, Heading, HeadingGroup, Text, Animation, DatePicker, InputGroup
 } from "rsuite";
 
 import {useState} from "react";
@@ -34,7 +34,7 @@ const Control = (props) => {
         await post(route('time_attendance.control', {user_id: user.id}), data);
     }
     return (
-        <Layout back_to={route('time_attendance.list')}>
+        <Layout>
             <>
                 <Animation.Fade in={!openForm}>
                     {(props, ref) =>

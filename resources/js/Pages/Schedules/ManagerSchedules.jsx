@@ -14,6 +14,7 @@ import PlusIcon from '@rsuite/icons/Plus';
 import RemindIcon from "@rsuite/icons/legacy/Remind";
 import {useDispatch, useSelector} from "react-redux";
 import {setLoading} from "@/redux/reducers/AppSlice.js";
+import Swal from "sweetalert2";
 
 const initialScheduleForm = {
     schedule_id: '',
@@ -38,9 +39,9 @@ const ManagerSchedules = (props) => {
         endOfWeek,
         errors
     } = props;
-    useEffect(()=>{
-        Object.values(errors).map((error)=>toast.error(error))
-    },[errors])
+    useEffect(() => {
+        Object.values(errors).map((error) => toast.error(error))
+    }, [errors])
 
     const [scheduleStates, setSchedulesState] = useState({
         form: false,
@@ -118,7 +119,7 @@ const ManagerSchedules = (props) => {
     }
 
     return (
-        <Layout back_to={route('schedules.list')}>
+        <Layout>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
                 <div className="flex flex-col gap-2">
                     <Calendar
@@ -168,15 +169,18 @@ const ManagerSchedules = (props) => {
                                                 const start_time_registered = dayjs(schedule_user.start_time_registered).format('HH:mm');
                                                 const end_time_registered = dayjs(schedule_user.end_time_registered).format('HH:mm');
                                                 let attendance_at = null;
-                                                if (schedule_user.attendance_at){
+                                                if (schedule_user.attendance_at) {
                                                     attendance_at = dayjs(schedule_user.attendance_at).format('DD/MM/YYYY HH:mm:ss');
                                                 }
                                                 return (
-                                                    <List.Item key={schedule_user.id} className="grid grid-cols-5 gap-4">
+                                                    <List.Item key={schedule_user.id}
+                                                               className="grid grid-cols-5 gap-4">
                                                         <div className="flex flex-col gap-2 self-center">
                                                             <span>Ngày: {day_registered}</span>
-                                                            <Text weight="bold" color={schedule_user.status.color}>{schedule_user.status.text}</Text>
-                                                            {attendance_at && <Text size={'sm'}>Chấm công lúc: {attendance_at}</Text>}
+                                                            <Text weight="bold"
+                                                                  color={schedule_user.status.color}>{schedule_user.status.text}</Text>
+                                                            {attendance_at &&
+                                                                <Text size={'sm'}>Chấm công lúc: {attendance_at}</Text>}
                                                         </div>
                                                         <div className="flex flex-col gap-2 self-center">
                                                             <Text color={schedule_user.type.color}
@@ -191,11 +195,20 @@ const ManagerSchedules = (props) => {
                                                                     onClick={() => editSchedule(schedule_user)}>Chỉnh
                                                                 sửa</Button>
                                                             <Button appearance="primary" color="red" block={false}
-                                                                    onClick={() => setSchedulesState(prevState => ({
-                                                                        ...prevState,
-                                                                        alert: true,
-                                                                        id_deleted: schedule_user.id
-                                                                    }))}>Xoá</Button>
+                                                                    onClick={() => {
+                                                                        Swal.fire({
+                                                                            title: 'Hãy có muốn xóa lịch làm này không ?',
+                                                                            text: 'Bạn có chắc chắn muốn làm điều này?',
+                                                                            icon: 'error',
+                                                                            showCancelButton: true,
+                                                                            confirmButtonText: 'Có, tôi chắc chắn!',
+                                                                            cancelButtonText: 'Không, hủy bỏ!'
+                                                                        }).then((result) => {
+                                                                            if (result.isConfirmed) {
+                                                                                router.patch(route('schedules.deleted', {schedule_id: schedule_user.id}), {}, {preserveScroll: true})
+                                                                            }
+                                                                        });
+                                                                    }}>Xoá</Button>
                                                         </ButtonGroup>
                                                     </List.Item>
                                                 )
@@ -338,32 +351,6 @@ const ManagerSchedules = (props) => {
                     </Form>
                 </Modal.Body>
             </Modal>
-            {/*Modal alert xoá nhân viên*/}
-            <Modal backdrop="static" role="alertdialog" open={scheduleStates.alert} size="sm">
-                <Modal.Body>
-                    <RemindIcon className="text-amber-500 text-2xl"/>
-                    Bạn có muốn xoá lịch làm này
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={() => {
-                        setSchedulesState(value => ({
-                            ...value,
-                            alert: false
-                        }));
-                        router.patch(route('schedules.deleted', {schedule_id: scheduleStates.id_deleted}), {}, {preserveScroll: true})
-                    }} appearance="primary" color="red">
-                        Có
-                    </Button>
-                    <Button onClick={() => {
-                        setSchedulesState(value => ({
-                            ...value,
-                            alert: false
-                        }));
-                    }} appearance="subtle">
-                        Không
-                    </Button>
-                </Modal.Footer>
-            </Modal>
             {/*Modal View*/}
             <Modal size='70vw' open={scheduleStates.view}
                    onClose={() => setSchedulesState((prevState) => ({...prevState, view: false}))}>
@@ -407,11 +394,20 @@ const ManagerSchedules = (props) => {
                                                                     onClick={() => editSchedule(schedule_user)}>Chỉnh
                                                                 sửa</Button>
                                                             <Button appearance="primary" color="red" block={false}
-                                                                    onClick={() => setSchedulesState(prevState => ({
-                                                                        ...prevState,
-                                                                        alert: true,
-                                                                        id_deleted: schedule_user.id
-                                                                    }))}>Xoá</Button>
+                                                                    onClick={() => {
+                                                                        Swal.fire({
+                                                                            title: 'Hãy có muốn xóa lịch làm này không ?',
+                                                                            text: 'Bạn có chắc chắn muốn làm điều này?',
+                                                                            icon: 'error',
+                                                                            showCancelButton: true,
+                                                                            confirmButtonText: 'Có, tôi chắc chắn!',
+                                                                            cancelButtonText: 'Không, hủy bỏ!'
+                                                                        }).then((result) => {
+                                                                            if (result.isConfirmed) {
+                                                                                router.patch(route('schedules.deleted', {schedule_id: schedule_user.id}), {}, {preserveScroll: true})
+                                                                            }
+                                                                        });
+                                                                    }}>Xoá</Button>
                                                         </ButtonGroup>
                                                     </List.Item>
                                                 )
@@ -427,7 +423,8 @@ const ManagerSchedules = (props) => {
                         </Message>)}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button onClick={() => setSchedulesState((prevState) => ({...prevState, view: false}))} appearance="subtle">Đóng</Button>
+                    <Button onClick={() => setSchedulesState((prevState) => ({...prevState, view: false}))}
+                            appearance="subtle">Đóng</Button>
                 </Modal.Footer>
             </Modal>
         </Layout>

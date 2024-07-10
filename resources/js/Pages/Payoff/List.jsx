@@ -23,6 +23,7 @@ import HelperFunction from "@/utils/HelperFunction.js";
 
 const List = (props) => {
     const {facilities, payoffs, payoffStatus} = props;
+    const login = props.auth.user;
     const [filter, setFilter] = useState({
         keyword: '',
         facility: '',
@@ -66,25 +67,27 @@ const List = (props) => {
                                         placeholder="ID,Email,SĐT nhân viên"/>
                                 </Form.Group>
                             </Col>
-                            <Col xl={6} lg={12} md={24}>
-                                <Form.Group controlId="facility">
-                                    <Form.ControlLabel>Lọc theo cơ sở</Form.ControlLabel>
-                                    <SelectPicker
-                                        block
-                                        data={[
-                                            {label: 'Lựa chọn', value: ""},
-                                            ...facilities.map(facility => ({
-                                                label: `${facility.name} - ${facility.address}`,
-                                                value: facility.id
-                                            }))
-                                        ]}
-                                        value={filter.facility}
-                                        onChange={(value) => handleChangeFilter('facility', value)}
-                                        name="facility"
-                                        id="facility"
-                                        placeholder="Tìm kiếm theo cơ sở làm việc"/>
-                                </Form.Group>
-                            </Col>
+                            {login.permission === constant.PermissionAdmin.ADMIN &&
+                                <Col xl={6} lg={12} md={24}>
+                                    <Form.Group controlId="facility">
+                                        <Form.ControlLabel>Lọc theo cơ sở</Form.ControlLabel>
+                                        <SelectPicker
+                                            block
+                                            data={[
+                                                {label: 'Lựa chọn', value: ""},
+                                                ...facilities.map(facility => ({
+                                                    label: `${facility.name} - ${facility.address}`,
+                                                    value: facility.id
+                                                }))
+                                            ]}
+                                            value={filter.facility}
+                                            onChange={(value) => handleChangeFilter('facility', value)}
+                                            name="facility"
+                                            id="facility"
+                                            placeholder="Tìm kiếm theo cơ sở làm việc"/>
+                                    </Form.Group>
+                                </Col>
+                            }
                         </Row>
                         <Row gutter={12}>
                             <Col xl={24} as={"div"} className="flex items-center gap-2">

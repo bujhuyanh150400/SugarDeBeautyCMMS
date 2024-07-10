@@ -15,7 +15,7 @@ const View = (props) => {
 
 
     return (
-        <Layout back_to={route('workflow.list')}>
+        <Layout>
             <Panel bordered shaded header={`Quy trình ${workflow.title}`}>
                 <div className="flex flex-col gap-4">
                     <div className="inline-flex items-center gap-4"><Text color={'blue'} weight={'bold'}>Chuyên

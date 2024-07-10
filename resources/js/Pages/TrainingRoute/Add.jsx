@@ -23,8 +23,7 @@ const Add = props => {
         router.post(route('training_route.add'), data);
     }
     return (
-        <Layout back_to={route('training_route.list')}>
-
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="flex flex-col gap-4 mb-8">
                     <Form.Group controlId="name">

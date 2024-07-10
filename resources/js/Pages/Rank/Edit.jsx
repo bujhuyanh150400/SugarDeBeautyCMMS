@@ -14,7 +14,7 @@ const Edit = (props) => {
         await patch(route('rank.edit',{rank_id: rank.id}), data);
     }
     return (
-        <Layout back_to={route('rank.list')}>
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="flex flex-col gap-2 mb-4">
                     <Form.Group controlId="name">

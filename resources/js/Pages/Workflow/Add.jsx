@@ -33,7 +33,7 @@ const Add = (props) => {
 
 
     return (
-        <Layout back_to={route('workflow.list')}>
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="flex flex-col gap-4 mb-8">
                     <Form.Group controlId="name">

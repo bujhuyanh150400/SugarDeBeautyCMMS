@@ -36,12 +36,26 @@ const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp'];
 
 const TYPE_CHECKBOX = 15;
 const TYPE_RADIO = 20;
-
+const MONTHS_VIETNAMESE = {
+    1: { text: 'Tháng Một', value: 1 },
+    2: { text: 'Tháng Hai', value: 2 },
+    3: { text: 'Tháng Ba', value: 3 },
+    4: { text: 'Tháng Tư', value: 4 },
+    5: { text: 'Tháng Năm', value: 5 },
+    6: { text: 'Tháng Sáu', value: 6 },
+    7: { text: 'Tháng Bảy', value: 7 },
+    8: { text: 'Tháng Tám', value: 8 },
+    9: { text: 'Tháng Chín', value: 9 },
+    10: { text: 'Tháng Mười', value: 10 },
+    11: { text: 'Tháng Mười Một', value: 11 },
+    12: { text: 'Tháng Mười Hai', value: 12 }
+};
 export default {
     Validate,
     PermissionAdmin,
     Gender,
     FileType,
+    MONTHS_VIETNAMESE,
     ActiveStatus,
     ACTIVE,
     IN_ACTIVE,

@@ -282,7 +282,7 @@ class DatabaseSeeder extends Seeder
             'address' => 'Hà Nội',
             'gender' => 1,
             'rank_id' => 2406052325224804,
-            'salary_per_month' => Helpers::encryptData(200000000),
+            'salary_per_month' => Helpers::encryptData(20000000),
             'phone' => $faker->e164PhoneNumber,
             'permission' => 16,
             'facility_id' => Facilities::inRandomOrder()->first()->id,
@@ -300,7 +300,6 @@ class DatabaseSeeder extends Seeder
             'user_id' => 15042000,
         ]);
         for ($i = 0; $i < 50; $i++) {
-            $randomKey = array_rand(PermissionAdmin::getList());
             $data_user = [
                 'id' => intval(date('ymdHis') . rand(1000, 9999)),
                 'name' => $faker->name,
@@ -309,10 +308,10 @@ class DatabaseSeeder extends Seeder
                 'birth' => $faker->date,
                 'address' => $faker->address,
                 'gender' => rand(1, 2),
-                'salary_per_month' => Helpers::encryptData(rand(1, 9) * 1000000),
+                'salary_per_month' => Helpers::encryptData(rand(6, 10) * 1000000),
                 'rank_id' => 2406052325224804,
                 'phone' => $faker->e164PhoneNumber,
-                'permission' => PermissionAdmin::getListNotAdmin()[$randomKey]['value'],
+                'permission' => PermissionAdmin::EMPLOYEE,
                 'facility_id' => Facilities::inRandomOrder()->first()->id,
                 'specialties_id' => Specialties::inRandomOrder()->first()->id,
                 'number_of_day_offs' => 4,
@@ -329,5 +328,35 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $data_user['id'],
             ]);
         }
+        $facilities = Facilities::all();
+        $facilities->each(function ($facility) use ($faker) {
+            $data_user = [
+                'id' => intval(date('ymdHis') . rand(1000, 9999)),
+                'name' => $faker->name,
+                'email' => $faker->unique()->safeEmail,
+                'password' => Hash::make('123456789'),
+                'birth' => $faker->date,
+                'address' => $faker->address,
+                'gender' => rand(1, 2),
+                'salary_per_month' => Helpers::encryptData(rand(6, 10) * 1000000),
+                'rank_id' => 2406052325224804,
+                'phone' => $faker->e164PhoneNumber,
+                'permission' => PermissionAdmin::MANAGER,
+                'facility_id' => $facility->id,
+                'specialties_id' => Specialties::inRandomOrder()->first()->id,
+                'number_of_day_offs' => 4,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'remember_token' => null,
+            ];
+            DB::table('users')->insert($data_user);
+            DB::table('time_attendances')->insert([
+                'id' => intval(date('ymdHis') . rand(1000, 9999)),
+                'pin' => Helpers::encryptData(random_int(10000, 99999)),
+                'short_url' => Str::random(10),
+                'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
+                'user_id' => $data_user['id'],
+            ]);
+        });
     }
 }

@@ -53,7 +53,7 @@ const Add = (props) => {
         await post(route('user.add'), data);
     }
     return (
-        <Layout back_to={route('user.list')}>
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
                     <Form.Group controlId="name">

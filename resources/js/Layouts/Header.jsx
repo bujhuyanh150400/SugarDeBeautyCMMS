@@ -7,6 +7,8 @@ import {Icon} from "@rsuite/icons";
 import OffRoundIcon from '@rsuite/icons/OffRound';
 import MenuIcon from '@rsuite/icons/Menu';
 import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine';
+import constant from "@/utils/constant.js";
+import AvatarIcon from "rsuite/cjs/Avatar/AvatarIcon.js";
 const SunIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="mt-1" height="15" width="15" viewBox="0 0 512 512">
         <path
@@ -18,7 +20,7 @@ const MoonIcon = () => (
             d="M283.2 512c79 0 151.1-35.9 198.9-94.8 7.1-8.7-.6-21.4-11.6-19.4-124.2 23.7-238.3-71.6-238.3-197 0-72.2 38.7-138.6 101.5-174.4 9.7-5.5 7.3-20.2-3.8-22.2A258.2 258.2 0 0 0 283.2 0c-141.3 0-256 114.5-256 256 0 141.3 114.5 256 256 256z"/>
     </svg>);
 
-const renderToggle = props => <Avatar bordered  {...props} size="sm" className="mt-1" circle/>
+
 
 const HeaderAdmin = ({back_to}) => {
     const dispatch = useDispatch();
@@ -29,6 +31,18 @@ const HeaderAdmin = ({back_to}) => {
     const handleLogout = async () => {
         await router.post(route('logout'))
     }
+    let avatar = currentUser.files.find(file => file.file_type === constant.FileType.FILE_TYPE_AVATAR) || null;
+    if (avatar) {
+        avatar = route('file.show', {filepath: avatar.file_location})
+    }
+    const renderToggle = props => <Avatar bordered  {...props} size="sm" className="mt-1" circle>
+        {avatar ? (
+            <img src={avatar} width="100%" height="100%"/>
+        ) : (
+            <AvatarIcon />
+        )}
+    </Avatar>
+
     return (
         <>
             <Head title={page.props.title ?? 'Sugar de beautes'}/>
@@ -64,7 +78,7 @@ const HeaderAdmin = ({back_to}) => {
                                 <strong>{currentUser.name}</strong>
                             </Dropdown.Item>
                             <Dropdown.Separator/>
-                            <Dropdown.Item>Xem thông tin cá nhân</Dropdown.Item>
+                            <Dropdown.Item onClick={()=> router.get(route('profile'))}>Xem thông tin cá nhân</Dropdown.Item>
                             <Dropdown.Separator/>
                             <Dropdown.Item onClick={handleLogout} icon={<OffRoundIcon/>}>Đăng xuất</Dropdown.Item>
                         </Dropdown>

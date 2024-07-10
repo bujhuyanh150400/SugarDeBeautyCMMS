@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Constant\AppConstant;
 use App\Helpers\Constant\DayOffStatus;
+use App\Helpers\Constant\PermissionAdmin;
 use App\Models\DayOff;
 use App\Models\Facilities;
 use App\Models\Schedule;
@@ -11,6 +12,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -25,32 +27,41 @@ class DayOffController extends Controller
 
     public function list(Request $request): Response
     {
-        $list_day_off = DayOff::KeywordFilter($request->get('keyword') ?? '')
-            ->dayOffFilterBetween($request->get('start_date') ?? '', $request->get('end_date') ?? '')
-            ->FacilityFilter($request->get('facility') ?? '')
+        $list_day_off_query = DayOff::query();
+        if (Gate::allows('allow_admin')) {
+            $list_day_off_query->FacilityFilter($request->get('facility') ?? '');
+        } else {
+            $list_day_off_query->FacilityFilter(\auth()->user()->facility_id);
+        }
+        $list_day_off_query->KeywordFilter($request->get('keyword') ?? '')
+            ->dayOffFilterBetween($request->get('start_date') ?? '', $request->get('end_date') ?? '');
+        $list_day_off = $list_day_off_query
             ->with(['user', 'user.facility', 'user.specialties'])
             ->orderBy('created_at', 'desc')
             ->paginate(self::PER_PAGE);
-
-        $facilities = Facilities::where('active', AppConstant::ACTIVE)->get();
+        if (Gate::allows('allow_admin')){
+            $facilities = Facilities::where('active', AppConstant::ACTIVE)->get();
+        }
         return Inertia::render('DayOff/List', [
             'title' => "Quản lý xin nghỉ phép",
             'list_day_off' => fn() => $list_day_off,
             'query' => $request->query() ?: null,
-            'facilities' => $facilities,
+            'facilities' => $facilities ?? [],
             'dayoffStatus' => DayOffStatus::getList()
         ]);
     }
-
     public function view_add(): Response
     {
-        $users = User::with(['facility', 'specialties'])->get();
+        if (Gate::allows('just_manager')) {
+            $users = User::FacilityFilter(\auth()->user()->facility_id)->with(['facility', 'specialties'])->get();
+        } elseif (Gate::allows('allow_admin')){
+            $users = User::with(['facility', 'specialties'])->get();
+        }
         return Inertia::render('DayOff/Add', [
             'title' => "Tạo đơn xin nghỉ phép",
-            'users' => fn() => $users,
+            'users' => fn() => $users ?? null,
         ]);
     }
-
     public function add(Request $request)
     {
         $validator = Validator::make($request->all(), [

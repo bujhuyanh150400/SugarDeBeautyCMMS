@@ -23,13 +23,7 @@ class PermissionMiddleware
                     $can_access = false;
                     break;
                 }
-
         }
-
-
-
-
-
         if ($can_access === true){
             return $next($request);
         }else{

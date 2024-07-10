@@ -53,7 +53,7 @@ const Detail = (props) => {
     }
 
     return (
-        <Layout className={`space-y-4`} back_to={route('salary.list')}>
+        <Layout className={`space-y-4`}>
 
             <Panel bordered shaded header={`Thông tin về lương`}>
                 <div className={`space-y-4`}>

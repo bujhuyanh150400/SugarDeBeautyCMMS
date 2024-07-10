@@ -52,7 +52,6 @@ const List = (props) => {
     const filterForm = async () => {
         await router.get(route('user.list'), filter, optionsRouter);
     }
-    console.log(users)
     return (
         <Layout>
             <Panel header={<div className="roboto">Tìm kiếm <SearchIcon/></div>} bordered shaded className="mb-8">
@@ -208,7 +207,6 @@ const List = (props) => {
                                             <li className={`flex gap-2 items-center`}><Text weight={`semibold`} color={`blue`}>Ngân hàng: </Text> {rowData.bin_bank ?? 'Chưa điền'}</li>
                                             <li className={`flex gap-2 items-center`}><Text weight={`semibold`} color={`blue`}>STK ngân hàng: </Text> {rowData.account_bank ? rowData.account_bank : 'Chưa điền'}</li>
                                             <li className={`flex gap-2 items-center`}><Text weight={`semibold`} color={`blue`}>Chủ thể ngân hàng: </Text> {rowData.account_bank_name ? rowData.account_bank_name : 'Chưa điền'}</li>
-
                                         </ul>
                                     </Popover>
                                 )}>

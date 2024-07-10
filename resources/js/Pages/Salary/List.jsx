@@ -21,9 +21,12 @@ import HelperFunction from "@/utils/HelperFunction.js";
 import dayjs from "dayjs";
 import PlusIcon from "@rsuite/icons/Plus";
 import toast from "react-hot-toast";
+import constant from "@/utils/constant.js";
 
 const List = (props) => {
     const {salaries, users, query, salaryStatus, facilities, is_pay} = props
+    const currentMonth = dayjs().month() + 1;
+
     const [filter, setFilter] = useState({
         facility: null,
         status: null,
@@ -32,7 +35,10 @@ const List = (props) => {
         pay_start: undefined,
         pay_end: undefined,
     })
-    const [employee,setEmployee] = useState(null);
+    const [employee, setEmployee] = useState(null);
+    const [month, setMonth] = useState(null);
+
+    const previousMonths = _.filter(constant.MONTHS_VIETNAMESE, month => month.value < currentMonth);
     const handleChangeFilter = (key, value) => {
         setFilter(values => ({
             ...values,
@@ -65,10 +71,13 @@ const List = (props) => {
         }, optionsRouter);
     }
     const createSalary = () => {
-        if (!employee){
-            return toast.error('Hãy chọn nhân viên trước')
+        if (!employee) {
+            return toast.error('Hãy chọn nhân viên trước');
         }
-        router.get(route('salary.add',{user_id: employee}),optionsRouter);
+        if (!month) {
+            return toast.error('Hãy chọn tháng trước');
+        }
+        router.get(route('salary.add', {user_id: employee, month}), optionsRouter);
     }
 
     return (
@@ -165,13 +174,14 @@ const List = (props) => {
                                 </Form.Group>
                             </Col>
                         </Row>
-                        <Divider />
+                        <Divider/>
                         <Row gutter={12}>
                             <Col xl={24} as={"div"} className="flex items-center gap-2">
                                 <Button type="submit" startIcon={<SearchIcon/>} appearance="primary">
                                     Tìm kiếm
                                 </Button>
-                                <Button type="button" startIcon={<PlusIcon/>} appearance="primary" color={`green`} onClick={createSalary}>
+                                <Button type="button" startIcon={<PlusIcon/>} appearance="primary" color={`green`}
+                                        onClick={createSalary}>
                                     Tạo bảng lương
                                 </Button>
                                 <SelectPicker
@@ -188,6 +198,21 @@ const List = (props) => {
                                     name="user"
                                     id="user"
                                     placeholder="Chọn nhân viên để tạo bảng lương"/>
+                                <SelectPicker
+                                    block
+                                    searchable={false}
+                                    data={[
+                                        {label: 'Lựa chọn', value: ""},
+                                        ..._.map(previousMonths, (prevMonth) => ({
+                                            label: prevMonth.text,
+                                            value: prevMonth.value
+                                        }))
+                                    ]}
+                                    value={month}
+                                    onChange={(value) => setMonth(value)}
+                                    name="month"
+                                    id="month"
+                                    placeholder="Chọn tháng"/>
                             </Col>
                         </Row>
                     </Grid>

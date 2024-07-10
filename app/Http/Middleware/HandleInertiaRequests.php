@@ -22,7 +22,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user()->load('files'),
                 'permission' => PermissionAdmin::getList(),
                 'menu' => $menu->getListByPermission(),
                 'scheduleStatus' => ScheduleStatus::getList(),

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Helpers\Helpers;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\belongsTo;
@@ -21,6 +23,10 @@ class TimeAttendance extends Model
         'updated_at',
         'created_at',
     ];
+    protected function Pin(): Attribute
+    {
+        return Helpers::handleCryptAttribute();
+    }
     /**
      * -------------- Relations -------------
      */
