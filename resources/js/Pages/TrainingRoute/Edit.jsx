@@ -29,8 +29,7 @@ const Add = props => {
         router.patch(route('training_route.edit', {training_route_id: training_route.id}), data);
     }
     return (
-        <Layout back_to={route('training_route.list')}>
-
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="flex flex-col gap-4 mb-8">
                     <Form.Group controlId="name">

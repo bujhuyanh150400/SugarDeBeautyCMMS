@@ -73,6 +73,30 @@ class SchedulesController extends Controller
         }
     }
 
+
+    public function selfSchedules(): Response
+    {
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfWeek = Carbon::now()->endOfWeek();
+        $self_schedules = User::where('id', auth()->user()->id)->whereHas('schedules', function ($query) use ($startOfWeek, $endOfWeek) {
+            $query->whereDate('day_registered', '>=', $startOfWeek)
+                ->whereDate('day_registered', '<=', $endOfWeek);
+        })->with(['specialties', 'schedules' => function ($query) use ($startOfWeek, $endOfWeek) {
+            $query->whereDate('day_registered', '>=', $startOfWeek)
+                ->whereDate('day_registered', '<=', $endOfWeek);
+        }])->first();
+        return Inertia::render('Schedules/SelfSchedules', [
+            'title' => "Lịch làm cá nhân",
+            'self_schedules' => fn() => $self_schedules,
+            'startOfWeek' => $startOfWeek->format('d/m/Y'),
+            'endOfWeek' => $endOfWeek->format('d/m/Y'),
+            'scheduleType' => ScheduleStatus::getListType(),
+            'scheduleStatus' => ScheduleStatus::getList(),
+            'scheduleStatusConstant' => ScheduleStatus::getConstants(),
+        ]);
+    }
+
+
     public function view(Request $request, int $facilities_id): JsonResponse
     {
         $facility = Facilities::find($facilities_id);
@@ -95,6 +119,25 @@ class SchedulesController extends Controller
             }
         } else {
             return response()->json('Không tìm thấy cơ sở', 422);
+        }
+    }
+
+
+    public function viewSelfSchedules(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $day_registered = $request->date('day_registered');
+            if (empty($day_registered)) {
+                return response()->json('Hãy chọn 1 ngày để tìm lịch làm', 422);
+            }
+            $users_schedule = User::where('id', auth()->user()->id)->whereHas('schedules', function ($query) use ($day_registered) {
+                $query->whereDate('day_registered', '=', $day_registered);
+            })->with(['specialties', 'schedules' => function ($query) use ($day_registered) {
+                $query->whereDate('day_registered', '=', $day_registered);
+            }])->get();
+            return response()->json($users_schedule);
+        } catch (Exception $exception) {
+            return response()->json('Có lỗi xảy ra , vui lòng liên hệ với quản trị viên', 500);
         }
     }
 
@@ -178,6 +221,10 @@ class SchedulesController extends Controller
             session()->flash('error', 'Không tìm thấy cơ sở');
             return redirect()->back();
         }
+    }
+
+    public function register_self(Request $request) {
+
     }
 
     public function edit(Request $request, int $schedule_id): RedirectResponse

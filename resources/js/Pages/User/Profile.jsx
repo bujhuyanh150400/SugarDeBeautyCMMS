@@ -15,6 +15,7 @@ const Profile = (props)=>{
         avatar = route('file.show', {filepath: avatar.file_location})
     }
     let file_had_uploads = user.files.filter(file => file.file_type === constant.FileType.FILE_TYPE_UPLOAD);
+    console.log(user)
     return (
         <Layout>
             <div className='grid grid-cols-2 gap-x-2 pb-4'>
@@ -58,6 +59,7 @@ const Profile = (props)=>{
                         <div className="flex flex-col items-center gap-3">
                             <Heading level={5}>Mã QRCode của nhân viên</Heading>
                             <QRCode url={route('short_url',{short_url:user.time_attendance.short_url})} />
+                            <Text weight={'bold'} color={'blue'}>Mã PIN: {user.time_attendance.pin}</Text>
                             <a target="_blank" href={route('short_url',{short_url:user.time_attendance.short_url})}>{route('short_url',{short_url:user.time_attendance.short_url})}</a>
                         </div>
                     </div>

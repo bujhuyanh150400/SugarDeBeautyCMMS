@@ -85,6 +85,17 @@ class Menu
                         $this->setChildMenu('Quản lý đào tạo', '/training_route/list','test'),
                     ]),
                 ],
+                PermissionAdmin::EMPLOYEE => [
+                    $this->setMenu('Trang chủ', 'DashboardIcon', '/dashboard' , 'dashboard'),
+                    $this->setMenu('Lịch làm','CalendarIcon', '/time_attendance/schedule/self_schedules', 'schedule'),
+                    $this->setMenu('Đơn nghỉ phép', 'IdMappingIcon', '/dayoff/list' , 'dayoff'),
+                    $this->setMenu('Thưởng/Phạt', 'RateIcon', '/payoff/list' , 'payoff'),
+                    $this->setMenu('Lương', 'QrcodeIcon', '/salary/list' , 'salary'),
+                    $this->setMenu('Đào tạo', 'PeoplesIcon', '/workflow/list' , 'education' ,[
+                        $this->setChildMenu('Danh sách quy trình', '/workflow/list' , 'workflow'),
+                        $this->setChildMenu('Kiểm tra định kì', '/training_route/list','test'),
+                    ]),
+                ],
                 default => [],
             };
         }

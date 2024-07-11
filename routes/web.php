@@ -96,6 +96,9 @@ Route::middleware('guest')->group(function () {
                 Route::patch('/edit/{schedule_id}', [SchedulesController::class, 'edit'])->name('schedules.edit')->whereNumber('schedule_id');
                 Route::patch('/deleted/{schedule_id}', [SchedulesController::class, 'deleted'])->name('schedules.deleted')->whereNumber('schedule_id');
             });
+            Route::get('/self_schedules', [SchedulesController::class, 'selfSchedules'])->name('schedules.selfSchedules');
+            Route::get('/view_self_schedules', [SchedulesController::class, 'viewSelfSchedules'])->name('schedules.view_self_schedules')->middleware('auth');
+            Route::post('/register_self', [SchedulesController::class, 'register'])->name('schedules.register')->whereNumber('facilities_id');
         });
         // Quản lý chấm công
         Route::prefix('manager')->group(function () {
@@ -127,8 +130,10 @@ Route::middleware('guest')->group(function () {
     // Quản lý lương
     Route::prefix('salary')->group(function () {
         Route::get('/list', [SalaryController::class, 'list'])->name('salary.list');
-        Route::match(['get', 'post'], '/add/{user_id}', [SalaryController::class, 'add'])->name('salary.add')->whereNumber('user_id');
-        Route::match(['get', 'patch'], '/detail/{salary_id}', [SalaryController::class, 'detail'])->name('salary.detail')->whereNumber('salary_id');
+        Route::middleware('permission:allow_manager')->group(function () {
+            Route::match(['get', 'post'], '/add/{user_id}', [SalaryController::class, 'add'])->name('salary.add')->whereNumber('user_id');
+            Route::match(['get', 'patch'], '/detail/{salary_id}', [SalaryController::class, 'detail'])->name('salary.detail')->whereNumber('salary_id')->middleware('permission:allow_admin');
+        });
         Route::get('/view/{salary_id}', [SalaryController::class, 'view'])->name('salary.view')->whereNumber('salary_id');
     });
 
@@ -173,10 +178,12 @@ Route::middleware('guest')->group(function () {
 
     // config
     Route::prefix('config')->group(function () {
-        Route::get('/list', [ConfigAppController::class, 'list'])->name('config.list');
-        Route::post('/add', [ConfigAppController::class, 'add'])->name('config.add');
-        Route::match(['get', 'patch'], '/edit/{config_id}', [ConfigAppController::class, 'edit'])->name('config.edit')->whereNumber('config_id');
-        Route::delete('/deleted/{config_id}', [ConfigAppController::class, 'deleted'])->name('config.deleted')->whereNumber('config_id');
+        Route::middleware('permission:allow_admin')->group(function () {
+            Route::get('/list', [ConfigAppController::class, 'list'])->name('config.list');
+            Route::post('/add', [ConfigAppController::class, 'add'])->name('config.add');
+            Route::match(['get', 'patch'], '/edit/{config_id}', [ConfigAppController::class, 'edit'])->name('config.edit')->whereNumber('config_id');
+            Route::delete('/deleted/{config_id}', [ConfigAppController::class, 'deleted'])->name('config.deleted')->whereNumber('config_id');
+        });
     });
 });
 

@@ -25,7 +25,7 @@ const Add = props => {
     return (
         <Layout>
             <Form onSubmit={submit} fluid>
-                <div className="flex flex-col gap-4 mb-8">
+                <div className="grid grid-cols-2 gap-4 mb-8">
                     <Form.Group controlId="name">
                         <Form.ControlLabel>Tiêu đề đào tạo</Form.ControlLabel>
                         <Form.Control
@@ -96,15 +96,15 @@ const Add = props => {
                             postfix="Phút"/>
                         <Form.ErrorMessage show={!!errors.time}>{errors.time}</Form.ErrorMessage>
                     </Form.Group>
-                    <Form.Group controlId="description">
-                        <Form.ControlLabel>Mô tả về đào tạo</Form.ControlLabel>
-                        <Editor minHeight={200} data={data.description} onChange={(event, editor) => {
-                            let value = editor.getData();
-                            setForm('description', value);
-                        }}/>
-                        <Form.ErrorMessage show={!!errors.description}>{errors.description}</Form.ErrorMessage>
-                    </Form.Group>
                 </div>
+                <Form.Group controlId="description">
+                    <Form.ControlLabel>Mô tả về đào tạo</Form.ControlLabel>
+                    <Editor minHeight={200} data={data.description} onChange={(event, editor) => {
+                        let value = editor.getData();
+                        setForm('description', value);
+                    }}/>
+                    <Form.ErrorMessage show={!!errors.description}>{errors.description}</Form.ErrorMessage>
+                </Form.Group>
                 <div className="flex items-center justify-end">
                     <Button type="submit" appearance="primary" color="green" startIcon={<PlusIcon/>}> Tạo </Button>
                 </div>

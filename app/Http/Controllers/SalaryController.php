@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Constant\DayOffStatus;
 use App\Helpers\Constant\PayoffStatus;
+use App\Helpers\Constant\PermissionAdmin;
 use App\Helpers\Constant\SalaryStatus;
 use App\Helpers\Constant\ScheduleStatus;
 use App\Helpers\Helpers;
@@ -16,6 +17,7 @@ use App\Models\Schedule;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -178,7 +180,13 @@ class SalaryController extends Controller
     public function list(Request $request): \Inertia\Response
     {
         $title = "Danh sách lương nhân viên";
-        $users = User::with('facility')->orderBy('facility_id', 'desc')->get();
+        $user_query = User::query();
+        if (Gate::allows('allow_admin')) {
+            $user_query->FacilityFilter($request->get('facility') ?? '');
+        } else {
+            $user_query->whereIn('permission', [PermissionAdmin::MANAGER, PermissionAdmin::EMPLOYEE])->FacilityFilter(\auth()->user()->facility_id);
+        }
+        $users = $user_query->with('facility')->orderBy('facility_id', 'desc')->get();
         $salaries = Salary::FacilityFilter($request->get('facility') ?? '')
             ->StatusFilter($request->get('status') ?? '')
             ->CreatedAtFilter($request->date('start_date'), $request->date('end_date'))
@@ -205,7 +213,6 @@ class SalaryController extends Controller
 
     public function add(int $user_id, Request $request): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
-
         $currentMonth = date('n'); // Lấy tháng hiện tại (1 đến 12)
         if ($request->integer('month') >= $currentMonth) {
             session()->flash('error', 'Chỉ tính được lương của tháng trước đó!');
@@ -219,7 +226,7 @@ class SalaryController extends Controller
             if ($salary_exist) {
                 session()->flash('error', 'Nhân viên này tháng này đã có bảng lương');
             } else {
-                $create_choose = Carbon::createFromFormat('m', $request->integer('month'))->setDay(1);
+                $create_choose = Carbon::createFromFormat('m', $request->integer('month'))->setDay(10);
                 $data_salary = $this->getDataSalaryMonth($user,$create_choose);
                 if (!$data_salary->isEmpty()) {
                     if ($request->method() === 'POST') {
@@ -244,8 +251,6 @@ class SalaryController extends Controller
                         }, 0);
                         $statistical = $data_salary->get('statistical');
                         $total_salary = $statistical['total_salary'] + $total_service_money;
-
-
                         DB::beginTransaction();
                         try {
                             $data_insert = [
@@ -255,6 +260,7 @@ class SalaryController extends Controller
                                 'service_money' => $total_service_money,
                                 'description' => $request->get('description'),
                                 'status' => SalaryStatus::WAIT_CONFIRM,
+                                'created_at' => $create_choose,
                                 'user_id' => $user->id,
                             ];
                             $salary = Salary::create($data_insert);
@@ -274,15 +280,17 @@ class SalaryController extends Controller
                         }
                     } else {
                         return Inertia::render('Salary/Add', [
-                            'title' => 'Tạo lương cho nhân viên ' . $user->name,
+                            'title' => 'Tạo lương tháng '. $create_choose->month . ' cho nhân viên ' . $user->name,
                             'user' => $user,
+                            'month' => $request->integer('month'),
                             'schedules' => $data_salary->get('schedules'),
                             'day_offs' => $data_salary->get('day_offs'),
                             'pay_offs' => $data_salary->get('pay_offs'),
                             'statistical' => $data_salary->get('statistical'),
                         ]);
                     }
-                } else {
+                }
+                else {
                     session()->flash('error', 'Nhân viên không có lịch làm nào trong tháng đã chọn');
                 }
             }
@@ -331,7 +339,7 @@ class SalaryController extends Controller
                 }
             }
         } else {
-            session()->flash('error', 'Không tìm thấy người dùng');
+            session()->flash('error', 'Không tìm thấy bảng lương');
         }
         return redirect()->route('salary.list');
     }

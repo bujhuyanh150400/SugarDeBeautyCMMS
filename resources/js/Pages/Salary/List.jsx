@@ -26,7 +26,6 @@ import constant from "@/utils/constant.js";
 const List = (props) => {
     const {salaries, users, query, salaryStatus, facilities, is_pay} = props
     const currentMonth = dayjs().month() + 1;
-
     const [filter, setFilter] = useState({
         facility: null,
         status: null,
@@ -37,6 +36,7 @@ const List = (props) => {
     })
     const [employee, setEmployee] = useState(null);
     const [month, setMonth] = useState(null);
+    const login = props.auth.user;
 
     const previousMonths = _.filter(constant.MONTHS_VIETNAMESE, month => month.value < currentMonth);
     const handleChangeFilter = (key, value) => {
@@ -86,25 +86,27 @@ const List = (props) => {
                 <Form onSubmit={filterForm} fluid>
                     <Grid gutter={16} fluid>
                         <Row gutter={12} className="mb-4">
-                            <Col xl={4} lg={12} md={24}>
-                                <Form.Group controlId="facility">
-                                    <Form.ControlLabel>Lọc cơ sở</Form.ControlLabel>
-                                    <SelectPicker
-                                        block
-                                        data={[
-                                            {label: 'Lựa chọn', value: ""},
-                                            ...facilities.map(facility => ({
-                                                label: `${facility.name} - ${facility.address}`,
-                                                value: facility.id
-                                            }))
-                                        ]}
-                                        value={filter.facility}
-                                        onChange={(value) => handleChangeFilter('facility', value)}
-                                        name="facility"
-                                        id="facility"
-                                        placeholder="Tìm kiếm theo cơ sở"/>
-                                </Form.Group>
-                            </Col>
+                            {login.permission === constant.PermissionAdmin.ADMIN &&
+                                <Col xl={6} lg={12} md={24}>
+                                    <Form.Group controlId="facility">
+                                        <Form.ControlLabel>Lọc theo cơ sở</Form.ControlLabel>
+                                        <SelectPicker
+                                            block
+                                            data={[
+                                                {label: 'Lựa chọn', value: ""},
+                                                ...facilities.map(facility => ({
+                                                    label: `${facility.name} - ${facility.address}`,
+                                                    value: facility.id
+                                                }))
+                                            ]}
+                                            value={filter.facility}
+                                            onChange={(value) => handleChangeFilter('facility', value)}
+                                            name="facility"
+                                            id="facility"
+                                            placeholder="Tìm kiếm theo cơ sở làm việc"/>
+                                    </Form.Group>
+                                </Col>
+                            }
                             <Col xl={4} lg={12} md={24}>
                                 <Form.Group controlId="status">
                                     <Form.ControlLabel>Lọc theo trạng thái lương</Form.ControlLabel>
@@ -127,7 +129,7 @@ const List = (props) => {
                             </Col>
                             <Col xl={4} lg={12} md={24}>
                                 <Form.Group controlId="created_at">
-                                    <Form.ControlLabel>Lọc theo ngày tạo bảng lương</Form.ControlLabel>
+                                    <Form.ControlLabel>Lọc theo tháng lương</Form.ControlLabel>
                                     <DateRangePicker
                                         block={true}
                                         name="created_at"
@@ -250,9 +252,9 @@ const List = (props) => {
                     </Table.Cell>
                 </Table.Column>
                 <Table.Column flexGrow={1} verticalAlign="center" align="start" fullText>
-                    <Table.HeaderCell>Ngày tạo bảng lương</Table.HeaderCell>
+                    <Table.HeaderCell>Lương tháng</Table.HeaderCell>
                     <Table.Cell>
-                        {rowData => (<Text weight={`bold`}>{dayjs(rowData.created_at).format('DD-MM-YYYY')}</Text>)}
+                        {rowData => (<Text weight={`bold`}>{dayjs(rowData.created_at).format('MM-YYYY')}</Text>)}
                     </Table.Cell>
                 </Table.Column>
                 <Table.Column flexGrow={1} verticalAlign="center" align="start" fullText>
@@ -268,7 +270,7 @@ const List = (props) => {
                     <Table.Cell>
                         {rowData => (
                             <ButtonGroup>
-                                {rowData.status.value !== is_pay &&
+                                {rowData.status.value !== is_pay && login.permission === constant.PermissionAdmin.ADMIN &&
                                     <Button as={Link} href={route('salary.detail', {salary_id: rowData.id})}
                                             appearance={`primary`} color={`green`}>
                                         Thanh toán lương

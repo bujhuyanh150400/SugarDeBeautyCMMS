@@ -14,6 +14,7 @@ use App\Models\Workflow;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -42,8 +43,13 @@ class TrainingRouteController extends Controller
 
     public function view_add(): \Inertia\Response
     {
-        $users = User::PermissionFilter(PermissionAdmin::EMPLOYEE)->with('specialties', 'facility')->get();
-//        $users = User::with('specialties', 'facility')->get();
+        $user_query = User::query();
+        if (Gate::allows('allow_admin')) {
+            $user_query->PermissionFilter(PermissionAdmin::EMPLOYEE);
+        } else {
+            $user_query->PermissionFilter(PermissionAdmin::EMPLOYEE)->FacilityFilter(\auth()->user()->facility_id);
+        }
+        $users = $user_query->with('specialties', 'facility')->get();
         $workflows = Workflow::with('specialties')->get();
         $test_questions = TestQuestion::with('specialties')->get();
         return Inertia::render('TrainingRoute/Add', [

@@ -273,7 +273,7 @@ class DatabaseSeeder extends Seeder
             'updated_at' => now(),
         ]);
         // Users
-        DB::table('users')->insert([
+        $admin = [
             'id' => 15042000,
             'name' => 'Bùi Huy Anh',
             'email' => 'bujhuyanh150400@gmail.com',
@@ -291,7 +291,8 @@ class DatabaseSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
             'remember_token' => null,
-        ]);
+        ];
+        DB::table('users')->insert($admin);
         DB::table('time_attendances')->insert([
             'id' => intval(date('ymdHis') . rand(1000, 9999)),
             'pin' => Helpers::encryptData(random_int(10000, 99999)),
@@ -299,8 +300,10 @@ class DatabaseSeeder extends Seeder
             'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
             'user_id' => 15042000,
         ]);
+        $data_user = [];
+        $data_attendance = [];
         for ($i = 0; $i < 50; $i++) {
-            $data_user = [
+            $data_user[] = [
                 'id' => intval(date('ymdHis') . rand(1000, 9999)),
                 'name' => $faker->name,
                 'email' => $faker->unique()->safeEmail,
@@ -319,15 +322,16 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
                 'remember_token' => null,
             ];
-            DB::table('users')->insert($data_user);
-            DB::table('time_attendances')->insert([
+            $data_attendance[] = [
                 'id' => intval(date('ymdHis') . rand(1000, 9999)),
                 'pin' => Helpers::encryptData(random_int(10000, 99999)),
                 'short_url' => Str::random(10),
                 'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
                 'user_id' => $data_user['id'],
-            ]);
+            ];
         }
+        DB::table('users')->insert($data_user);
+        DB::table('time_attendances')->insert($data_attendance);
         $facilities = Facilities::all();
         $facilities->each(function ($facility) use ($faker) {
             $data_user = [
