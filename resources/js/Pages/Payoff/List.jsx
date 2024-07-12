@@ -52,6 +52,7 @@ const List = (props) => {
     }
     return (
         <Layout>
+            {login.permission !== constant.PermissionAdmin.EMPLOYEE &&
             <Panel header={<div className="roboto">Tìm kiếm <SearchIcon/></div>} bordered shaded className="mb-8">
                 <Form onSubmit={filterForm} fluid>
                     <Grid gutter={16} fluid>
@@ -97,7 +98,7 @@ const List = (props) => {
                         </Row>
                     </Grid>
                 </Form>
-            </Panel>
+            </Panel>}
             <Table affixHeader rowHeight={100} autoHeight data={payoffs.data}>
                 <Table.Column flexGrow={1.5} verticalAlign="center" align="center" fullText>
                     <Table.HeaderCell>ID</Table.HeaderCell>

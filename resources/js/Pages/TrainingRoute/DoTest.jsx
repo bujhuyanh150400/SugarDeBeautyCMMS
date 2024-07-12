@@ -59,17 +59,16 @@ const DoTest = ({training_route}) => {
             if ((forbiddenKeys.includes(keyString) &&
                 (ctrlKey || shiftKey)) || forbiddenKeys.includes(keyString)) {
                 toast.error('Bạn đang cố tình vào devTool ?')
-                // event.preventDefault();
+                event.preventDefault();
             }
         };
         document.addEventListener('keydown', handleKeyDown);
-
         const handleVisibilityChange = () => {
             if (document.hidden) {
-                // router.post(route('training_route.scoring', {training_route_id: training_route.id}), {violating: true});
+                router.post(route('training_route.scoring', {training_route_id: training_route.id}), {violating: true});
             }
         };
-        document.addEventListener('visibilitychange', handleVisibilityChange);
+        document.addEventListener('blur', handleVisibilityChange);
         return () => {
             document.removeEventListener('contextmenu', handleContextMenu);
             document.removeEventListener('keydown', handleKeyDown);
@@ -297,31 +296,15 @@ const DoTest = ({training_route}) => {
                             {images.length > 0 && (
                                 <>
                                     <Text color="blue" weight="bold">Ảnh đính kèm:</Text>
-                                    <FancyBox
-                                        options={{
-                                            Carousel: {infinite: false},
-                                            contentClick: "toggleCover",
-                                            Images: {
-                                                initialSize: "fit",
-                                                Panzoom: {
-                                                    panMode: "mousemove",
-                                                    mouseMoveFactor: 1.1,
-                                                    mouseMoveFriction: 0.12,
-                                                },
-                                            },
-                                            animate: true
-                                        }}
-                                    >
-                                        <div className="space-x-4 space-y-2">
-                                            {images.map((image, index) => (
-                                                <a key={index} data-fancybox="gallery"
-                                                   href={route('file.show', {filepath: image.file_location})}>
-                                                    <img src={route('file.show', {filepath: image.file_location})}
-                                                         width="200" height="150"/>
-                                                </a>
-                                            ))}
-                                        </div>
-                                    </FancyBox>
+                                    <div className="space-x-4 space-y-2 flex items-center gap-2 flex-col justify-center">
+                                        {images.map((image, index) => {
+                                            return (
+                                                <div className={`!max-w-[800px]`}>
+                                                    <img key={index} src={route('file.show', {filepath: image.file_location})} className="w-full h-full" />
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
                                 </>
                             )}
                             <Text color="blue" weight="bold">Nội dung câu hỏi:</Text>

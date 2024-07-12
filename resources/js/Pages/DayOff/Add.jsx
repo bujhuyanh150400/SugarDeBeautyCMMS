@@ -40,7 +40,7 @@ const Add = (props) => {
     return (
         <Layout >
             <Form onSubmit={submit} fluid>
-                {login.permission !== constant.PermissionAdmin.EMPLOYEE && (
+                {login.permission !== constant.PermissionAdmin.EMPLOYEE ? (
                     <Form.Group controlId="user">
                         <Form.ControlLabel>Nhân viên xin nghỉ</Form.ControlLabel>
                         <SelectPicker
@@ -60,7 +60,7 @@ const Add = (props) => {
                             placeholder="Nhân viên nghỉ phép"/>
                         <Form.ErrorMessage show={!!errors.user_id}>{errors.user_id}</Form.ErrorMessage>
                     </Form.Group>
-                )}
+                ) : <Form.ErrorMessage show={!!errors.user_id}>{errors.user_id}</Form.ErrorMessage>}
                 <Form.Group controlId="day_off">
                     <Form.ControlLabel>Ngày bắt đầu nghỉ</Form.ControlLabel>
                     <DateRangePicker

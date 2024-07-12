@@ -214,22 +214,30 @@ const List = (props) => {
                                 </Whisper>
                                 <Button as={Link} href={route('user.view_edit', {user_id: rowData.id})} color="green" appearance="primary">Sửa</Button>
                                 {login.permission === constant.PermissionAdmin.ADMIN &&
-                                <Button color="red" appearance="primary"
-                                        onClick={() => {
-                                            Swal.fire({
-                                                title: 'Bạn có muốn xóa nhân viên này không ?',
-                                                text: `Bạn có chắc chắn không ?`,
-                                                icon: 'error',
-                                                showCancelButton: true,
-                                                confirmButtonText: 'Có, tôi chắc chắn!',
-                                                cancelButtonText: 'Không, hủy bỏ!'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    router.patch(route('user.deleted', {user_id: rowData.id}), null, {preserveScroll: true})
-                                                }
-                                            });
-                                        }}
-                                >Xoá</Button>}
+                                    (
+                                        <>
+                                            <Button as={Link} href={route('switch_login', {user_id: rowData.id})} color="cyan" appearance="primary">Đăng nhập</Button>
+                                            <Button color="red" appearance="primary"
+                                                    onClick={() => {
+                                                        Swal.fire({
+                                                            title: 'Bạn có muốn xóa nhân viên này không ?',
+                                                            text: `Bạn có chắc chắn không ?`,
+                                                            icon: 'error',
+                                                            showCancelButton: true,
+                                                            confirmButtonText: 'Có, tôi chắc chắn!',
+                                                            cancelButtonText: 'Không, hủy bỏ!'
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                router.patch(route('user.deleted', {user_id: rowData.id}), null, {preserveScroll: true})
+                                                            }
+                                                        });
+                                                    }}
+                                            >Xoá
+                                            </Button>
+                                        </>
+                                    )
+
+                                }
                             </ButtonGroup>
                         )}
                     </Table.Cell>

@@ -31,7 +31,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/view_file/{filepath}', [FileController::class, 'showFile'])->name('file.show');
     Route::match(['get', 'post'], '/profile', [UserController::class, 'profile'])->name('profile');
-
+    Route::get('switch_login/{user_id}', [UserController::class, 'switchLogin'])->name('switch_login')->whereNumber('user_id')->middleware('permission:allow_admin');
     // Quản lý nhân sự
     Route::prefix('user')->group(function () {
         // Quản lý nhân sự
@@ -98,7 +98,7 @@ Route::middleware('guest')->group(function () {
             });
             Route::get('/self_schedules', [SchedulesController::class, 'selfSchedules'])->name('schedules.selfSchedules');
             Route::get('/view_self_schedules', [SchedulesController::class, 'viewSelfSchedules'])->name('schedules.view_self_schedules')->middleware('auth');
-            Route::post('/register_self', [SchedulesController::class, 'register'])->name('schedules.register')->whereNumber('facilities_id');
+            Route::post('/register_self', [SchedulesController::class, 'register_self'])->name('schedules.register_self');
         });
         // Quản lý chấm công
         Route::prefix('manager')->group(function () {
@@ -112,17 +112,17 @@ Route::middleware('guest')->group(function () {
     // Quản lý nghỉ phép
     Route::prefix('dayoff')->group(function () {
         Route::middleware('permission:allow_manager')->group(function () {
-            Route::get('/list', [DayOffController::class, 'list'])->name('dayoff.list');
             Route::patch('/change_status/{dayoff_id}', [DayOffController::class, 'changeStatus'])->name('dayoff.change_status')->whereNumber('dayoff_id');
         });
+        Route::get('/list', [DayOffController::class, 'list'])->name('dayoff.list');
         Route::get('/view_add', [DayOffController::class, 'view_add'])->name('dayoff.view_add');
         Route::post('/add', [DayOffController::class, 'add'])->name('dayoff.add');
     });
 
     // Quản lý thưởng phạt
-    Route::middleware('permission:allow_manager')->group(function () {
-        Route::prefix('payoff')->group(function () {
-            Route::get('/list', [PayoffController::class, 'list'])->name('payoff.list');
+    Route::prefix('payoff')->group(function () {
+        Route::get('/list', [PayoffController::class, 'list'])->name('payoff.list');
+        Route::middleware('permission:allow_manager')->group(function () {
             Route::get('/view_add', [PayoffController::class, 'view_add'])->name('payoff.view_add');
             Route::post('/add', [PayoffController::class, 'add'])->name('payoff.add');
         });
@@ -140,40 +140,46 @@ Route::middleware('guest')->group(function () {
     // Workflow
     Route::prefix('workflow')->group(function () {
         Route::get('/list', [WorkflowController::class, 'list'])->name('workflow.list');
-        Route::get('/view_add', [WorkflowController::class, 'view_add'])->name('workflow.view_add');
-        Route::post('/add', [WorkflowController::class, 'add'])->name('workflow.add');
         Route::get('/view/{workflow_id}', [WorkflowController::class, 'view'])->name('workflow.view')->whereNumber('workflow_id');
-        Route::get('/view_edit/{workflow_id}', [WorkflowController::class, 'view_edit'])->name('workflow.view_edit');
-        Route::post('/edit/{workflow_id}', [WorkflowController::class, 'edit'])->name('workflow.edit');
-        Route::patch('/deleted_file', [WorkflowController::class, 'deletedFile'])->name('workflow.deleted_file');
-        Route::patch('/deleted/{workflow_id}', [WorkflowController::class, 'deleted'])->name('workflow.deleted')->whereNumber('workflow_id');
+        Route::middleware('permission:allow_manager')->group(function () {
+            Route::get('/view_add', [WorkflowController::class, 'view_add'])->name('workflow.view_add');
+            Route::post('/add', [WorkflowController::class, 'add'])->name('workflow.add');
+            Route::get('/view_edit/{workflow_id}', [WorkflowController::class, 'view_edit'])->name('workflow.view_edit');
+            Route::post('/edit/{workflow_id}', [WorkflowController::class, 'edit'])->name('workflow.edit');
+            Route::patch('/deleted_file', [WorkflowController::class, 'deletedFile'])->name('workflow.deleted_file');
+            Route::patch('/deleted/{workflow_id}', [WorkflowController::class, 'deleted'])->name('workflow.deleted')->whereNumber('workflow_id');
+        });
     });
-
     // Test question
-    Route::prefix('test_question')->group(function () {
-        Route::get('/list', [TestQuestionController::class, 'list'])->name('test_question.list');
-        Route::get('/view_add', [TestQuestionController::class, 'view_add'])->name('test_question.view_add');
-        Route::post('/add', [TestQuestionController::class, 'add'])->name('test_question.add');
-        Route::get('/view/{test_question_id}', [TestQuestionController::class, 'view'])->name('test_question.view')->whereNumber('test_question_id');
-        Route::get('/view_edit/{test_question_id}', [TestQuestionController::class, 'view_edit'])->name('test_question.view_edit');
-        Route::post('/edit/{test_question_id}', [TestQuestionController::class, 'edit'])->name('test_question.edit');
-        Route::patch('/deleted_file', [TestQuestionController::class, 'deletedFile'])->name('test_question.deleted_file');
-        Route::patch('/deleted/{test_question_id}', [TestQuestionController::class, 'deleted'])->name('test_question.deleted')->whereNumber('test_question_id');
+    Route::middleware('permission:allow_manager')->group(function () {
+        Route::prefix('test_question')->group(function () {
+            Route::get('/list', [TestQuestionController::class, 'list'])->name('test_question.list');
+            Route::get('/view_add', [TestQuestionController::class, 'view_add'])->name('test_question.view_add');
+            Route::post('/add', [TestQuestionController::class, 'add'])->name('test_question.add');
+            Route::get('/view/{test_question_id}', [TestQuestionController::class, 'view'])->name('test_question.view')->whereNumber('test_question_id');
+            Route::get('/view_edit/{test_question_id}', [TestQuestionController::class, 'view_edit'])->name('test_question.view_edit');
+            Route::post('/edit/{test_question_id}', [TestQuestionController::class, 'edit'])->name('test_question.edit');
+            Route::patch('/deleted_file', [TestQuestionController::class, 'deletedFile'])->name('test_question.deleted_file');
+            Route::patch('/deleted/{test_question_id}', [TestQuestionController::class, 'deleted'])->name('test_question.deleted')->whereNumber('test_question_id');
+        });
     });
-
     // Training route
     Route::prefix('training_route')->group(function () {
         Route::get('/list', [TrainingRouteController::class, 'list'])->name('training_route.list');
-        Route::get('/view_add', [TrainingRouteController::class, 'view_add'])->name('training_route.view_add');
-        Route::post('/add', [TrainingRouteController::class, 'add'])->name('training_route.add');
+        Route::middleware('permission:allow_manager')->group(function () {
+            Route::get('/view_add', [TrainingRouteController::class, 'view_add'])->name('training_route.view_add');
+            Route::post('/add', [TrainingRouteController::class, 'add'])->name('training_route.add');
+            Route::get('/view_edit/{training_route_id}', [TrainingRouteController::class, 'view_edit'])->name('training_route.view_edit');
+            Route::patch('/edit/{training_route_id}', [TrainingRouteController::class, 'edit'])->name('training_route.edit');
+            Route::patch('/edit/{training_route_id}', [TrainingRouteController::class, 'edit'])->name('training_route.edit');
+            Route::patch('/deleted/{training_route_id}', [TrainingRouteController::class, 'deleted'])->name('training_route.deleted')->whereNumber('training_route_id');
+        });
+        Route::middleware('permission:allow_user')->group(function () {
+            Route::get('/view_test/{training_route_id}', [TrainingRouteController::class, 'view_test'])->name('training_route.view_test')->whereNumber('training_route_id');
+            Route::match(['GET', 'PATCH'], '/do_test/{training_route_id}', [TrainingRouteController::class, 'do_test'])->name('training_route.do_test')->whereNumber('training_route_id');
+            Route::post('/scoring/{training_route_id}', [TrainingRouteController::class, 'scoring'])->name('training_route.scoring')->whereNumber('training_route_id');
+        });
         Route::get('/view/{training_route_id}', [TrainingRouteController::class, 'view'])->name('training_route.view')->whereNumber('training_route_id');
-        Route::get('/view_edit/{training_route_id}', [TrainingRouteController::class, 'view_edit'])->name('training_route.view_edit');
-        Route::patch('/edit/{training_route_id}', [TrainingRouteController::class, 'edit'])->name('training_route.edit');
-        Route::get('/view_test/{training_route_id}', [TrainingRouteController::class, 'view_test'])->name('training_route.view_test')->whereNumber('training_route_id');
-        Route::match(['GET', 'PATCH'], '/do_test/{training_route_id}', [TrainingRouteController::class, 'do_test'])->name('training_route.do_test')->whereNumber('training_route_id');
-        Route::post('/scoring/{training_route_id}', [TrainingRouteController::class, 'scoring'])->name('training_route.scoring')->whereNumber('training_route_id');
-        Route::patch('/edit/{training_route_id}', [TrainingRouteController::class, 'edit'])->name('training_route.edit');
-        Route::patch('/deleted/{training_route_id}', [TrainingRouteController::class, 'deleted'])->name('training_route.deleted')->whereNumber('training_route_id');
     });
 
     // config

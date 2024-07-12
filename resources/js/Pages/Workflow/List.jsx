@@ -27,7 +27,8 @@ import TrashIcon from "@rsuite/icons/Trash";
 import Swal from "sweetalert2";
 
 const List = (props) => {
-    const {specialties,workflows} = props;
+    const {specialties, workflows} = props;
+    const login = props.auth.user;
 
     const [filter, setFilter] = useState({
         keyword: '',
@@ -95,11 +96,14 @@ const List = (props) => {
                                 <Button type="submit" startIcon={<SearchIcon/>} appearance="primary">
                                     Tìm kiếm
                                 </Button>
-                                <Button type="button" startIcon={<PlusIcon/>}
-                                        onClick={() => router.get(route('workflow.view_add'))} color="green"
-                                        appearance="primary">
-                                    Thêm quy trình
-                                </Button>
+                                {login.permission !== constant.PermissionAdmin.EMPLOYEE
+                                    &&
+                                    <Button type="button" startIcon={<PlusIcon/>}
+                                            onClick={() => router.get(route('workflow.view_add'))} color="green"
+                                            appearance="primary">
+                                        Thêm quy trình
+                                    </Button>
+                                }
                             </Col>
                         </Row>
                     </Grid>
@@ -128,25 +132,28 @@ const List = (props) => {
                     <Table.Cell>
                         {rowData => (
                             <ButtonGroup>
-                                <Button as={Link} href={route('workflow.view', {workflow_id: rowData.id})} color="blue" appearance="primary">Xem chi tiết</Button>
-                                <Button as={Link} href={route('workflow.view_edit', {workflow_id: rowData.id})}
-                                        startIcon={<EditIcon/>} color="green" appearance="primary">Sửa</Button>
-                                <Button startIcon={<TrashIcon/>} color="red" appearance="primary"
-                                        onClick={() => {
-                                            Swal.fire({
-                                                title: 'Bạn có muốn xóa workflow không ?',
-                                                text: `Bạn có chắc chắn muốn xóa workflow ?`,
-                                                icon: 'error',
-                                                showCancelButton: true,
-                                                confirmButtonText: 'Có, tôi chắc chắn!',
-                                                cancelButtonText: 'Không, hủy bỏ!'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    router.patch(route('workflow.deleted',{workflow_id: rowData.id}), {}, {preserveScroll: true})
-                                                }
-                                            });
-                                        }}
-                                >Xóa</Button>
+                                <Button as={Link} href={route('workflow.view', {workflow_id: rowData.id})} color="blue"
+                                        appearance="primary">Xem chi tiết</Button>
+                                {login.permission !== constant.PermissionAdmin.EMPLOYEE && (<>
+                                    <Button as={Link} href={route('workflow.view_edit', {workflow_id: rowData.id})}
+                                            startIcon={<EditIcon/>} color="green" appearance="primary">Sửa</Button>
+                                    <Button startIcon={<TrashIcon/>} color="red" appearance="primary"
+                                            onClick={() => {
+                                                Swal.fire({
+                                                    title: 'Bạn có muốn xóa workflow không ?',
+                                                    text: `Bạn có chắc chắn muốn xóa workflow ?`,
+                                                    icon: 'error',
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Có, tôi chắc chắn!',
+                                                    cancelButtonText: 'Không, hủy bỏ!'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        router.patch(route('workflow.deleted', {workflow_id: rowData.id}), {}, {preserveScroll: true})
+                                                    }
+                                                });
+                                            }}
+                                    >Xóa</Button>
+                                </>)}
                             </ButtonGroup>
                         )}
                     </Table.Cell>
@@ -154,7 +161,8 @@ const List = (props) => {
             </Table>
             {workflows.total > 0 && (
                 <div className="my-8 flex w-full justify-center items-center">
-                    <Pagination prev next ellipsis size="lg" limit={workflows.per_page} activePage={workflows.current_page} total={workflows.total}
+                    <Pagination prev next ellipsis size="lg" limit={workflows.per_page}
+                                activePage={workflows.current_page} total={workflows.total}
                                 onChangePage={handlePagination}/>
                 </div>
             )}

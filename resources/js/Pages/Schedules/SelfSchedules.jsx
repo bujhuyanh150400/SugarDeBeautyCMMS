@@ -70,27 +70,16 @@ const SelfSchedules = (props) => {
         }));
     }
     const submitSchedule = () => {
-        if (scheduleForm.schedule_id > 0) {
-            router.patch(route('schedules.edit', {schedule_id: scheduleForm.schedule_id}), scheduleForm, {
-                onSuccess: () => {
-                    setSchedulesForm(initialScheduleForm);
-                    setSchedulesState((prevState) => ({
-                        ...prevState,
-                        form: false,
-                    }));
-                }
-            })
-        } else {
-            router.post(route('schedules.register', {facilities_id: facility.id}), scheduleForm, {
-                onSuccess: () => {
-                    setSchedulesForm(initialScheduleForm);
-                    setSchedulesState((prevState) => ({
-                        ...prevState,
-                        form: false,
-                    }));
-                }
-            })
-        }
+        router.post(route('schedules.register_self'), scheduleForm, {
+            onSuccess: () => {
+                setSchedulesForm(initialScheduleForm);
+                setSchedulesState((prevState) => ({
+                    ...prevState,
+                    form: false,
+                }));
+            }
+        })
+
     }
     const viewSchedule = async (date) => {
         const date_format = dayjs(date).hour(0).minute(0).second(0).millisecond(0).format('YYYY/MM/DD HH:mm:ss');

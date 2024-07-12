@@ -16,6 +16,7 @@ use App\Models\Salary;
 use App\Models\Schedule;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
@@ -183,12 +184,26 @@ class SalaryController extends Controller
         $user_query = User::query();
         if (Gate::allows('allow_admin')) {
             $user_query->FacilityFilter($request->get('facility') ?? '');
-        } else {
+        } elseif (Gate::allows('just_manager')) {
             $user_query->whereIn('permission', [PermissionAdmin::MANAGER, PermissionAdmin::EMPLOYEE])->FacilityFilter(\auth()->user()->facility_id);
+        } else {
+            $user_query->where('user_id', Auth::user()->id);
         }
-        $users = $user_query->with('facility')->orderBy('facility_id', 'desc')->get();
-        $salaries = Salary::FacilityFilter($request->get('facility') ?? '')
-            ->StatusFilter($request->get('status') ?? '')
+        // làm tạm bợ ở đây
+        if (Gate::allows('allow_admin')) {
+            $users = $user_query->with('facility')->orderBy('facility_id', 'desc')->get();
+        }else{
+            $users = collect();
+        }
+        $salaries_query = Salary::query();
+        if (Gate::allows('allow_admin')){
+            $salaries_query->FacilityFilter($request->get('facility') ?? '');
+        }elseif (Gate::allows('just_manager')){
+            $salaries_query->FacilityFilter(\auth()->user()->facility_id);
+        }else{
+            $salaries_query->where('user_id',Auth::user()->id);
+        }
+        $salaries = $salaries_query->StatusFilter($request->get('status') ?? '')
             ->CreatedAtFilter($request->date('start_date'), $request->date('end_date'))
             ->DayPayFilter($request->date('pay_start'), $request->date('pay_end'))
             ->with([
@@ -227,7 +242,7 @@ class SalaryController extends Controller
                 session()->flash('error', 'Nhân viên này tháng này đã có bảng lương');
             } else {
                 $create_choose = Carbon::createFromFormat('m', $request->integer('month'))->setDay(10);
-                $data_salary = $this->getDataSalaryMonth($user,$create_choose);
+                $data_salary = $this->getDataSalaryMonth($user, $create_choose);
                 if (!$data_salary->isEmpty()) {
                     if ($request->method() === 'POST') {
                         $validator = Validator::make($request->all(), [
@@ -280,7 +295,7 @@ class SalaryController extends Controller
                         }
                     } else {
                         return Inertia::render('Salary/Add', [
-                            'title' => 'Tạo lương tháng '. $create_choose->month . ' cho nhân viên ' . $user->name,
+                            'title' => 'Tạo lương tháng ' . $create_choose->month . ' cho nhân viên ' . $user->name,
                             'user' => $user,
                             'month' => $request->integer('month'),
                             'schedules' => $data_salary->get('schedules'),
@@ -289,8 +304,7 @@ class SalaryController extends Controller
                             'statistical' => $data_salary->get('statistical'),
                         ]);
                     }
-                }
-                else {
+                } else {
                     session()->flash('error', 'Nhân viên không có lịch làm nào trong tháng đã chọn');
                 }
             }

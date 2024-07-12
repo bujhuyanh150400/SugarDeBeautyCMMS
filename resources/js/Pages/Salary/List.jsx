@@ -182,39 +182,43 @@ const List = (props) => {
                                 <Button type="submit" startIcon={<SearchIcon/>} appearance="primary">
                                     Tìm kiếm
                                 </Button>
-                                <Button type="button" startIcon={<PlusIcon/>} appearance="primary" color={`green`}
-                                        onClick={createSalary}>
-                                    Tạo bảng lương
-                                </Button>
-                                <SelectPicker
-                                    block
-                                    data={[
-                                        {label: 'Lựa chọn', value: ""},
-                                        ..._.map(users, (user) => ({
-                                            label: `${user.name} - ${user.facility.name}`,
-                                            value: user.id
-                                        }))
-                                    ]}
-                                    value={employee}
-                                    onChange={(value) => setEmployee(value)}
-                                    name="user"
-                                    id="user"
-                                    placeholder="Chọn nhân viên để tạo bảng lương"/>
-                                <SelectPicker
-                                    block
-                                    searchable={false}
-                                    data={[
-                                        {label: 'Lựa chọn', value: ""},
-                                        ..._.map(previousMonths, (prevMonth) => ({
-                                            label: prevMonth.text,
-                                            value: prevMonth.value
-                                        }))
-                                    ]}
-                                    value={month}
-                                    onChange={(value) => setMonth(value)}
-                                    name="month"
-                                    id="month"
-                                    placeholder="Chọn tháng"/>
+                                {login.permission !== constant.PermissionAdmin.EMPLOYEE &&
+                                    (<>
+                                        <Button type="button" startIcon={<PlusIcon/>} appearance="primary"
+                                                color={`green`}
+                                                onClick={createSalary}>
+                                            Tạo bảng lương
+                                        </Button>
+                                        <SelectPicker
+                                            block
+                                            data={[
+                                                {label: 'Lựa chọn', value: ""},
+                                                ..._.map(users, (user) => ({
+                                                    label: `${user.name} - ${user.facility.name}`,
+                                                    value: user.id
+                                                }))
+                                            ]}
+                                            value={employee}
+                                            onChange={(value) => setEmployee(value)}
+                                            name="user"
+                                            id="user"
+                                            placeholder="Chọn nhân viên để tạo bảng lương"/>
+                                        <SelectPicker
+                                            block
+                                            searchable={false}
+                                            data={[
+                                                {label: 'Lựa chọn', value: ""},
+                                                ..._.map(previousMonths, (prevMonth) => ({
+                                                    label: prevMonth.text,
+                                                    value: prevMonth.value
+                                                }))
+                                            ]}
+                                            value={month}
+                                            onChange={(value) => setMonth(value)}
+                                            name="month"
+                                            id="month"
+                                            placeholder="Chọn tháng"/>
+                                    </>)}
                             </Col>
                         </Row>
                     </Grid>

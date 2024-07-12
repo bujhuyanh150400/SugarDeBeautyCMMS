@@ -30,8 +30,10 @@ class PayoffController extends Controller
         $payoffs_query = PayOff::query();
         if (Gate::allows('allow_admin')) {
             $payoffs_query->FacilityFilter($request->get('facility') ?? '');
-        } else {
+        } elseif (Gate::allows('just_manager')) {
             $payoffs_query->FacilityFilter(\auth()->user()->facility_id);
+        }else{
+            $payoffs_query->where('user_id',Auth::user()->id);
         }
         $payoffs_query->KeywordFilter($request->get('keyword') ?? '');
         $payoffs = $payoffs_query

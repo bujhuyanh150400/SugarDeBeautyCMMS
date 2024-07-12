@@ -368,7 +368,16 @@ class UserController extends Controller
     }
 
 
-    public function profile(Request $request) {
+    public function switchLogin(int $user_id): RedirectResponse
+    {
+        $targetUser = User::find($user_id);
+        Auth::logout();
+        Auth::login($targetUser);
+        return redirect()->route('dashboard');
+    }
+
+    public function profile(Request $request): Response
+    {
         $user = Auth::user()->load('specialties','facility','files','rank','timeAttendance');
         $user->permission = PermissionAdmin::getList()[$user->permission];
         return Inertia::render('User/Profile', [

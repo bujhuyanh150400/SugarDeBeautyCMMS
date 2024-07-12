@@ -15,6 +15,7 @@ class DashboardController extends Controller
 
     public function index(): \Inertia\Response
     {
+
         return Inertia::render('Dashboard', [
             'title' => 'Trang chủ'
         ]);

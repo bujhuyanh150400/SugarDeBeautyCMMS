@@ -11,6 +11,7 @@ use App\Models\Schedule;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
@@ -30,8 +31,10 @@ class DayOffController extends Controller
         $list_day_off_query = DayOff::query();
         if (Gate::allows('allow_admin')) {
             $list_day_off_query->FacilityFilter($request->get('facility') ?? '');
-        } else {
+        } elseif (Gate::allows('just_manager')) {
             $list_day_off_query->FacilityFilter(\auth()->user()->facility_id);
+        }else{
+            $list_day_off_query->where('user_id',Auth::user()->id);
         }
         $list_day_off_query->KeywordFilter($request->get('keyword') ?? '')
             ->dayOffFilterBetween($request->get('start_date') ?? '', $request->get('end_date') ?? '');
@@ -64,6 +67,9 @@ class DayOffController extends Controller
     }
     public function add(Request $request)
     {
+        if (Gate::allows('allow_user')){
+            $request->merge(['user_id' => Auth::user()->id]);
+        }
         $validator = Validator::make($request->all(), [
             'start_date' => ['required', 'date', 'after_or_equal:today', 'date_format:Y-m-d H:i:s'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date', 'date_format:Y-m-d H:i:s'],
@@ -80,7 +86,6 @@ class DayOffController extends Controller
                             });
                     })
                     ->exists();
-
                 if ($existingDayoff) {
                     $fail('Nhân viên đã đăng ký lịch nghỉ trong khoảng thời gian này.');
                 }
@@ -131,7 +136,6 @@ class DayOffController extends Controller
 
     public function changeStatus(int $dayoff_id, Request $request)
     {
-
         $dayoff = DayOff::find($dayoff_id);
         if ($dayoff) {
             $validator = Validator::make(

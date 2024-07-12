@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -72,8 +73,6 @@ class SchedulesController extends Controller
             return redirect()->back();
         }
     }
-
-
     public function selfSchedules(): Response
     {
         $startOfWeek = Carbon::now()->startOfWeek();
@@ -224,7 +223,78 @@ class SchedulesController extends Controller
     }
 
     public function register_self(Request $request) {
+        $validator = Validator::make($request->all(),
+            [
+            'day_registered' => ['required', 'date', 'after_or_equal:today'],
+            'start_time_registered' => [
+                'required',
+                function ($attribute, $value, $fail) use ($request) {
+                    // Kiểm tra nếu thời gian kết thúc được cung cấp
+                    if ($request->has('end_time_registered')) {
+                        $start_time = Carbon::parse($value);
+                        $end_time = Carbon::parse($request->input('end_time_registered'));
+                        if ($end_time->lessThan($start_time)) {
+                            $fail('Giờ bắt đầu phải lớn hơn giờ kết thúc');
+                        }
+                        if ($start_time->diffInHours($end_time) < 4) {
+                            $fail('Đăng kí lịch làm phải tối thiểu 4 tiếng 1 ca.');
+                        }
+                        // Kiểm tra xem có lịch trùng trong cơ sở dữ liệu không
+                        $existingSchedule = Schedule::whereDate('day_registered', $request->date('day_registered'))
+                            ->where('user_id', Auth::user()->id)
+                            ->where(function ($query) use ($start_time, $end_time) {
+                                $query->where(function ($query) use ($start_time, $end_time) {
+                                    $query->whereTime('start_time_registered', '<=', $end_time)->whereTime('end_time_registered', '>=', $start_time);
+                                });
+                            })
+                            ->exists();
+                        if ($existingSchedule) {
+                            $fail('Bạn đang chọn 1 khung giờ làm đè lên khung giờ hôm nay bạn đã đăng kí');
+                        }
+                    } else {
+                        $fail('Hãy chọn giờ kết thúc làm việc');
+                    }
 
+                },
+            ],
+            'end_time_registered' => 'required',
+            'type' => ['required', 'numeric', Rule::in(array_keys(ScheduleStatus::getListType()))],
+        ],
+            [
+            'day_registered.required' => 'Ngày đăng ký là bắt buộc.',
+            'day_registered.date' => 'Ngày đăng ký phải là một ngày hợp lệ.',
+            'day_registered.after_or_equal' => 'Ngày đăng ký phải là hôm nay hoặc một ngày trong tương lai.',
+            'user_id.required' => 'Mã nhân viên là bắt buộc.',
+            'user_id.exists' => 'Mã nhân viên không tồn tại hoặc không thuộc cơ sở này.',
+            'start_time_registered.required' => 'Giờ bắt đầu làm việc là bắt buộc.',
+            'end_time_registered.required' => 'Giờ kết thúc làm việc là bắt buộc.',
+            'type.required' => 'Loại lịch làm việc là bắt buộc.',
+            'type.numeric' => 'Loại lịch làm việc không hợp lệ.',
+            'type.in' => 'Loại lịch làm việc không hợp lệ.',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        try {
+            $schedule = [
+                'id' => $this->getIdAsTimestamp(),
+                'day_registered' => $request->date('day_registered')->setTimezone(config('app.timezone'))->setHour(0)->setMinute(0)->setSecond(0),
+                'start_time_registered' => $request->date('start_time_registered'),
+                'end_time_registered' => $request->date('end_time_registered'),
+                'type' => $request->integer('type'),
+                'status' => ScheduleStatus::WAIT,
+                'note' => $request->input('note'),
+                'user_id' => Auth::user()->id,
+                'facility_id' => Auth::user()->facility_id,
+                'time_attendance_id' => Auth::user()->timeAttendance->id
+            ];
+            Schedule::create($schedule);
+            session()->flash('success', 'Lưu trữ dữ liệu thành công!');
+            return redirect()->back();
+        } catch (QueryException $exception) {
+            session()->flash('error', 'Có lỗi xảy ra, vui lòng liên hệ quản trị viên');
+            return redirect()->back()->withInput();
+        }
     }
 
     public function edit(Request $request, int $schedule_id): RedirectResponse

@@ -15,16 +15,7 @@ class PermissionMiddleware
      */
     public function handle(Request $request, Closure $next , string $action): Response
     {
-        $can_access = true;
-        switch ($action){
-            case 'allow_admin':
-            case 'allow_manager':
-                if (!Gate::allows($action)){
-                    $can_access = false;
-                    break;
-                }
-        }
-        if ($can_access === true){
+        if (Gate::allows($action)){
             return $next($request);
         }else{
             session()->flash('error', 'Bạn không có quyền truy cập');

@@ -11,20 +11,28 @@ const ViewTest = props => {
             <div className="flex items-center justify-center w-full h-full">
                 <Panel bordered shaded className="p-4">
                     <div className='space-y-4 min-w-[500px]'>
-                        <Text className="text-center" color={'blue'} weight={'bold'} size={'xxl'}>Bài thi đào tạo: {training_route.title}</Text>
+                        <Text className="text-center" color={'blue'} weight={'bold'} size={'xxl'}>Bài thi đào
+                            tạo: {training_route.title}</Text>
                         <Text weight={'bold'}>Nhân viên làm đào tạo: {user.name}</Text>
                         <Text weight={'bold'}>Thời gian làm bài thi: {training_route.time} phút</Text>
                         <Text weight={'bold'}>Số câu hỏi: {training_route.test_questions_count} câu hỏi</Text>
-                        <Text weight={'bold'}>Nghiệp vụ được phép xem: {training_route.workflows.length} nghiệp vụ</Text>
+                        <Text weight={'bold'}>Nghiệp vụ được phép xem: {training_route.workflows.length} nghiệp
+                            vụ</Text>
+
                         {training_route.workflows.length > 0 && (
                             <ul>
-                                {training_route.workflows.map((workflow,key) => (
-                                    <li key={key}>Nghiệp vụ: {workflow.title}</li>
-                                ))}
+                                {training_route.workflows.map((workflow, key)=> {
+                                    return (
+                                        <li key={key}>
+                                            <a target={'_blank'}  href={route('workflow.view', {'workflow_id': workflow.pivot.workflow_id})}  color="blue">Nghiệp vụ: {workflow.title}</a>
+                                        </li>
+                                    )
+
+                                })}
                             </ul>
                         )}
                         <Text weight={'bold'}>Mô tả về đào tạo:</Text>
-                        <div dangerouslySetInnerHTML={{__html: training_route.description}} />
+                        <div dangerouslySetInnerHTML={{__html: training_route.description}}/>
                         <Message type={'warning'} showIcon={true}>
                             <b>Lưu ý:</b>
                             <ul>
@@ -33,7 +41,10 @@ const ViewTest = props => {
                                 <li>Hết giờ làm bài, hệ thống sẽ tự động nộp bài</li>
                             </ul>
                         </Message>
-                        <Button block={true} appearance={'primary'} as={Link} href={route('training_route.do_test',{training_route_id: training_route.id,user_id: user.id})}>
+                        <Button block={true} appearance={'primary'} as={Link} href={route('training_route.do_test', {
+                            training_route_id: training_route.id,
+                            user_id: user.id
+                        })}>
                             Làm bài thi
                         </Button>
                     </div>

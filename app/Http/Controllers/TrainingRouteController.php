@@ -28,11 +28,20 @@ class TrainingRouteController extends Controller
 
     public function list(Request $request): \Inertia\Response
     {
-        $training_routes = TrainingRoute::KeywordFilter($request->get('keyword') ?? '')
-            ->withCount(['testQuestions', 'workflows'])
-            ->with(['users' => function ($query) {
+        $training_routes_query = TrainingRoute::query();
+        if (Gate::allows('just_manager')){
+            $training_routes_query->with(['users' => function ($query) {
+                $query->where('facility_id',auth()->user()->facility_id);
                 $query->selectRaw('id');
-            }])
+            }]);
+        }elseif(Gate::allows('allow_user')){
+            $training_routes_query->with(['users' => function ($query) {
+                $query->where('id',auth()->user()->id);
+                $query->selectRaw('id');
+            }]);
+        }
+        $training_routes = $training_routes_query->KeywordFilter($request->get('keyword') ?? '')
+            ->withCount(['testQuestions', 'workflows'])
             ->orderBy('created_at', 'desc')
             ->paginate(self::PER_PAGE);
         return Inertia::render('TrainingRoute/List', [
@@ -235,10 +244,10 @@ class TrainingRouteController extends Controller
 
     public function view(int $training_route): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
-        $training_route = TrainingRoute::find($training_route);
+        $training_route = TrainingRoute::where('id', $training_route)->with(['users','users.facility','users.specialties'])->first();
         if ($training_route) {
             return Inertia::render('TrainingRoute/View', [
-                'title' => "Xem chi tiết đào tạo",
+                'title' => "Xem danh sách điểm đào tạo",
                 'training_route' => fn() => $training_route,
             ]);
         } else {
@@ -359,7 +368,7 @@ class TrainingRouteController extends Controller
                 'results' => json_encode($result),
             ]);
             $training_route->save();
-            session()->flash('success', 'Bạn đã làm xong bài test, bài thi đã được chấm điểm');
+            session()->flash('success', 'Bạn đã làm xong bài test, bài thi đã hoàn thành, điểm thi của ban là '. $score);
             return redirect()->route('training_route.list');
         } else {
             session()->flash('error', 'Không thấy bài thi của bạn hoặc bạn đã làm bài thi rồi');
