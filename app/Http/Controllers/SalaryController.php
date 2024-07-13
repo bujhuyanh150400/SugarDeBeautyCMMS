@@ -190,7 +190,7 @@ class SalaryController extends Controller
             $user_query->where('user_id', Auth::user()->id);
         }
         // làm tạm bợ ở đây
-        if (Gate::allows('allow_admin')) {
+        if (Gate::allows('allow_manager')) {
             $users = $user_query->with('facility')->orderBy('facility_id', 'desc')->get();
         }else{
             $users = collect();
@@ -235,13 +235,13 @@ class SalaryController extends Controller
         }
         $user = User::with('facility', 'specialties', 'specialties.service', 'rank')->find($user_id);
         if ($user) {
-            $start_month = Carbon::now()->startOfMonth();
-            $end_month = Carbon::now()->endOfMonth();
+            $create_choose = Carbon::createFromFormat('m', $request->integer('month'))->setDay(10);
+            $start_month = $create_choose->clone()->startOfMonth();
+            $end_month = $create_choose->clone()->endOfMonth();
             $salary_exist = Salary::whereBetween('created_at', [$start_month, $end_month])->where('user_id', $user_id)->exists();
             if ($salary_exist) {
-                session()->flash('error', 'Nhân viên này tháng này đã có bảng lương');
+                session()->flash('error', 'Nhân viên này tháng '. $request->integer('month') .' đã có bảng lương');
             } else {
-                $create_choose = Carbon::createFromFormat('m', $request->integer('month'))->setDay(10);
                 $data_salary = $this->getDataSalaryMonth($user, $create_choose);
                 if (!$data_salary->isEmpty()) {
                     if ($request->method() === 'POST') {

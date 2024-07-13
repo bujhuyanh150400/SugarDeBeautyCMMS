@@ -113,7 +113,10 @@ const List = (props) => {
                     <Table.HeaderCell>Action</Table.HeaderCell>
                     <Table.Cell>
                         {rowData => {
-                            const training_self = rowData.users.find(user => user.id === login.id && user?.pivot?.score === null && user?.pivot?.time_did === null && user?.pivot?.time_start === null);
+
+                            const training_self =
+                                login.permission == constant.PermissionAdmin.EMPLOYEE ?
+                                rowData.users.find(user => user.id === login.id && user?.pivot?.score === null && user?.pivot?.time_did === null && user?.pivot?.time_start === null) : null;
 
                             return (
                                 <ButtonGroup>
