@@ -1,3 +1,4 @@
+
 # Setting project
 
 ---
@@ -20,3 +21,5 @@ Run local : Mở 2 command và chạy lệnh (nếu laragon thì start server đ
 ---
 #### Project core: Laravel 10 + Inertia 1.0 + ReactJS 18 + Redux toolkit + React Suite UI
 #### database: MySQL
+#### Made by AnhBH
+#### project learning Inertia with React 
