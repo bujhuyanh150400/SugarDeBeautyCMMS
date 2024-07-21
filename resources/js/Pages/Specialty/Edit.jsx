@@ -20,6 +20,7 @@ import SaveIcon from "@/assets/icons/save-fontawsome.svg"
 
 const Edit = (props) => {
     const {specialty, errors} = props;
+    console.log(specialty)
     const [data, setData] = useState({
         name: specialty.name,
         description: specialty.description,

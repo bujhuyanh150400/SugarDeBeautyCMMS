@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('schedules:check-late')->everyMinute();
+        $schedule->command('app:time-attendance-schedules')->everyMinute();
     }
 
     /**

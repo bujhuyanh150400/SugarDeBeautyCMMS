@@ -143,7 +143,7 @@ const Edit = (props) => {
         router.post(route('test_question.edit', {test_question_id: test_question.id}), data);
     }
     return (
-        <Layout}>
+        <Layout>
             <Form onSubmit={submit} fluid>
                 <div className="flex flex-col gap-4 mb-8">
                     <Form.Group controlId="name">
