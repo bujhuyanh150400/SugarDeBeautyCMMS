@@ -71,18 +71,17 @@ class TimeAttendanceController extends Controller
                     $minutes = Carbon::parse($request->expires_at)->format('i');
                     $seconds = Carbon::parse($request->expires_at)->format('s');
                     $expires_at = Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute($minutes)->second($seconds)->toDateTimeString();
-                    $pin = Helpers::encryptData($request->integer('pin'));
                     try {
                         // Nếu tồn tại thì cập nhật
                         if ($time_attendance) {
-                            $time_attendance->pin = $pin;
+                            $time_attendance->pin = $request->input('pin');
                             $time_attendance->expires_at = $expires_at;
                             $time_attendance->save();
                         } // Không thì tạo mới
                         else {
                             $data_qrcode = [
                                 'id' => $this->getIdAsTimestamp(),
-                                'pin' => $pin,
+                                'pin' => $request->input('pin'),
                                 'short_url' => Str::random(10),
                                 'expires_at' => $expires_at,
                                 'user_id' => $user->id,
