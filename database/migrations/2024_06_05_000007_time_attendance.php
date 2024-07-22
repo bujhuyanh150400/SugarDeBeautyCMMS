@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('time_attendances', function (Blueprint $table) {
             $table->comment('table dùng để lưu trữ qr chấm công');
             $table->id();
-            $table->text('pin')->comment('Password qr chấm công, và được mã hoá');
             $table->string('short_url',10)->unique()->comment('url rút ngắn');
+            $table->text('pin')->comment('Password qr chấm công, và được mã hoá');
             $table->timestamp('expires_at')->nullable()->comment('thời gian được phép đi muộn');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();

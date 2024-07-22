@@ -50,9 +50,6 @@ class TimeAttendanceController extends Controller
         $user = User::find($user_id);
         if ($user) {
             $time_attendance = TimeAttendance::where('user_id', $user_id)->first();
-            if (!empty($time_attendance)){
-                $time_attendance->pin = Helpers::decryptData($time_attendance->pin);
-            }
             if ($request->method() === 'POST') {
                 $validator = Validator::make(
                     $request->all(),
@@ -136,8 +133,7 @@ class TimeAttendanceController extends Controller
         if (strtoupper($request->method()) === 'POST') {
             $request->validate([
                 'pin' => ['required', 'between:1,5', function ($attribute, $value, $fail) use ($time_attendance) {
-                    $pin = Helpers::decryptData($time_attendance->pin);
-                    if ($pin !== trim($value)) {
+                    if ($time_attendance->pin !== trim($value)) {
                         $fail('Mã pin bạn nhập không đúng');
                     }
                 }],

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Helpers\Constant\PermissionAdmin;
 use App\Helpers\Helpers;
 use App\Models\Facilities;
@@ -300,8 +299,6 @@ class DatabaseSeeder extends Seeder
             'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
             'user_id' => 15042000,
         ]);
-        $data_user = [];
-        $data_attendance = [];
         for ($i = 0; $i < 50; $i++) {
             $user = [
                 'id' => intval(date('ymdHis') . rand(1000, 9999)),
@@ -322,17 +319,16 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
                 'remember_token' => null,
             ];
-            $data_user[] = $user;
-            $data_attendance[] = [
+            DB::table('users')->insert($user);
+            $data_attendance = [
                 'id' => intval(date('ymdHis') . rand(1000, 9999)),
-                'pin' => Helpers::encryptData(random_int(10000, 99999)),
+                'pin' => Helpers::encryptData(12345),
                 'short_url' => Str::random(10),
                 'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
                 'user_id' => $user['id'],
             ];
+            DB::table('time_attendances')->insert($data_attendance);
         }
-        DB::table('users')->insert($data_user);
-        DB::table('time_attendances')->insert($data_attendance);
         $facilities = Facilities::all();
         $facilities->each(function ($facility) use ($faker) {
             $data_user = [
@@ -357,7 +353,7 @@ class DatabaseSeeder extends Seeder
             DB::table('users')->insert($data_user);
             DB::table('time_attendances')->insert([
                 'id' => intval(date('ymdHis') . rand(1000, 9999)),
-                'pin' => Helpers::encryptData(random_int(10000, 99999)),
+                'pin' => Helpers::encryptData(12345),
                 'short_url' => Str::random(10),
                 'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
                 'user_id' => $data_user['id'],
