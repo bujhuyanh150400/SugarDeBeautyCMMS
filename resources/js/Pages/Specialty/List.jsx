@@ -21,6 +21,7 @@ import constant from "@/utils/constant.js";
 import EditIcon from "@rsuite/icons/Edit.js";
 import OffIcon from '@rsuite/icons/Off';
 import RemindIcon from "@rsuite/icons/legacy/Remind.js";
+import Swal from "sweetalert2";
 
 const List = (props) => {
     const {specialties} = props;
@@ -148,20 +149,34 @@ const List = (props) => {
                                 {rowData.active === constant.ACTIVE ? (
                                     <Button startIcon={<OffIcon/>} color="blue" appearance="primary"
                                             onClick={() => {
-                                                setAlertActiveStatus({
-                                                    id: rowData.id,
-                                                    active: constant.IN_ACTIVE,
-                                                    openAlert: true
+                                                Swal.fire({
+                                                    title: 'Bạn có muốn thay đổi trạng thái hoạt động',
+                                                    text: 'Bạn có chắc chắn muốn làm điều này?',
+                                                    icon: 'question',
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Có, tôi chắc chắn!',
+                                                    cancelButtonText: 'Không, hủy bỏ!'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        router.patch(route('specialties.change_active', {specialty_id: rowData.id}), {active: constant.IN_ACTIVE}, {preserveScroll: true})
+                                                    }
                                                 });
                                             }}
                                     >Hoạt động</Button>
                                 ) : (
                                     <Button startIcon={<OffIcon/>} color="red" appearance="primary"
                                             onClick={() => {
-                                                setAlertActiveStatus({
-                                                    id: rowData.id,
-                                                    active: constant.ACTIVE,
-                                                    openAlert: true
+                                                Swal.fire({
+                                                    title: 'Bạn có muốn thay đổi trạng thái hoạt động',
+                                                    text: 'Bạn có chắc chắn muốn làm điều này?',
+                                                    icon: 'question',
+                                                    showCancelButton: true,
+                                                    confirmButtonText: 'Có, tôi chắc chắn!',
+                                                    cancelButtonText: 'Không, hủy bỏ!'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        router.patch(route('specialties.change_active', {specialty_id: rowData.id}), {active: constant.ACTIVE}, {preserveScroll: true})
+                                                    }
                                                 });
                                             }}
                                     >Không hoạt động</Button>

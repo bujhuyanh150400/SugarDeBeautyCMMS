@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const AppSlice = createSlice({
     name: 'app',
     initialState: {
-        collapsedMenu:true,
+        collapsedMenu:false,
         darkTheme:false,
         loading:false,
     },

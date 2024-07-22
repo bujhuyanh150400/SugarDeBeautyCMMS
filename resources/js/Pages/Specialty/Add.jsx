@@ -66,6 +66,7 @@ const Add = (props) => {
                     <Form.Group controlId="active">
                         <Form.ControlLabel>Trạng thái hoạt động</Form.ControlLabel>
                         <SelectPicker
+                            block
                             data={constant.ActiveStatus}
                             value={data.active}
                             onChange={(value) => setForm('active', value)}

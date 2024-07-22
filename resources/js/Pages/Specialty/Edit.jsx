@@ -20,7 +20,6 @@ import SaveIcon from "@/assets/icons/save-fontawsome.svg"
 
 const Edit = (props) => {
     const {specialty, errors} = props;
-    console.log(specialty)
     const [data, setData] = useState({
         name: specialty.name,
         description: specialty.description,
@@ -100,7 +99,7 @@ const Edit = (props) => {
                         <Form.ControlLabel>Tên cơ sở</Form.ControlLabel>
                         <Form.Control
                             name="name" id="name"
-                            onChange={(value) => setData('name', value)} value={data.name}
+                            onChange={(value) => setForm('name', value)} value={data.name}
                             placeholder="Tên chuyên môn"
                             errorMessage={errors.name}
                         />
@@ -111,7 +110,7 @@ const Edit = (props) => {
                             block
                             data={constant.ActiveStatus}
                             value={data.active}
-                            onChange={(value) => setData('active', value)}
+                            onChange={(value) => setForm('active', value)}
                             name="active"
                             searchable={false}
                             id="active"
@@ -123,7 +122,7 @@ const Edit = (props) => {
                     <Form.ControlLabel>Mô tả</Form.ControlLabel>
                     <Editor data={data.description} onChange={(event, editor) => {
                         let value = editor.getData();
-                        setData('description', value);
+                        setForm('description', value);
                     }}/>
                     <Form.ErrorMessage show={!!errors.description}>{errors.description}</Form.ErrorMessage>
                 </Form.Group>
