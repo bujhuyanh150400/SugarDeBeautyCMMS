@@ -176,19 +176,9 @@ class SchedulesController extends Controller
                             if ($existingSchedule) {
                                 $fail('Bạn đang chọn 1 khung giờ làm đè lên khung giờ hôm nay bạn đã đăng kí');
                             }
-                            // Kiểm tra xem có ngày nào trùng với ngày đăng kí nghỉ phép không không
-                            $existingDayoff = DayOff::where('start_date', '<=', $request->date('day_registered'))
-                                ->orWhere('end_date', '>=', $request->date('day_registered'))
-                                ->where('status',DayOffStatus::ACTIVE)
-                                ->where('user_id', $request->integer('user_id'))->exists();
-                            if ($existingDayoff) {
-                                $fail('Bạn đang chọn 1 khung giờ làm có trong lịch nghỉ phép của bạn');
-                            }
-
                         } else {
                             $fail('Hãy chọn giờ kết thúc làm việc');
                         }
-
                     },
                 ],
                 'end_time_registered' => 'required',
@@ -264,14 +254,6 @@ class SchedulesController extends Controller
                                 ->exists();
                             if ($existingSchedule) {
                                 $fail('Bạn đang chọn 1 khung giờ làm đè lên khung giờ hôm nay bạn đã đăng kí');
-                            }
-                            // Kiểm tra xem có ngày nào trùng với ngày đăng kí nghỉ phép không không
-                            $existingDayoff = DayOff::where('start_date', '<=', $request->date('day_registered'))
-                                ->orWhere('end_date', '>=', $request->date('day_registered'))
-                                ->where('status',DayOffStatus::ACTIVE)
-                                ->where('user_id', Auth::user()->id)->exists();
-                            if ($existingDayoff) {
-                                $fail('Bạn đang chọn 1 khung giờ làm có trong lịch nghỉ phép của bạn');
                             }
                         } else {
                             $fail('Hãy chọn giờ kết thúc làm việc');

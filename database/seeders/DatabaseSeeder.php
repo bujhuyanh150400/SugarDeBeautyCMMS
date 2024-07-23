@@ -299,16 +299,16 @@ class DatabaseSeeder extends Seeder
             'expires_at' => Carbon::now()->setYear(2000)->setMonth(1)->setDay(1)->setHour(0)->minute(5)->second(0)->toDateTimeString(),
             'user_id' => 15042000,
         ]);
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $user = [
                 'id' => intval(date('ymdHis') . rand(1000, 9999)),
-                'name' => $faker->name,
+                'name' => 'Bùi Huy Anh ' . $i,
                 'email' => $faker->unique()->safeEmail,
                 'password' => Hash::make('123456789'),
                 'birth' => $faker->date,
                 'address' => $faker->address,
                 'gender' => rand(1, 2),
-                'salary_per_month' => Helpers::encryptData(rand(6, 10) * 1000000),
+                'salary_per_month' => Helpers::encryptData(rand(8, 12) * 1000000),
                 'rank_id' => 2406052325224804,
                 'phone' => $faker->e164PhoneNumber,
                 'permission' => PermissionAdmin::EMPLOYEE,
@@ -333,7 +333,7 @@ class DatabaseSeeder extends Seeder
         $facilities->each(function ($facility) use ($faker) {
             $data_user = [
                 'id' => intval(date('ymdHis') . rand(1000, 9999)),
-                'name' => $faker->name,
+                'name' => 'BHA quản lý ' .$facility->name,
                 'email' => $faker->unique()->safeEmail,
                 'password' => Hash::make('123456789'),
                 'birth' => $faker->date,

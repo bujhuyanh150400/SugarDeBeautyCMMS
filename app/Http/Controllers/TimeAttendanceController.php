@@ -124,7 +124,7 @@ class TimeAttendanceController extends Controller
             $query->whereDate('day_registered', '=', $today)
                 ->whereTime('start_time_registered', '<=', $time_allowed_go_soon)
                 ->whereTime('end_time_registered', '>=', $time_now)
-                ->where('status', '=', ScheduleStatus::WAIT);
+                ->whereIn('status', [ScheduleStatus::WAIT,ScheduleStatus::LATE]);
         })->orderBy('start_time_registered', 'asc')->first();
         if (empty($schedule)) {
             abort(404);

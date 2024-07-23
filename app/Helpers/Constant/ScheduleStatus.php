@@ -24,7 +24,7 @@ class ScheduleStatus
             ],
             self::CANCEL => [
                 'value' => self::CANCEL,
-                'text' => 'Chưa chấm công',
+                'text' => 'Bỏ làm',
                 'color' => 'red'
             ],
             self::WAIT => [

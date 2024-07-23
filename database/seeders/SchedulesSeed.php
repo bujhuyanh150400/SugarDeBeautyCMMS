@@ -56,7 +56,7 @@ class SchedulesSeed extends Seeder
                 ];
             }
             // Giả lập dữ liệu từ đầu tháng này đến hiện tại
-            foreach (collect(range(0, $daysInThisMonth - 1)) as $day) {
+            foreach (collect(range(0, $daysInThisMonth - 2)) as $day) {
                 $date = $startOfThisMonth->copy()->addDays($day);
                 $status = [ScheduleStatus::DONE, ScheduleStatus::LATE];
                 $randomStatus = $status[array_rand($status)];
